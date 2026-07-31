@@ -1,0 +1,13 @@
+## Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+## Node / Web
+node_modules/
+dist/
+.DS_Store
