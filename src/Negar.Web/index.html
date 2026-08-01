@@ -969,11 +969,25 @@
             <div class="card form-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div style="font-weight:700;font-size:0.95rem;">🌊 نمایش درختی و ساختار سلسله‌مراتبی حساب‌های شناور</div>
-                <button class="btn btn-primary" onclick="addShenavaar()">+ شناور جدید</button>
+                <button class="btn btn-outline" onclick="openAddShenavarRow()">+ شناور جدید</button>
               </div>
               <div class="table-wrapper">
-                <table><thead><tr><th>کد شناور</th><th>عنوان شناور</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+                <table><thead><tr><th style="width:36px;text-align:center;"></th><th>کد شناور</th><th>عنوان شناور</th><th>وضعیت</th><th>عملیات</th></tr></thead>
                 <tbody id="shenavaarTableBody"></tbody></table>
+              </div>
+              <div id="addShenavarRow" style="display:none;" class="inline-form">
+                <h4>افزودن حساب شناور جدید</h4>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newShenCode" class="form-input" /></div>
+                  <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newShenName" class="form-input" /></div>
+                  <div class="form-group"><label class="form-label">حساب شناور والد:</label>
+                    <select id="newShenParentId" class="form-select"><option value="">بدون والد (شناور اصلی)</option></select>
+                  </div>
+                  <div class="form-group" style="align-self:flex-end;">
+                    <button class="btn btn-primary" onclick="saveNewShenavar()">ذخیره</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('addShenavarRow').style.display='none'">لغو</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

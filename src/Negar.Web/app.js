@@ -196,8 +196,10 @@ const AppState = {
     { id: 13, code: '0550', name: 'هزینه اداری', type: 'کل', nature: 'بدهکار', parentId: 12 },
   ],
   shenavars: [
-    { id: 1, code: 'SH-101', name: 'پروژه احداث شعبه غرب', parent: '-', status: 'فعال' },
-    { id: 2, code: 'SH-102', name: 'مرکز هزینه کارخانه ۱', parent: '-', status: 'فعال' }
+    { id: 1, code: 'SH-101', name: 'پروژه احداث شعبه غرب', parentId: null, status: 'فعال' },
+    { id: 2, code: 'SH-102', name: 'مرکز هزینه کارخانه ۱', parentId: null, status: 'فعال' },
+    { id: 3, code: 'SH-101-01', name: 'فاز ۱ سازه بتنی', parentId: 1, status: 'فعال' },
+    { id: 4, code: 'SH-101-02', name: 'فاز ۲ محوطه‌سازی', parentId: 1, status: 'فعال' }
   ],
   sanads: [
     { id: 101, date: '1403/01/05', desc: 'سند افتتاحیه سال مالی', debit: 5000000000, credit: 5000000000, status: 'دائم' },
@@ -542,35 +544,107 @@ function deleteAccount(id) {
   }
 }
 
+// Set of expanded floating account IDs
+const expandedShenavarIds = new Set();
+
+function toggleShenavarExpand(shenId) {
+  if (expandedShenavarIds.has(shenId)) {
+    expandedShenavarIds.delete(shenId);
+  } else {
+    expandedShenavarIds.add(shenId);
+  }
+  renderShenavaarTable();
+}
+
+function getShenavarLevel(s) {
+  let level = 0;
+  let curr = s;
+  let visited = new Set();
+  while (curr && curr.parentId && !visited.has(curr.id)) {
+    visited.add(curr.id);
+    curr = AppState.shenavars.find(x => x.id === curr.parentId);
+    if (curr) level++;
+    else break;
+  }
+  return level;
+}
+
+function isShenavarVisible(s) {
+  let curr = s;
+  let visited = new Set();
+  while (curr && curr.parentId && !visited.has(curr.id)) {
+    visited.add(curr.id);
+    if (!expandedShenavarIds.has(curr.parentId)) return false;
+    curr = AppState.shenavars.find(x => x.id === curr.parentId);
+  }
+  return true;
+}
+
 function renderShenavaarTable() {
   const tbody = document.getElementById('shenavaarTableBody');
   if (!tbody) return;
-  tbody.innerHTML = AppState.shenavars.map(s => `
-    <tr>
-      <td><b>${s.code}</b></td>
-      <td>${s.name}</td>
-      <td>${s.parent}</td>
-      <td><span class="badge badge-success">${s.status}</span></td>
-      <td>
-        <button class="btn btn-outline" style="padding:3px 8px;">✏️</button>
-        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteShenavar('${s.code}')">🗑️</button>
-      </td>
-    </tr>
-  `).join('');
+
+  const visibleShenavars = AppState.shenavars.filter(isShenavarVisible);
+
+  tbody.innerHTML = visibleShenavars.map(s => {
+    const level = getShenavarLevel(s);
+    const hasChildren = AppState.shenavars.some(child => child.parentId === s.id);
+    const isExpanded = expandedShenavarIds.has(s.id);
+
+    const toggleBtnHtml = hasChildren
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleShenavarExpand(${s.id})">${isExpanded ? '-' : '+'}</button>`
+      : '';
+
+    const indentPx = level * 22;
+
+    return `
+      <tr class="tree-level-${Math.min(level, 3)}">
+        <td style="text-align:center;vertical-align:middle;">${toggleBtnHtml}</td>
+        <td><b>${s.code}</b></td>
+        <td style="padding-right:${indentPx + 10}px;">
+          ${level > 0 ? '<span style="color:var(--accent-color);margin-left:6px;">└─</span>' : ''}
+          <b>${s.name}</b>
+        </td>
+        <td><span class="badge badge-success">${s.status}</span></td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 8px;">✏️</button>
+          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteShenavar(${s.id})">🗑️</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
-function addShenavaar() {
-  const code = prompt('کد شناور جدید:');
-  const name = prompt('عنوان شناور:');
-  if (code && name) {
-    AppState.shenavars.push({ id: Date.now(), code, name, parent: '-', status: 'فعال' });
-    renderShenavaarTable();
+function openAddShenavarRow() {
+  const select = document.getElementById('newShenParentId');
+  if (select) {
+    select.innerHTML = '<option value="">بدون والد (شناور اصلی)</option>' +
+      AppState.shenavars.map(s => `<option value="${s.id}">${s.code} - ${s.name}</option>`).join('');
   }
+  document.getElementById('addShenavarRow').style.display = 'block';
+  document.getElementById('newShenCode').focus();
 }
 
-function deleteShenavar(code) {
+function saveNewShenavar() {
+  const code = document.getElementById('newShenCode')?.value?.trim();
+  const name = document.getElementById('newShenName')?.value?.trim();
+  const parentVal = document.getElementById('newShenParentId')?.value;
+  const parentId = parentVal ? Number(parentVal) : null;
+
+  if (!code || !name) { alert('کد و عنوان شناور الزامی است.'); return; }
+  if (AppState.shenavars.find(s => s.code === code)) { alert('این کد شناور قبلاً ثبت شده است.'); return; }
+
+  AppState.shenavars.push({ id: Date.now(), code, name, parentId, status: 'فعال' });
+  document.getElementById('newShenCode').value = '';
+  document.getElementById('newShenName').value = '';
+  document.getElementById('addShenavarRow').style.display = 'none';
+  renderShenavaarTable();
+  alert(`حساب شناور "${code} - ${name}" ثبت شد.`);
+}
+
+function deleteShenavar(id) {
   if (confirm('حذف این حساب شناور؟')) {
-    AppState.shenavars = AppState.shenavars.filter(s => s.code !== code);
+    AppState.shenavars = AppState.shenavars.filter(s => s.id !== id);
     renderShenavaarTable();
   }
 }

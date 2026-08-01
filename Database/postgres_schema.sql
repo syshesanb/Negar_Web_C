@@ -361,6 +361,17 @@ INSERT INTO "SarfaslHesab" ("CompanyID", "AccountCode", "AccountName", "AccountT
 (1, '022001', 'فروشندگان و تامین کنندگان', 'معین', 'بستانکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '0220'))
 ON CONFLICT ("CompanyID", "AccountCode") DO NOTHING;
 
+-- Seeding floating accounts with hierarchical parent-child relationships using subqueries
+INSERT INTO "SarfaslShenavar" ("CompanyID", "AccountCode", "AccountName", "ParentShenavarID") VALUES
+(1, 'SH-101', 'پروژه احداث شعبه غرب', NULL),
+(1, 'SH-102', 'مرکز هزینه کارخانه ۱', NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO "SarfaslShenavar" ("CompanyID", "AccountCode", "AccountName", "ParentShenavarID") VALUES
+(1, 'SH-101-01', 'فاز ۱ سازه بتنی', (SELECT "ShenavarID" FROM "SarfaslShenavar" WHERE "CompanyID" = 1 AND "AccountCode" = 'SH-101')),
+(1, 'SH-101-02', 'فاز ۲ محوطه‌سازی', (SELECT "ShenavarID" FROM "SarfaslShenavar" WHERE "CompanyID" = 1 AND "AccountCode" = 'SH-101'))
+ON CONFLICT DO NOTHING;
+
 INSERT INTO "AppSettings" ("SettingKey", "SettingValue", "SettingCategory") VALUES
 ('CurrentTheme', 'Blue', 'UI'),
 ('AllowNegativeStock', 'False', 'Inventory'),
