@@ -922,29 +922,42 @@ function deleteShenavar(id) {
 }
 
 // Sanad 1 (list)
+let selectedSanadId = null;
+
+function selectSanadRow(id) {
+  selectedSanadId = id;
+  renderSanadListTable();
+}
+
 function renderSanadListTable() {
   const tbody = document.getElementById('sanadListTable');
   if (!tbody) return;
-  tbody.innerHTML = AppState.sanads.map(s => `
-    <tr>
-      <td><b>#${s.id}</b></td>
-      <td>${s.date}</td>
-      <td>${s.desc}</td>
-      <td>${s.debit.toLocaleString()}</td>
-      <td>${s.credit.toLocaleString()}</td>
-      <td><span class="badge badge-success">متوازن ✅</span></td>
-      <td><span class="badge badge-primary">${s.status}</span></td>
-      <td>
-        <button class="btn btn-outline" style="padding:3px 8px;" onclick="editSanad(${s.id})">✏️ ویرایش</button>
-        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteSanad(${s.id})">🗑️ حذف</button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = AppState.sanads.map(s => {
+    const isSelected = (s.id === selectedSanadId);
+    const selectedClass = isSelected ? 'selected-parent-row' : '';
+
+    return `
+      <tr class="${selectedClass}" onclick="selectSanadRow(${s.id})" style="cursor:pointer;">
+        <td><b>#${s.id}</b></td>
+        <td>${s.date}</td>
+        <td>${s.desc}</td>
+        <td>${s.debit.toLocaleString()}</td>
+        <td>${s.credit.toLocaleString()}</td>
+        <td><span class="badge badge-success">متوازن ✅</span></td>
+        <td><span class="badge badge-primary">${s.status}</span></td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 8px;" onclick="event.stopPropagation(); editSanad(${s.id})">✏️ ویرایش</button>
+          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="event.stopPropagation(); deleteSanad(${s.id})">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function deleteSanad(id) {
   if (confirm(`حذف سند #${id}؟`)) {
     AppState.sanads = AppState.sanads.filter(s => s.id !== id);
+    if (selectedSanadId === id) selectedSanadId = null;
     renderSanadListTable();
   }
 }
@@ -952,6 +965,191 @@ function deleteSanad(id) {
 function editSanad(id) {
   showForm('form-sanad2');
   document.getElementById('sanadNumberInput').value = id;
+}
+
+function printVouchers() {
+  if (!selectedSanadId) {
+    alert('لطفاً ابتدا یک سند را از جدول انتخاب (کلیک) کنید.');
+    return;
+  }
+  const s = AppState.sanads.find(x => x.id === selectedSanadId);
+  if (!s) return;
+
+  const printWindow = window.open('', '_blank');
+  // Use dummy/default lines if no specific ones exist for this draft
+  const linesHtml = AppState.sanadLines.map((line, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td>${line.account}</td>
+      <td>حساب معین ${line.account}</td>
+      <td>${line.desc}</td>
+      <td style="text-align:left;">${line.debit.toLocaleString()}</td>
+      <td style="text-align:left;">${line.credit.toLocaleString()}</td>
+    </tr>
+  `).join('');
+
+  printWindow.document.write(`
+    <html dir="rtl">
+    <head>
+      <title>چاپ سند حسابداری #${s.id}</title>
+      <style>
+        body { font-family: Tahoma, Arial, sans-serif; padding: 20px; color: #000; background: #fff; font-size: 12px; }
+        .header-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+        .header-table td { border: none; padding: 4px; }
+        .voucher-title { font-size: 16px; font-weight: bold; text-align: center; margin: 10px 0; }
+        .main-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .main-table th, .main-table td { border: 1px solid #000; padding: 8px; text-align: right; }
+        .main-table th { background-color: #f2f2f2; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 20px; }
+        .sig-box { text-align: center; width: 20%; border-top: 1px dashed #000; padding-top: 8px; }
+        @media print {
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="no-print" style="margin-bottom: 20px; text-align: left;">
+        <button onclick="window.print()" style="padding: 8px 16px; font-size: 14px; cursor: pointer;">🖨️ چاپ سند</button>
+      </div>
+      <table class="header-table">
+        <tr>
+          <td style="width: 33%;"><b>شرکت:</b> شرکت نمونه نگار</td>
+          <td style="width: 33%; text-align: center;"><div class="voucher-title">سند حسابداری (Voucher)</div></td>
+          <td style="width: 33%; text-align: left;"><b>شماره سند:</b> #${s.id}<br><b>تاریخ سند:</b> ${s.date}</td>
+        </tr>
+        <tr>
+          <td colspan="3"><b>شرح کلی سند:</b> ${s.desc}</td>
+        </tr>
+      </table>
+      <table class="main-table">
+        <thead>
+          <tr>
+            <th style="width: 5%;">ردیف</th>
+            <th style="width: 15%;">کد معین/تفصیلی</th>
+            <th style="width: 25%;">عنوان حساب</th>
+            <th style="width: 35%;">شرح ردیف</th>
+            <th style="width: 10%;">بدهکار (ریال)</th>
+            <th style="width: 10%;">بستانکار (ریال)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${linesHtml}
+          <tr style="font-weight: bold; background-color: #f9f9f9;">
+            <td colspan="4" style="text-align: left;">جمع کل:</td>
+            <td style="text-align: left;">${s.debit.toLocaleString()}</td>
+            <td style="text-align: left;">${s.credit.toLocaleString()}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="signatures">
+        <div class="sig-box">تنظیم کننده</div>
+        <div class="sig-box">تایید کننده</div>
+        <div class="sig-box">مدیر مالی</div>
+        <div class="sig-box">مدیر عامل</div>
+      </div>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+
+function printJournalLedger() {
+  const printWindow = window.open('', '_blank');
+  let totalDebit = 0;
+  let totalCredit = 0;
+
+  const rowsHtml = AppState.sanads.map((s, idx) => {
+    totalDebit += s.debit;
+    totalCredit += s.credit;
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>#${s.id}</td>
+        <td>${s.date}</td>
+        <td>${s.desc}</td>
+        <td style="text-align:left;">${s.debit.toLocaleString()}</td>
+        <td style="text-align:left;">${s.credit.toLocaleString()}</td>
+        <td>${s.status}</td>
+      </tr>
+    `;
+  }).join('');
+
+  printWindow.document.write(`
+    <html dir="rtl">
+    <head>
+      <title>چاپ دفتر روزنامه</title>
+      <style>
+        body { font-family: Tahoma, Arial, sans-serif; padding: 20px; color: #000; background: #fff; font-size: 12px; }
+        .title { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 20px; }
+        .main-table { width: 100%; border-collapse: collapse; }
+        .main-table th, .main-table td { border: 1px solid #000; padding: 8px; text-align: right; }
+        .main-table th { background-color: #f2f2f2; }
+        @media print {
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="no-print" style="margin-bottom: 20px; text-align: left;">
+        <button onclick="window.print()" style="padding: 8px 16px; font-size: 14px; cursor: pointer;">🖨️ چاپ دفتر روزنامه</button>
+      </div>
+      <div class="title">دفتر روزنامه اسناد حسابداری - شرکت نمونه نگار</div>
+      <table class="main-table">
+        <thead>
+          <tr>
+            <th style="width: 5%;">ردیف</th>
+            <th style="width: 10%;">شماره سند</th>
+            <th style="width: 15%;">تاریخ</th>
+            <th style="width: 40%;">شرح سند</th>
+            <th style="width: 10%;">جمع بدهکار (ریال)</th>
+            <th style="width: 10%;">جمع بستانکار (ریال)</th>
+            <th style="width: 10%;">وضعیت</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          <tr style="font-weight: bold; background-color: #f2f2f2;">
+            <td colspan="4" style="text-align: left;">جمع کل دفتر:</td>
+            <td style="text-align: left;">${totalDebit.toLocaleString()}</td>
+            <td style="text-align: left;">${totalCredit.toLocaleString()}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+
+function copyActiveVoucher() {
+  if (!selectedSanadId) {
+    alert('لطفاً ابتدا یک سند را از جدول انتخاب (کلیک) کنید.');
+    return;
+  }
+  const source = AppState.sanads.find(x => x.id === selectedSanadId);
+  if (!source) return;
+
+  if (confirm(`آیا مایلید سند #${source.id} را کپی کنید؟`)) {
+    const newId = Math.max(...AppState.sanads.map(s => s.id)) + 1;
+    const todayStr = (PersianCal && typeof PersianCal.getTodayString === 'function') 
+      ? PersianCal.getTodayString() 
+      : '1403/05/11';
+
+    const newVoucher = {
+      id: newId,
+      date: todayStr,
+      desc: `کپی از سند #${source.id} - ${source.desc}`,
+      debit: source.debit,
+      credit: source.credit,
+      status: 'موقت'
+    };
+
+    AppState.sanads.push(newVoucher);
+    selectedSanadId = newId; // Select the copied one
+    renderSanadListTable();
+    alert(`سند #${source.id} با موفقیت به سند جدید #${newId} کپی گردید.`);
+  }
 }
 
 // Sanad 2 (editor)

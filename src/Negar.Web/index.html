@@ -997,8 +997,11 @@
             <div class="card form-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div style="font-weight:700;font-size:0.95rem;">📝 ثبت و مدیریت اسناد حسابداری</div>
-                <div style="display:flex;gap:8px;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   <button class="btn btn-primary" onclick="showForm('form-sanad2')">+ ثبت سند جدید</button>
+                  <button class="btn btn-outline" onclick="printVouchers()">🖨️ چاپ اسناد</button>
+                  <button class="btn btn-outline" onclick="printJournalLedger()">📖 چاپ دفتر روزنامه</button>
+                  <button class="btn btn-outline" onclick="copyActiveVoucher()">📋 کپی سند</button>
                   <button class="btn btn-outline" onclick="showForm('form-sanad-merge')">🔗 ادغام اسناد</button>
                   <button class="btn btn-outline" onclick="showForm('form-sanad-split')">✂️ تفکیک سند</button>
                 </div>
