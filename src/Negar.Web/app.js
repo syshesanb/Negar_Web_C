@@ -613,11 +613,30 @@ function openAddAccountRow() {
     inputCode.value = suggestNextAccountCode(targetType, targetParentId);
   }
   
+  // Dynamically update the inline form heading with reset option if a parent is selected
+  const heading = document.querySelector('#addAccountRow h4');
+  if (heading) {
+    if (currentParentIdForNewAccount !== null) {
+      const parentAcc = AppState.accounts.find(a => a.id === currentParentIdForNewAccount);
+      const parentName = parentAcc ? parentAcc.name : '';
+      heading.innerHTML = `افزودن حساب جدید <span style="font-size:0.85rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(به عنوان فرزندِ "${parentName}")</span> 
+        <button class="btn btn-outline" style="padding:2px 8px;font-size:0.75rem;margin-right:12px;color:var(--text-muted);border-color:rgba(255,255,255,0.15);" onclick="resetParentSelectionForNewAccount(event)">🔄 ایجاد به عنوان حساب اصلی (گروه)</button>`;
+    } else {
+      heading.innerHTML = `افزودن حساب جدید <span style="font-size:0.85rem;color:var(--text-muted);font-weight:normal;margin-right:6px;">(به عنوان حساب اصلی / گروه)</span>`;
+    }
+  }
+
   // Highlight the table to show current selection
   renderAccountsTable();
 
   document.getElementById('addAccountRow').style.display = 'block';
   document.getElementById('newAccName').focus();
+}
+
+function resetParentSelectionForNewAccount(e) {
+  if (e) e.preventDefault();
+  currentParentIdForNewAccount = null;
+  openAddAccountRow();
 }
 
 function saveNewAccount() {
