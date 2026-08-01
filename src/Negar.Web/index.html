@@ -3,1004 +3,344 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>نرم‌افزار جامع مدیریت نگار تحت وب (C# & PostgreSQL)</title>
+  <title>سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- Sidebar Navigation -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand-header">
-      <div class="brand-logo">N</div>
-      <div>
-        <div class="brand-title">نگار تحت وب</div>
-        <div class="brand-subtitle">سیستم جامع مالی، انبار و ERP</div>
+  <!-- Top Desktop Header Bar -->
+  <header class="desktop-header">
+    <div class="title-bar">
+      <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب (C# & PostgreSQL)</div>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <span>کاربر: <b>ابر مدیر (admin)</b></span>
+        <span>شرکت: <b>شرکت نمونه نگار</b></span>
+        <span>سال مالی: <b>۱۴۰۳</b></span>
       </div>
     </div>
 
-    <nav class="nav-menu">
-      <div class="nav-section-title">اصلی و داشبورد</div>
-      <div class="nav-item active" onclick="switchView('dashboard')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-        <span>داشبورد و هوش تجاری (BI)</span>
+    <!-- Main Module Ribbon matching Desktop Negar Navigation Ribbon -->
+    <nav class="main-modules-ribbon" id="ribbonNav">
+      <div class="ribbon-tab active" onclick="switchRibbon('system')">
+        <span class="ribbon-icon">⚙️</span>
+        <span>سیستم</span>
       </div>
-
-      <div class="nav-section-title">ماژول حسابداری (Hesabdary)</div>
-      <div class="nav-item" onclick="switchView('accounting-coding')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        <span>کدگذاری سرفصل حساب‌ها</span>
+      <div class="ribbon-tab" onclick="switchRibbon('users')">
+        <span class="ribbon-icon">👥</span>
+        <span>کاربران</span>
       </div>
-      <div class="nav-item" onclick="switchView('accounting-shenavar')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-        <span>حساب‌های شناور (Shenavar)</span>
+      <div class="ribbon-tab" onclick="switchRibbon('companies')">
+        <span class="ribbon-icon">🏢</span>
+        <span>شرکت‌ها و سال‌ها</span>
       </div>
-      <div class="nav-item" onclick="switchView('accounting-sanad')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
-        <span>ثبت و مدیریت اسناد (Sanad 1 & 2)</span>
+      <div class="ribbon-tab" onclick="switchRibbon('accounting')">
+        <span class="ribbon-icon">📊</span>
+        <span>حسابداری</span>
       </div>
-      <div class="nav-item" onclick="switchView('accounting-bank')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-        <span>موجودیت نقد، بانک و مغایرت‌گیری</span>
+      <div class="ribbon-tab" onclick="switchRibbon('inventory')">
+        <span class="ribbon-icon">📦</span>
+        <span>خرید و فروش و انبارداری</span>
       </div>
-      <div class="nav-item" onclick="switchView('accounting-reports')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-        <span>دفاتر و تراز آزمایشی (۴ و ۸ ستونی)</span>
+      <div class="ribbon-tab" onclick="switchRibbon('payroll')">
+        <span class="ribbon-icon">👔</span>
+        <span>حقوق و دستمزد</span>
       </div>
-      <div class="nav-item" onclick="switchView('financial-statements')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path></svg>
-        <span>صورت‌های مالی (ترازنامه و سود/زیان)</span>
+      <div class="ribbon-tab" onclick="switchRibbon('assets')">
+        <span class="ribbon-icon">🏛</span>
+        <span>اموال</span>
       </div>
-
-      <div class="nav-section-title">ماژول انبارداری و کالا (Anbardary)</div>
-      <div class="nav-item" onclick="switchView('inventory-groups')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-        <span>گروه‌بندی کالاها (درختی)</span>
+      <div class="ribbon-tab" onclick="switchRibbon('automation')">
+        <span class="ribbon-icon">✉️</span>
+        <span>اتوماسیون اداری</span>
       </div>
-      <div class="nav-item" onclick="switchView('inventory-products')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-        <span>تعریف کالاها و واحدها</span>
+      <div class="ribbon-tab" onclick="switchRibbon('crm')">
+        <span class="ribbon-icon">🤝</span>
+        <span>باشگاه مشتریان</span>
       </div>
-      <div class="nav-item" onclick="switchView('inventory-warehouses')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="22" height="13" rx="2" ry="2"></rect></svg>
-        <span>تعریف انبارها و جانمایی</span>
+      <div class="ribbon-tab" onclick="switchRibbon('treasury')">
+        <span class="ribbon-icon">💰</span>
+        <span>خزانه‌داری</span>
       </div>
-      <div class="nav-item" onclick="switchView('inventory-stock')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
-        <span>کاردکس و موجودی انبار</span>
+      <div class="ribbon-tab" onclick="switchRibbon('budget')">
+        <span class="ribbon-icon">📈</span>
+        <span>بودجه و هزینه</span>
       </div>
-      <div class="nav-item" onclick="switchView('inventory-transfer')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path></svg>
-        <span>انتقال بین انبارها و رسیدها</span>
+      <div class="ribbon-tab" onclick="switchRibbon('production')">
+        <span class="ribbon-icon">🏭</span>
+        <span>تولید و بهای تمام‌شده</span>
       </div>
-      <div class="nav-item" onclick="switchView('modyan-system')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 15h0M12 15h0M17 15h0"></path></svg>
-        <span>سامانه مودیان مالیاتی</span>
+      <div class="ribbon-tab" onclick="switchRibbon('projects')">
+        <span class="ribbon-icon">🏗</span>
+        <span>پروژه‌ها و پیمان‌ها</span>
       </div>
-
-      <div class="nav-section-title">خرید، فروش و طرف حساب‌ها</div>
-      <div class="nav-item" onclick="switchView('invoices-purchase')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
-        <span>فاکتورهای خرید</span>
-      </div>
-      <div class="nav-item" onclick="switchView('invoices-sales')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
-        <span>فاکتورهای فروش</span>
-      </div>
-      <div class="nav-item" onclick="switchView('vendors-customers')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-        <span>تامین‌کنندگان و مشتریان</span>
-      </div>
-
-      <div class="nav-section-title">ماژول‌های سازمانی و تخصصی نگار</div>
-      <div class="nav-item" onclick="switchView('treasury-checks')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect></svg>
-        <span>خزانه‌داری و مدیریت چک‌ها</span>
-      </div>
-      <div class="nav-item" onclick="switchView('payroll-personnel')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path></svg>
-        <span>حقوق، دستمزد و پرسنل (Payroll)</span>
-      </div>
-      <div class="nav-item" onclick="switchView('fixed-assets')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-        <span>اموال و دارایی‌های ثابت (Amval)</span>
-      </div>
-      <div class="nav-item" onclick="switchView('crm-module')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path></svg>
-        <span>ارتباط با مشتریان (CRM)</span>
-      </div>
-      <div class="nav-item" onclick="switchView('automation-dms')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
-        <span>اتوماسیون اداری و بایگانی اسناد</span>
-      </div>
-      <div class="nav-item" onclick="switchView('production-pm')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
-        <span>مدیریت تولید، PM و کنترل کیفیت</span>
-      </div>
-      <div class="nav-item" onclick="switchView('saham-budget')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line></svg>
-        <span>امور سهام، بودجه و حقوقی</span>
-      </div>
-
-      <div class="nav-section-title">مدیریت سیستم و تنظیمات</div>
-      <div class="nav-item" onclick="switchView('users-permissions')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path></svg>
-        <span>کاربران و ماتریس دسترسی‌ها</span>
-      </div>
-      <div class="nav-item" onclick="switchView('companies-years')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"></rect></svg>
-        <span>شرکت‌ها و سال‌های مالی</span>
-      </div>
-      <div class="nav-item" onclick="switchView('backup-restore')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-        <span>پشتیبان‌گیری و بازگردانی (Backup)</span>
-      </div>
-      <div class="nav-item" onclick="switchView('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle></svg>
-        <span>تنظیمات عمومی و تم سیستم</span>
+      <div class="ribbon-tab" onclick="switchRibbon('kpi')">
+        <span class="ribbon-icon">🎯</span>
+        <span>ارزیابی عملکرد و KPI</span>
       </div>
     </nav>
-  </aside>
+  </header>
 
-  <!-- Main Application Area -->
-  <div class="main-wrapper">
-    <header class="top-navbar">
-      <div class="company-selector">
-        <span style="font-size:0.85rem; color:var(--text-muted);">شرکت:</span>
-        <select class="select-pill" id="activeCompanySelect">
-          <option value="1">شرکت نمونه نگار (کد: ۱۰۰۱)</option>
-        </select>
-        <span style="font-size:0.85rem; color:var(--text-muted); margin-right:12px;">سال مالی:</span>
-        <select class="select-pill" id="activeFiscalYearSelect">
-          <option value="1">۱۴۰۳ (فعال)</option>
-        </select>
-      </div>
-
-      <div class="user-profile">
-        <button class="theme-toggle-btn" onclick="toggleTheme()">
-          <span>🎨 تم: <b id="themeLabel">آبی</b></span>
-        </button>
-        <div style="text-align: left;">
-          <div style="font-weight:700; font-size:0.9rem;" id="userNameDisplay">مدیر ارشد سیستم (admin)</div>
-          <div style="font-size:0.75rem; color:var(--text-muted);" id="userRoleDisplay">SuperAdmin</div>
-        </div>
-        <div class="avatar-badge">م</div>
-      </div>
-    </header>
-
-    <main class="content-body">
+  <!-- Main View Container -->
+  <div class="app-container">
+    <main class="main-content">
       
-      <!-- 1. Dashboard View -->
-      <section id="view-dashboard" class="view-section active">
-        <h2 style="margin-bottom: 20px; font-weight:800;">داشبورد جامع مدیریت و هوش تجاری نگار (BI)</h2>
-        
-        <div class="grid-4">
-          <div class="card stat-card">
-            <div>
-              <div class="stat-label">کل اسناد حسابداری</div>
-              <div class="stat-number" id="statSanadCount">۱۴۸</div>
-            </div>
-            <div style="background:var(--accent-light); padding:12px; border-radius:12px; color:var(--accent-color);">📄</div>
-          </div>
-          <div class="card stat-card">
-            <div>
-              <div class="stat-label">فروش سال جاری (ریال)</div>
-              <div class="stat-number" id="statSalesAmount">۴,۲۵۰,۰۰۰,۰۰۰</div>
-            </div>
-            <div style="background:rgba(16,185,129,0.15); padding:12px; border-radius:12px; color:#10b981;">💰</div>
-          </div>
-          <div class="card stat-card">
-            <div>
-              <div class="stat-label">تعداد کالاهای فعال</div>
-              <div class="stat-number" id="statProductCount">۳۵۰</div>
-            </div>
-            <div style="background:rgba(245,158,11,0.15); padding:12px; border-radius:12px; color:#f59e0b;">📦</div>
-          </div>
-          <div class="card stat-card">
-            <div>
-              <div class="stat-label">توازن عمومی اسناد</div>
-              <div class="stat-number" style="color:#10b981; font-size:1.4rem;">متوازن ✅</div>
-            </div>
-            <div style="background:var(--accent-light); padding:12px; border-radius:12px; color:var(--accent-color);">⚖️</div>
-          </div>
-        </div>
+      <!-- 1. MODULE: SYSTEM (سیستم) - Matching Desktop Image 1 Tiles -->
+      <section id="module-system" class="view-section active">
+        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت سیستم نگار</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">عملیات اصلی سیستم، پشتیبان‌گیری، تبدیل اطلاعات و تنظیمات برنامه</p>
 
-        <div class="card">
-          <h3 style="margin-bottom:16px;">آخرین اسناد و تراکنش‌های صادر شده در نگار</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره سند</th>
-                  <th>تاریخ</th>
-                  <th>شرح کلی سند</th>
-                  <th>جمع بدهکار (ریال)</th>
-                  <th>جمع بستانکار (ریال)</th>
-                  <th>وضعیت سند</th>
-                </tr>
-              </thead>
-              <tbody id="recentSanadTable">
-                <tr>
-                  <td>#۱۰۴۲</td>
-                  <td>۱۴۰۳/۰۵/۱۰</td>
-                  <td>ثبت فاکتور فروش شماره فروشگاه مرکزی</td>
-                  <td>۱۲۵,۰۰۰,۰۰۰</td>
-                  <td>۱۲۵,۰۰۰,۰۰۰</td>
-                  <td><span class="badge badge-success">تایید شده</span></td>
-                </tr>
-                <tr>
-                  <td>#۱۰۴۱</td>
-                  <td>۱۴۰۳/۰۵/۰۹</td>
-                  <td>پرداخت قبوض و هزینه‌های اداری شرکت</td>
-                  <td>۴۵,۰۰۰,۰۰۰</td>
-                  <td>۴۵,۰۰۰,۰۰۰</td>
-                  <td><span class="badge badge-primary">موقت</span></td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="tiles-grid">
+          
+          <div class="tile-card" onclick="alert('تبدیل دیتا از سایر نرم‌افزارها')">
+            <div class="tile-icon-box tile-orange">🔀</div>
+            <div class="tile-title">تبدیل دیتا از سایر نرم‌افزارها</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('مدیریت پیام‌های سیستم')">
+            <div class="tile-icon-box tile-gray">💬</div>
+            <div class="tile-title">مدیریت پیامهای : درباره... و ارتباط با ما</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('مدیریت تم‌های برنامه')">
+            <div class="tile-icon-box tile-gray">🎨</div>
+            <div class="tile-title">مدیریت تمهای برنامه و فرمها</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('پشتیبان‌گیری اطلاعات انجام شد')">
+            <div class="tile-icon-box tile-green">💾</div>
+            <div class="tile-title">پشتیبان‌گیری اطلاعات</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('بازیابی اطلاعات')">
+            <div class="tile-icon-box tile-orange">🔄</div>
+            <div class="tile-title">بازیابی اطلاعات</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('ایجاد نسخه فایل انتشار')">
+            <div class="tile-icon-box tile-green">⬇️</div>
+            <div class="tile-title">ایجاد نسخه فایل انتشار</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('ایجاد بسته به‌روزرسانی')">
+            <div class="tile-icon-box tile-purple">⬆️</div>
+            <div class="tile-title">ایجاد بسته به‌روزرسانی</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('خروجی دیتابیس بازرسی')">
+            <div class="tile-icon-box tile-blue">🗄️</div>
+            <div class="tile-title">خروجی دیتابیس (بازرسی)</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('برنامه قفل شد')">
+            <div class="tile-icon-box tile-yellow">🔒</div>
+            <div class="tile-title">قفل موقت برنامه</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('نرم‌افزار نگار نسخه وبی v1.0')">
+            <div class="tile-icon-box tile-blue">ℹ️</div>
+            <div class="tile-title">درباره...</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('ارتباط با پشتیبانی نگار: 021-88888888')">
+            <div class="tile-icon-box tile-blue">👤</div>
+            <div class="tile-title">ارتباط با ما</div>
+          </div>
+
+          <div class="tile-card" onclick="alert('خروج از سیستم')">
+            <div class="tile-icon-box tile-red">🚪</div>
+            <div class="tile-title">خروج</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 2. MODULE: USERS (کاربران) -->
+      <section id="module-users" class="view-section">
+        <h2 style="margin-bottom: 16px;">مدیریت کاربران و سطوح دسترسی</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('مدیریت کاربران')">
+            <div class="tile-icon-box tile-blue">👥</div>
+            <div class="tile-title">مدیریت کاربران سیستم</div>
+          </div>
+          <div class="tile-card" onclick="alert('ماتریس دسترسی‌ها')">
+            <div class="tile-icon-box tile-green">🔑</div>
+            <div class="tile-title">ماتریس سطوح دسترسی</div>
+          </div>
+          <div class="tile-card" onclick="alert('تغییر رمز عبور')">
+            <div class="tile-icon-box tile-yellow">🔒</div>
+            <div class="tile-title">تغییر رمز عبور کاربر</div>
           </div>
         </div>
       </section>
 
-      <!-- 2. Accounting Coding (Sarfasl Hesab) -->
-      <section id="view-accounting-coding" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>کدگذاری سرفصل حساب‌ها (گروه، کل، معین، تفصیلی)</h2>
-          <button class="btn btn-primary" onclick="openModal('addAccountModal')">+ تعریف حساب جدید</button>
-        </div>
-
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد حساب</th>
-                  <th>عنوان حساب</th>
-                  <th>سطح حساب</th>
-                  <th>ماهیت حساب</th>
-                  <th>حساب والد</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="accountsTableBody">
-                <tr>
-                  <td><b>1</b></td>
-                  <td><b>دارایی‌های جاری</b></td>
-                  <td><span class="badge badge-primary">گروه</span></td>
-                  <td>بدهکار</td>
-                  <td>-</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش</button></td>
-                </tr>
-                <tr>
-                  <td>10</td>
-                  <td>موجودی نقد و بانک</td>
-                  <td><span class="badge badge-warning">کل</span></td>
-                  <td>بدهکار</td>
-                  <td>1 (دارایی‌های جاری)</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش</button></td>
-                </tr>
-                <tr>
-                  <td>1001</td>
-                  <td>صندوق مرکزی</td>
-                  <td><span class="badge badge-success">معین</span></td>
-                  <td>بدهکار</td>
-                  <td>10 (موجودی نقد و بانک)</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش</button></td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- 3. MODULE: COMPANIES (شرکت‌ها و سال‌ها) -->
+      <section id="module-companies" class="view-section">
+        <h2 style="margin-bottom: 16px;">مدیریت شرکت‌ها و سال‌های مالی</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('مدیریت شرکت‌ها')">
+            <div class="tile-icon-box tile-blue">🏢</div>
+            <div class="tile-title">تعریف و مدیریت شرکت‌ها</div>
+          </div>
+          <div class="tile-card" onclick="alert('سال‌های مالی')">
+            <div class="tile-icon-box tile-green">📅</div>
+            <div class="tile-title">مدیریت سال‌های مالی</div>
+          </div>
+          <div class="tile-card" onclick="alert('انتخاب شرکت فعال')">
+            <div class="tile-icon-box tile-purple">🔄</div>
+            <div class="tile-title">تغییر شرکت / سال مالی فعال</div>
           </div>
         </div>
       </section>
 
-      <!-- 3. Floating Accounts (Shenavar) -->
-      <section id="view-accounting-shenavar" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>کدگذاری حساب‌های شناور (Shenavar Accounts)</h2>
-          <button class="btn btn-primary" onclick="alert('تعریف حساب شناور جدید')">+ افزودن حساب شناور</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد شناور</th>
-                  <th>عنوان حساب شناور</th>
-                  <th>حساب والد شناور</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>SH-101</td>
-                  <td>پروژه احداث شعبه غرب</td>
-                  <td>-</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش</button></td>
-                </tr>
-                <tr>
-                  <td>SH-102</td>
-                  <td>مرکز هزینه کارخانه شماره ۱</td>
-                  <td>-</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش</button></td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- 4. MODULE: ACCOUNTING (حسابداری) -->
+      <section id="module-accounting" class="view-section">
+        <h2 style="margin-bottom: 16px;">ماژول حسابداری (Hesabdary)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('سرفصل حساب‌ها')">
+            <div class="tile-icon-box tile-blue">📑</div>
+            <div class="tile-title">کدگذاری سرفصل حساب‌ها (درختی)</div>
+          </div>
+          <div class="tile-card" onclick="alert('حساب‌های شناور')">
+            <div class="tile-icon-box tile-purple">🌊</div>
+            <div class="tile-title">کدگذاری حساب‌های شناور</div>
+          </div>
+          <div class="tile-card" onclick="alert('ثبت اسناد حسابداری')">
+            <div class="tile-icon-box tile-green">📝</div>
+            <div class="tile-title">ثبت و مدیریت اسناد حسابداری</div>
+          </div>
+          <div class="tile-card" onclick="alert('دفاتر حسابداری')">
+            <div class="tile-icon-box tile-yellow">📖</div>
+            <div class="tile-title">دفاتر کل، معین و روزنامه</div>
+          </div>
+          <div class="tile-card" onclick="alert('تراز آزمایشی')">
+            <div class="tile-icon-box tile-orange">⚖️</div>
+            <div class="tile-title">تراز آزمایشی (۴ و ۸ ستونی)</div>
+          </div>
+          <div class="tile-card" onclick="alert('صورت‌های مالی')">
+            <div class="tile-icon-box tile-blue">📊</div>
+            <div class="tile-title">ترازنامه و صورت سود و زیان</div>
           </div>
         </div>
       </section>
 
-      <!-- 4. Sanad Registration & Management -->
-      <section id="view-accounting-sanad" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>ثبت و مدیریت اسناد حسابداری (Sanad 1 & Sanad 2)</h2>
-          <div style="display:flex; gap:10px;">
-            <button class="btn btn-outline" onclick="openModal('mergeSanadModal')">🔗 ادغام اسناد</button>
-            <button class="btn btn-outline" onclick="openModal('splitSanadModal')">✂️ تفکیک سند</button>
-            <button class="btn btn-primary" onclick="openModal('newSanadModal')">+ ثبت سند حسابداری جدید</button>
+      <!-- 5. MODULE: INVENTORY (خرید، فروش و انبارداری) -->
+      <section id="module-inventory" class="view-section">
+        <h2 style="margin-bottom: 16px;">خرید، فروش و انبارداری (Anbardary)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('تعریف کالاها')">
+            <div class="tile-icon-box tile-blue">📦</div>
+            <div class="tile-title">تعریف کالاها و گروه‌بندی</div>
           </div>
-        </div>
-
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره سند</th>
-                  <th>تاریخ سند</th>
-                  <th>شرح کلی سند</th>
-                  <th>جمع بدهکار</th>
-                  <th>جمع بستانکار</th>
-                  <th>توازن</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="sanadListTable">
-                <tr>
-                  <td>۱۰۱</td>
-                  <td>۱۴۰۳/۰۱/۰۵</td>
-                  <td>ثبت سند افتتاحیه سال مالی جدید</td>
-                  <td>۵,۰۰۰,۰۰۰,۰۰۰</td>
-                  <td>۵,۰۰۰,۰۰۰,۰۰۰</td>
-                  <td><span class="badge badge-success">متوازن</span></td>
-                  <td><span class="badge badge-success">دائم</span></td>
-                  <td>
-                    <button class="btn btn-outline" style="padding:4px 8px;">ویرایش / نمایش</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="tile-card" onclick="alert('انبارها')">
+            <div class="tile-icon-box tile-green">🏭</div>
+            <div class="tile-title">تعریف انبارها و قفسه‌ها</div>
+          </div>
+          <div class="tile-card" onclick="alert('موجودی انبار')">
+            <div class="tile-icon-box tile-orange">📊</div>
+            <div class="tile-title">کاردکس و موجودی انبارها</div>
+          </div>
+          <div class="tile-card" onclick="alert('فاکتور خرید')">
+            <div class="tile-icon-box tile-purple">📥</div>
+            <div class="tile-title">فاکتورهای خرید</div>
+          </div>
+          <div class="tile-card" onclick="alert('فاکتور فروش')">
+            <div class="tile-icon-box tile-green">📤</div>
+            <div class="tile-title">فاکتورهای فروش</div>
+          </div>
+          <div class="tile-card" onclick="alert('انتقال بین انبارها')">
+            <div class="tile-icon-box tile-yellow">🔄</div>
+            <div class="tile-title">انتقال بین انبارها</div>
           </div>
         </div>
       </section>
 
-      <!-- 5. Bank Reconciliation & Cash -->
-      <section id="view-accounting-bank" class="view-section">
-        <h2 style="margin-bottom:20px;">موجودیت نقد، حساب‌های بانکی و مغایرت‌گیری</h2>
-        <div class="card">
-          <h3>صورت حساب‌های بانکی و تراکنش‌ها</h3>
-          <div class="table-wrapper" style="margin-top:12px;">
-            <table>
-              <thead>
-                <tr>
-                  <th>نام بانک / حساب</th>
-                  <th>شماره حساب</th>
-                  <th>موجودیت فعلی (ریال)</th>
-                  <th>وضعیت مغایرت‌گیری</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>بانک ملی شعبه مرکزی</td>
-                  <td>۰۱۰۴۵۸۹۶۳۲۰۰۱</td>
-                  <td>۲,۴۵۰,۰۰۰,۰۰۰</td>
-                  <td><span class="badge badge-success">مغایرت‌گیری شده ✅</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ثبت صورت‌حساب بانک</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- OTHER MODULE TILES (Payroll, Assets, Automation, CRM, Treasury, Budget, Production, Projects, KPI) -->
+      <section id="module-payroll" class="view-section">
+        <h2>حقوق و دستمزد (Payroll)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('مدیریت پرسنل')"><div class="tile-icon-box tile-blue">👔</div><div class="tile-title">پرونده پرسنلی و حکم حقوقی</div></div>
         </div>
       </section>
 
-      <!-- 6. Accounting Reports -->
-      <section id="view-accounting-reports" class="view-section">
-        <h2 style="margin-bottom:20px;">دفاتر حسابداری و ترازهای آزمایشی</h2>
-        <div class="grid-4">
-          <div class="card" onclick="alert('نمایش دفتر روزنامه')" style="cursor:pointer;">
-            <h3>📖 دفتر روزنامه</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">گزارش کلیه تراکنش‌ها به ترتیب تاریخ</p>
-          </div>
-          <div class="card" onclick="alert('نمایش دفتر کل')" style="cursor:pointer;">
-            <h3>📘 دفتر کل</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">گردش حساب‌های سطح کل</p>
-          </div>
-          <div class="card" onclick="alert('نمایش دفتر معین')" style="cursor:pointer;">
-            <h3>📗 دفتر معین</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">گردش تفکیکی حساب‌های معین</p>
-          </div>
-          <div class="card" onclick="alert('نمایش تراز آزمایشی')" style="cursor:pointer;">
-            <h3>⚖️ تراز آزمایشی ۲، ۴، ۶ و ۸ ستونی</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">بررسی مانده و گردش حساب‌ها</p>
-          </div>
+      <section id="module-assets" class="view-section">
+        <h2>اموال و دارایی‌های ثابت (Amval)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('اموال')"><div class="tile-icon-box tile-orange">🏛</div><div class="tile-title">ثبت اموال و محاسبه استهلاک</div></div>
         </div>
       </section>
 
-      <!-- 7. Financial Statements -->
-      <section id="view-financial-statements" class="view-section">
-        <h2 style="margin-bottom:20px;">صورت‌های مالی (ترازنامه و سود و زیان)</h2>
-        <div class="grid-4">
-          <div class="card" style="grid-column: span 2;">
-            <h3>📊 ترازنامه (Balance Sheet)</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">دارایی‌ها = بدهی‌ها + حقوق صاحبان سهام</p>
-            <div style="margin-top:16px; padding:16px; background:var(--bg-primary); border-radius:8px;">
-              <div>جمع دارایی‌ها: <b>۱۲,۵۰۰,۰۰۰,۰۰۰ ریال</b></div>
-              <div style="margin-top:8px;">جمع بدهی‌ها و حقوق سهامداران: <b>۱۲,۵۰۰,۰۰۰,۰۰۰ ریال</b></div>
-            </div>
-          </div>
-
-          <div class="card" style="grid-column: span 2;">
-            <h3>📈 صورت سود و زیان (Profit & Loss)</h3>
-            <p style="color:var(--text-muted); margin-top:8px;">درآمدها - بهای تمام شده - هزینه‌ها</p>
-            <div style="margin-top:16px; padding:16px; background:var(--bg-primary); border-radius:8px;">
-              <div>درآمد فروش: <b>۴,۲۵۰,۰۰۰,۰۰۰ ریال</b></div>
-              <div style="margin-top:4px; color:var(--danger-color);">بهای تمام شده: <b>(۲,۱۰۰,۰۰۰,۰۰۰) ریال</b></div>
-              <div style="margin-top:8px; border-top:1px solid var(--border-color); padding-top:8px;">سود خالص: <b style="color:var(--success-color);">۲,۱۵۰,۰۰۰,۰۰۰ ریال</b></div>
-            </div>
-          </div>
+      <section id="module-automation" class="view-section">
+        <h2>اتوماسیون اداری (Automation)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('اتوماسیون')"><div class="tile-icon-box tile-purple">✉️</div><div class="tile-title">مکاتبات اداری و دبیرخانه</div></div>
         </div>
       </section>
 
-      <!-- 8. Inventory Product Groups -->
-      <section id="view-inventory-groups" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>تعریف و مدیریت گروه‌بندی کالاها (درختی)</h2>
-          <button class="btn btn-primary" onclick="alert('تعریف گروه کالا')">+ افزودن گروه کالا</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد گروه</th>
-                  <th>عنوان گروه کالا</th>
-                  <th>سطح</th>
-                  <th>گروه مادر</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>GRP-10</td>
-                  <td>تجهیزات الکترونیکی</td>
-                  <td>۱</td>
-                  <td>-</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                </tr>
-                <tr>
-                  <td>GRP-1001</td>
-                  <td>لپ‌تاپ و قطعات جانبی</td>
-                  <td>۲</td>
-                  <td>تجهیزات الکترونیکی</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <section id="module-crm" class="view-section">
+        <h2>باشگاه مشتریان (CRM)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('CRM')"><div class="tile-icon-box tile-green">🤝</div><div class="tile-title">مدیریت ارتباط با مشتریان</div></div>
         </div>
       </section>
 
-      <!-- 9. Inventory Products & Units -->
-      <section id="view-inventory-products" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>تعریف کالاها، قیمت‌ها و واحدها</h2>
-          <button class="btn btn-primary" onclick="openModal('addProductModal')">+ تعریف کالای جدید</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد کالا</th>
-                  <th>نام کالا</th>
-                  <th>واحد اصلی</th>
-                  <th>بارکد</th>
-                  <th>قیمت فروش پیش‌فرض</th>
-                  <th>نقطه سفارش</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="productsTableBody">
-                <tr>
-                  <td>PRD-101</td>
-                  <td>لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ</td>
-                  <td>دستگاه</td>
-                  <td>690123456789</td>
-                  <td>۴۵۰,۰۰۰,۰۰۰ ریال</td>
-                  <td>۵</td>
-                  <td><span class="badge badge-success">موجود</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش کامل</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <section id="module-treasury" class="view-section">
+        <h2>خزانه‌داری (Treasury)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('چک‌ها')"><div class="tile-icon-box tile-yellow">💰</div><div class="tile-title">مدیریت چک‌ها و حساب‌های بانکی</div></div>
         </div>
       </section>
 
-      <!-- 10. Warehouses & Locations -->
-      <section id="view-inventory-warehouses" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>تعریف انبارها و جانمایی قفسه‌ها (Locations)</h2>
-          <button class="btn btn-primary" onclick="alert('افزودن انبار جدید')">+ تعریف انبار جدید</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد انبار</th>
-                  <th>نام انبار</th>
-                  <th>نوع انبار</th>
-                  <th>انباردار</th>
-                  <th>موقیعت فیزیکی</th>
-                  <th>موجودی منفی</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>WH-01</td>
-                  <td>انبار مرکزی کالا</td>
-                  <td>عمومی</td>
-                  <td>احمد محمدی</td>
-                  <td>تهران - سالن اصلی</td>
-                  <td>غیرمجاز ❌</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <section id="module-budget" class="view-section">
+        <h2>بودجه و هزینه (Budgeting)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('بودجه')"><div class="tile-icon-box tile-blue">📈</div><div class="tile-title">بودجه‌بندی و انحرافات</div></div>
         </div>
       </section>
 
-      <!-- 11. Inventory Stock & Cardex -->
-      <section id="view-inventory-stock" class="view-section">
-        <h2 style="margin-bottom:20px;">کاردکس کالا و موجودی انبارها</h2>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>نام انبار</th>
-                  <th>کد کالا</th>
-                  <th>نام کالا</th>
-                  <th>موجودی فعلی</th>
-                  <th>میانگین بهای تمام شده</th>
-                  <th>ارزش کل موجودی</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>انبار مرکزی</td>
-                  <td>PRD-101</td>
-                  <td>لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ</td>
-                  <td>۲۴ دستگاه</td>
-                  <td>۳۹۰,۰۰۰,۰۰۰ ریال</td>
-                  <td>۹,۳۶۰,۰۰۰,۰۰۰ ریال</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <section id="module-production" class="view-section">
+        <h2>تولید و بهای تمام‌شده (Production)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('تولید')"><div class="tile-icon-box tile-orange">🏭</div><div class="tile-title">دستور ساخت و بهای تمام‌شده</div></div>
         </div>
       </section>
 
-      <!-- 12. Transfers & Receipts -->
-      <section id="view-inventory-transfer" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>انتقال بین انبارها و رسید/حواله‌ها</h2>
-          <button class="btn btn-primary" onclick="alert('ثبت حواله انتقال جدید')">+ ثبت حواله انتقال</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره حواله</th>
-                  <th>تاریخ</th>
-                  <th>انبار مبدا</th>
-                  <th>انبار مقصد</th>
-                  <th>تعداد قلم کالا</th>
-                  <th>ثبت‌کننده</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>TRF-901</td>
-                  <td>۱۴۰۳/۰۵/۰۴</td>
-                  <td>انبار مرکزی</td>
-                  <td>انبار فروشگاه شعبه ۲</td>
-                  <td>۵ قلم</td>
-                  <td>اپراتور انبار</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <section id="module-projects" class="view-section">
+        <h2>پروژه‌ها و پیمان‌ها (Projects)</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('پروژه‌ها')"><div class="tile-icon-box tile-green">🏗</div><div class="tile-title">کنترل فاز پروژه‌ها و صورت وضعیت</div></div>
         </div>
       </section>
 
-      <!-- 13. Modyan Tax System -->
-      <section id="view-modyan-system" class="view-section">
-        <h2 style="margin-bottom:20px;">سامانه مودیان مالیاتی و کدهای شناسه کالا</h2>
-        <div class="card">
-          <p style="color:var(--text-muted);">ارسال خودکار فاکتورها به سامانه مودیان و مدیریت حافظه مالیاتی</p>
-          <div style="margin-top:16px;">
-            <button class="btn btn-primary" onclick="alert('ارسال صورتحساب به سامانه مودیان')">ارسال صورتحساب‌های آماده به مودیان</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 14. Purchase Invoices -->
-      <section id="view-invoices-purchase" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>فاکتورهای خرید (Kharid 1 & 2)</h2>
-          <button class="btn btn-primary" onclick="alert('ثبت فاکتور خرید جدید')">+ ثبت فاکتور خرید جدید</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره فاکتور</th>
-                  <th>تاریخ</th>
-                  <th>فروشنده / تامین‌کننده</th>
-                  <th>مبلغ کل فاکتور</th>
-                  <th>انبار ورودی</th>
-                  <th>وضعیت سند</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>PINV-4002</td>
-                  <td>۱۴۰۳/۰۵/۰۲</td>
-                  <td>بازرگانی واردات پارس</td>
-                  <td>۱,۸۵۰,۰۰۰,۰۰۰ ریال</td>
-                  <td>انبار مرکزی</td>
-                  <td><span class="badge badge-success">ثبت نهایی شده</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 15. Sales Invoices -->
-      <section id="view-invoices-sales" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>فاکتورهای فروش (Foroosh 1 & 2)</h2>
-          <button class="btn btn-primary" onclick="alert('صدور فاکتور فروش جدید')">+ صدور فاکتور فروش جدید</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره فاکتور</th>
-                  <th>تاریخ</th>
-                  <th>خریدار / مشتری</th>
-                  <th>مبلغ کل فاکتور</th>
-                  <th>انبار خروجی</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>INV-8001</td>
-                  <td>۱۴۰۳/۰۵/۰۸</td>
-                  <td>شرکت فناوری آریا</td>
-                  <td>۶۳۰,۰۰۰,۰۰۰ ریال</td>
-                  <td>انبار مرکزی</td>
-                  <td><span class="badge badge-success">ثبت نهایی شده</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 16. Vendors & Customers -->
-      <section id="view-vendors-customers" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>مدیریت تامین‌کنندگان و مشتریان</h2>
-          <button class="btn btn-primary" onclick="alert('افزودن شخص جدید')">+ تعریف شخص / شرکت جدید</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد طرف حساب</th>
-                  <th>نام شخص / شرکت</th>
-                  <th>نوع (مشتری/تامین‌کننده)</th>
-                  <th>کد ملی / اقتصادی</th>
-                  <th>تلفن تماس</th>
-                  <th>مانده حساب (ریال)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>CST-101</td>
-                  <td>شرکت فناوری آریا</td>
-                  <td>مشتری</td>
-                  <td>۴۱۱۱۲۳۴۵۶۷۸</td>
-                  <td>۰۲۱-۸۸۷۷۶۶۵۵</td>
-                  <td><span style="color:var(--success-color);">۶۳۰,۰۰۰,۰۰۰ (بدهکار)</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 17. Treasury & Checks -->
-      <section id="view-treasury-checks" class="view-section">
-        <h2 style="margin-bottom:20px;">خزانه‌داری و مدیریت چک‌های دریافتی/پرداختی</h2>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره چک</th>
-                  <th>نوع چک</th>
-                  <th>بانک صادرکننده</th>
-                  <th>مبلغ چک (ریال)</th>
-                  <th>تاریخ سررسید</th>
-                  <th>وضعیت چک</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>CHK-7744</td>
-                  <td>دریافتی</td>
-                  <td>بانک ملت</td>
-                  <td>۲۵۰,۰۰۰,۰۰۰</td>
-                  <td>۱۴۰۳/۰۶/۱۵</td>
-                  <td><span class="badge badge-warning">در جریان وصول</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 18. Payroll & Personnel -->
-      <section id="view-payroll-personnel" class="view-section">
-        <h2 style="margin-bottom:20px;">حقوق، دستمزد و پرسنل (Payroll)</h2>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد پرسنلی</th>
-                  <th>نام و نام خانوادگی</th>
-                  <th>سمت شغلی</th>
-                  <th>دپارتمان</th>
-                  <th>وضعیت</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>EMP-1001</td>
-                  <td>رضا حسینی</td>
-                  <td>مدیر انبار</td>
-                  <td>انبارداری</td>
-                  <td><span class="badge badge-success">شاغل</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 19. Fixed Assets (Amval) -->
-      <section id="view-fixed-assets" class="view-section">
-        <h2 style="margin-bottom:20px;">اموال و دارایی‌های ثابت (Amval)</h2>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد دارایی</th>
-                  <th>نام دارایی</th>
-                  <th>محل استقرار</th>
-                  <th>ارزش دفتری</th>
-                  <th>روش استهلاک</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>AST-501</td>
-                  <td>دستگاه لیفتراک ۲ تن</td>
-                  <td>انبار مرکزی</td>
-                  <td>۱,۲۰۰,۰۰۰,۰۰۰ ریال</td>
-                  <td>مستقیم ۵ ساله</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 20. CRM -->
-      <section id="view-crm-module" class="view-section">
-        <h2 style="margin-bottom:20px;">مدیریت ارتباط با مشتریان (CRM)</h2>
-        <div class="card">
-          <p style="color:var(--text-muted);">پیگیری فرصت‌های فروش و ارتباط با مشتریان</p>
-        </div>
-      </section>
-
-      <!-- 21. Automation & DMS -->
-      <section id="view-automation-dms" class="view-section">
-        <h2 style="margin-bottom:20px;">اتوماسیون اداری و بایگانی اسناد (DMS)</h2>
-        <div class="card">
-          <p style="color:var(--text-muted);">مدیریت نامه نگاری‌ها، دبیرخانه و فایل‌های ضمیمه</p>
-        </div>
-      </section>
-
-      <!-- 22. Production & PM -->
-      <section id="view-production-pm" class="view-section">
-        <h2 style="margin-bottom:20px;">مدیریت تولید، نت (PM) و کنترل کیفیت (QC)</h2>
-        <div class="card">
-          <p style="color:var(--text-muted);">دستور ساخت، بهای تمام شده، نگهداری ماشین‌آلات و بازرسی کیفیت</p>
-        </div>
-      </section>
-
-      <!-- 23. Saham & Budget -->
-      <section id="view-saham-budget" class="view-section">
-        <h2 style="margin-bottom:20px;">امور سهام، بودجه‌بندی و قراردادهای حقوقی</h2>
-        <div class="card">
-          <p style="color:var(--text-muted);">مدیریت سهامداران، انحرافات بودجه و قراردادها</p>
-        </div>
-      </section>
-
-      <!-- 24. Users & Permissions -->
-      <section id="view-users-permissions" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>مدیریت کاربران و ماتریس سطوح دسترسی</h2>
-          <button class="btn btn-primary" onclick="openModal('addUserModal')">+ ایجاد کاربر جدید</button>
-        </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>نام کاربری</th>
-                  <th>نام و نام خانوادگی</th>
-                  <th>نقش کاربر</th>
-                  <th>دسترسی انبار</th>
-                  <th>دسترسی حسابداری</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>admin</b></td>
-                  <td>مدیر ارشد سیستم</td>
-                  <td><span class="badge badge-primary">SuperAdmin</span></td>
-                  <td>کامل ✅</td>
-                  <td>کامل ✅</td>
-                  <td><span class="badge badge-success">فعال</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">تنظیم دسترسی</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 25. Companies & Fiscal Years -->
-      <section id="view-companies-years" class="view-section">
-        <h2 style="margin-bottom:20px;">مدیریت شرکت‌ها و سال‌های مالی</h2>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد شرکت</th>
-                  <th>نام شرکت</th>
-                  <th>کد اقتصادی</th>
-                  <th>تلفن تماس</th>
-                  <th>سال مالی فعال</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>۱۰۰۱</td>
-                  <td>شرکت نمونه نگار</td>
-                  <td>۴۱۱۱۱۱۱۱۱۱۱۱</td>
-                  <td>۰۲۱-۸۸۸۸۸۸۸۸</td>
-                  <td>۱۴۰۳</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 26. Backup & Restore -->
-      <section id="view-backup-restore" class="view-section">
-        <h2 style="margin-bottom:20px;">پشتیبان‌گیری و بازگردانی دیتابیس (Backup & Restore)</h2>
-        <div class="card">
-          <p style="color:var(--text-muted); margin-bottom:16px;">گرفتن فایل بک‌آپ از دیتابیس PostgreSQL یا بازیابی فایل‌های قبلی</p>
-          <div style="display:flex; gap:12px;">
-            <button class="btn btn-primary" onclick="alert('پشتیبان‌گیری انجام شد')">📥 دانلود فایل پشتیبان دیتابیس</button>
-            <button class="btn btn-outline" onclick="alert('انتخاب فایل پشتیبان')">📤 بازیابی فایل پشتیبان</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- 27. Settings -->
-      <section id="view-settings" class="view-section">
-        <h2 style="margin-bottom:20px;">تنظیمات عمومی و تم سیستم</h2>
-        <div class="card" style="max-width:600px;">
-          <div class="form-group">
-            <label class="form-label">تم ظاهری نرم‌افزار:</label>
-            <select class="form-select" id="themeSelect" onchange="changeTheme(this.value)">
-              <option value="blue">تم آبی (پیش‌فرض مدرن نگار)</option>
-              <option value="dark">تم تیره (Dark Mode)</option>
-              <option value="light">تم روشن (Default Light)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">اجازه موجودی منفی در انبار:</label>
-            <select class="form-select">
-              <option value="false">خیر (غیرمجاز)</option>
-              <option value="true">بله (مجاز)</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="alert('تنظیمات ذخیره شد.')">ذخیره تنظیمات</button>
+      <section id="module-kpi" class="view-section">
+        <h2>ارزیابی عملکرد و KPI</h2>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="alert('KPI')"><div class="tile-icon-box tile-purple">🎯</div><div class="tile-title">شاخص‌های کلیدی عملکرد (KPI)</div></div>
         </div>
       </section>
 
     </main>
   </div>
 
-  <!-- Modals -->
-  <div class="modal-overlay" id="addAccountModal">
-    <div class="modal-box">
-      <h3 style="margin-bottom:16px;">تعریف حساب جدید در کدگذاری</h3>
-      <div class="form-group">
-        <label class="form-label">کد حساب:</label>
-        <input type="text" class="form-input" placeholder="مثال: 1003" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">عنوان حساب:</label>
-        <input type="text" class="form-input" placeholder="مثال: بانک تجارت" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">سطح حساب:</label>
-        <select class="form-select">
-          <option>معین</option>
-          <option>تفصیلی</option>
-          <option>کل</option>
-        </select>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn btn-outline" onclick="closeModal('addAccountModal')">انصراف</button>
-        <button class="btn btn-primary" onclick="closeModal('addAccountModal'); alert('حساب با موفقیت ثبت شد.');">ذخیره حساب</button>
-      </div>
-    </div>
-  </div>
+  <!-- Status Bar Footer -->
+  <footer class="status-bar">
+    <div>کاربر: <b>ابر مدیر (admin)</b> | شرکت: <b>شرکت نمونه نگار</b> | سال مالی: <b>۱۴۰۳</b></div>
+    <div>تاریخ سیستم: <b>۱۴۰۵/۰۵/۱۰ - ۱۸:۱۸:۰۵</b></div>
+  </footer>
 
-  <script src="app.js"></script>
+  <script>
+    function switchRibbon(moduleId) {
+      // Remove active from all tabs
+      document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
+      // Hide all view sections
+      document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+
+      // Highlight selected tab
+      event.currentTarget.classList.add('active');
+      // Show selected module section
+      const targetSection = document.getElementById('module-' + moduleId);
+      if (targetSection) targetSection.classList.add('active');
+    }
+  </script>
 </body>
 </html>
