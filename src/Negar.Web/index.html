@@ -846,11 +846,17 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">تاریخ شروع: *</label>
-                  <input type="text" id="fyStartDate" class="form-input" placeholder="مثال: 1404/01/01" />
+                  <div class="date-picker-wrap">
+                    <input type="text" id="fyStartDate" class="form-input date-input" placeholder="مثال: 1404/01/01" maxlength="10" oninput="autoFormatDate(this)" autocomplete="off" />
+                    <button class="date-picker-btn" type="button" onclick="PersianCal.open('fyStartDate', this)" title="انتخاب از تقویم">...</button>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label class="form-label">تاریخ پایان: *</label>
-                  <input type="text" id="fyEndDate" class="form-input" placeholder="مثال: 1404/12/29" />
+                  <div class="date-picker-wrap">
+                    <input type="text" id="fyEndDate" class="form-input date-input" placeholder="مثال: 1404/12/29" maxlength="10" oninput="autoFormatDate(this)" autocomplete="off" />
+                    <button class="date-picker-btn" type="button" onclick="PersianCal.open('fyEndDate', this)" title="انتخاب از تقویم">...</button>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label class="form-label">شرکت مربوطه:</label>
@@ -1483,6 +1489,32 @@
     <div id="statusBarTime">تاریخ سیستم: <b>۱۴۰۵/۰۵/۱۰ - ۱۸:۵۰</b></div>
   </footer>
 
+
+  <!-- ================================================================
+       Persian Calendar Popup
+       ================================================================ -->
+  <div id="persianCalendarPopup" class="pcal-popup" style="display:none;" role="dialog" aria-label="تقویم شمسی">
+    <!-- Header: year nav -->
+    <div class="pcal-header">
+      <button class="pcal-nav-btn" onclick="PersianCal.prevYear()" title="سال قبل">&#171;</button>
+      <button class="pcal-nav-btn" onclick="PersianCal.prevMonth()" title="ماه قبل">&#8249;</button>
+      <span id="persianCalTitle" class="pcal-title"></span>
+      <button class="pcal-nav-btn" onclick="PersianCal.nextMonth()" title="ماه بعد">&#8250;</button>
+      <button class="pcal-nav-btn" onclick="PersianCal.nextYear()" title="سال بعد">&#187;</button>
+    </div>
+    <!-- Weekday names -->
+    <div class="pcal-weekdays">
+      <div>ش</div><div>ی</div><div>د</div><div>س</div><div>چ</div><div>پ</div><div class="pcal-holiday-hdr">ج</div>
+    </div>
+    <!-- Days grid -->
+    <div id="persianCalDays" class="pcal-days"></div>
+    <!-- Footer -->
+    <div class="pcal-footer">
+      <button class="pcal-close-btn" onclick="PersianCal.close()">۔ بستن</button>
+    </div>
+  </div>
+
+  <script src="persian-calendar.js"></script>
   <script src="app.js"></script>
   </div><!-- end mainApp -->
 </body>
