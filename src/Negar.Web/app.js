@@ -437,6 +437,7 @@ function renderPermissionsMatrix() {
 // ============================
 // Set of expanded account IDs for treeview datagrid
 const expandedAccountIds = new Set();
+let currentParentIdForNewAccount = null;
 
 function toggleAccountExpand(accId) {
   if (expandedAccountIds.has(accId)) {
@@ -445,6 +446,39 @@ function toggleAccountExpand(accId) {
     expandedAccountIds.add(accId);
   }
   renderAccountsTable();
+}
+
+function handleTreeButtonClick(accId) {
+  const account = AppState.accounts.find(a => a.id === accId);
+  if (!account) return;
+
+  // Set the clicked row as the active selected parent row
+  currentParentIdForNewAccount = accId;
+
+  const hasChildren = AppState.accounts.some(child => child.parentId === account.id);
+  if (hasChildren) {
+    // Normal expand/collapse toggle
+    toggleAccountExpand(accId);
+  } else {
+    // No children: Prompt to create a child account
+    const nextLevelMap = {
+      'گروه': 'کل',
+      'کل': 'معین',
+      'معین': 'تفصیلی',
+      'تفصیلی': 'تفصیلی'
+    };
+    const parentLevel = account.type;
+    const childLevel = nextLevelMap[parentLevel] || 'تفصیلی';
+    
+    const msg = `تا کنون برای این سرفصل "${parentLevel}" ، حساب "${childLevel}" ، ایجاد نشده است ، آیا مایلید برای آن حساب "${childLevel}" ایجاد کنید؟`;
+    if (confirm(msg)) {
+      openAddAccountRow();
+    } else {
+      // Clear selection if cancelled
+      currentParentIdForNewAccount = null;
+      renderAccountsTable();
+    }
+  }
 }
 
 function getAccountLevel(a) {
@@ -481,15 +515,18 @@ function renderAccountsTable() {
     const level = getAccountLevel(a);
     const hasChildren = AppState.accounts.some(child => child.parentId === a.id);
     const isExpanded = expandedAccountIds.has(a.id);
+    const isSelected = (a.id === currentParentIdForNewAccount);
+    const selectedClass = isSelected ? 'selected-parent-row' : '';
 
+    // Show tree toggle button for all rows
     const toggleBtnHtml = hasChildren
-      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleAccountExpand(${a.id})">${isExpanded ? '-' : '+'}</button>`
-      : '';
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="handleTreeButtonClick(${a.id})">${isExpanded ? '-' : '+'}</button>`
+      : `<button class="tree-toggle-btn" onclick="handleTreeButtonClick(${a.id})">+</button>`;
 
     const indentPx = level * 22;
 
     return `
-      <tr class="tree-level-${Math.min(level, 3)}">
+      <tr class="tree-level-${Math.min(level, 3)} ${selectedClass}">
         <td style="text-align:center;vertical-align:middle;">${toggleBtnHtml}</td>
         <td><b>${a.code}</b></td>
         <td style="padding-right:${indentPx + 10}px;">
@@ -508,14 +545,79 @@ function renderAccountsTable() {
   }).join('');
 }
 
-function openAddAccountRow() {
-  const select = document.getElementById('newAccParentId');
-  if (select) {
-    select.innerHTML = '<option value="">بدون والد (حساب اصلی/گروه)</option>' +
-      AppState.accounts.map(a => `<option value="${a.id}">${a.code} - ${a.name}</option>`).join('');
+function suggestNextAccountCode(type, parentId) {
+  // Find sibling accounts under the same parent
+  const siblings = AppState.accounts.filter(a => a.type === type && a.parentId === parentId);
+  if (siblings.length > 0) {
+    const codes = siblings.map(s => parseInt(s.code, 10)).filter(num => !isNaN(num));
+    if (codes.length > 0) {
+      const maxCodeVal = Math.max(...codes);
+      const nextVal = maxCodeVal + 1;
+      
+      const sampleCode = siblings[0].code;
+      return String(nextVal).padStart(sampleCode.length, '0');
+    }
   }
+  
+  // If no siblings exist, construct the starting code based on type/parent
+  if (type === 'گروه') {
+    const rootGroups = AppState.accounts.filter(a => a.parentId === null);
+    if (rootGroups.length > 0) {
+      const codes = rootGroups.map(s => parseInt(s.code, 10)).filter(num => !isNaN(num));
+      const maxCodeVal = Math.max(...codes);
+      return String(maxCodeVal + 1).padStart(2, '0');
+    }
+    return '01';
+  }
+  
+  if (parentId) {
+    const parent = AppState.accounts.find(a => a.id === parentId);
+    if (parent) {
+      if (type === 'کل') return parent.code + '10'; // e.g. '01' -> '0110'
+      if (type === 'معین') return parent.code + '01'; // e.g. '0110' -> '011001'
+      if (type === 'تفصیلی') return parent.code + '01'; // e.g. '011001' -> '01100101'
+    }
+  }
+  return '';
+}
+
+function openAddAccountRow() {
+  const selectType = document.getElementById('newAccType');
+  const selectParent = document.getElementById('newAccParentId');
+  const inputCode = document.getElementById('newAccCode');
+  
+  let targetType = 'گروه';
+  let targetParentId = null;
+  
+  if (currentParentIdForNewAccount !== null) {
+    const parentAcc = AppState.accounts.find(a => a.id === currentParentIdForNewAccount);
+    if (parentAcc) {
+      targetParentId = parentAcc.id;
+      const nextLevelMap = {
+        'گروه': 'کل',
+        'کل': 'معین',
+        'معین': 'تفصیلی',
+        'تفصیلی': 'تفصیلی'
+      };
+      targetType = nextLevelMap[parentAcc.type] || 'تفصیلی';
+    }
+  }
+  
+  if (selectType) selectType.value = targetType;
+  if (selectParent) {
+    selectParent.innerHTML = `<option value="${targetParentId || ''}">${targetParentId ? targetParentId : 'بدون والد'}</option>`;
+    selectParent.value = targetParentId || '';
+  }
+  
+  if (inputCode) {
+    inputCode.value = suggestNextAccountCode(targetType, targetParentId);
+  }
+  
+  // Highlight the table to show current selection
+  renderAccountsTable();
+
   document.getElementById('addAccountRow').style.display = 'block';
-  document.getElementById('newAccCode').focus();
+  document.getElementById('newAccName').focus();
 }
 
 function saveNewAccount() {
@@ -533,6 +635,15 @@ function saveNewAccount() {
   document.getElementById('newAccCode').value = '';
   document.getElementById('newAccName').value = '';
   document.getElementById('addAccountRow').style.display = 'none';
+  
+  // Auto-expand parent so the new child is visible
+  if (parentId) {
+    expandedAccountIds.add(parentId);
+  }
+  
+  // Clear selection after save
+  currentParentIdForNewAccount = null;
+
   renderAccountsTable();
   alert(`حساب "${code} - ${name}" با موفقیت ثبت شد.`);
 }
