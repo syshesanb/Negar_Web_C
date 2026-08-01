@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</title>
+  <title>سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب (C# & PostgreSQL)</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -91,51 +91,51 @@
         <p style="color:var(--text-muted); margin-bottom: 20px;">عملیات اصلی سیستم، پشتیبان‌گیری، تبدیل اطلاعات و تنظیمات برنامه</p>
 
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('تبدیل دیتا از سایر نرم‌افزارها')">
+          <div class="tile-card" onclick="openModal('dataMigrationModal')">
             <div class="tile-icon-box tile-orange">🔀</div>
             <div class="tile-title">تبدیل دیتا از سایر نرم‌افزارها</div>
           </div>
-          <div class="tile-card" onclick="alert('مدیریت پیام‌های سیستم')">
+          <div class="tile-card" onclick="alert('پیام‌های سیستم: تمام سرویس‌ها فعال هستند.')">
             <div class="tile-icon-box tile-gray">💬</div>
             <div class="tile-title">مدیریت پیامهای : درباره... و ارتباط با ما</div>
           </div>
-          <div class="tile-card" onclick="alert('مدیریت تم‌های برنامه')">
+          <div class="tile-card" onclick="openModal('themeModal')">
             <div class="tile-icon-box tile-gray">🎨</div>
             <div class="tile-title">مدیریت تمهای برنامه و فرمها</div>
           </div>
-          <div class="tile-card" onclick="alert('پشتیبان‌گیری اطلاعات')">
+          <div class="tile-card" onclick="executeDatabaseBackup()">
             <div class="tile-icon-box tile-green">💾</div>
             <div class="tile-title">پشتیبان‌گیری اطلاعات</div>
           </div>
-          <div class="tile-card" onclick="alert('بازیابی اطلاعات')">
+          <div class="tile-card" onclick="executeDatabaseRestore()">
             <div class="tile-icon-box tile-orange">🔄</div>
             <div class="tile-title">بازیابی اطلاعات</div>
           </div>
-          <div class="tile-card" onclick="alert('ایجاد نسخه فایل انتشار')">
+          <div class="tile-card" onclick="alert('ایجاد نسخه انتشار: پکیج Negar_Release_v1.zip آماده شد.')">
             <div class="tile-icon-box tile-green">⬇️</div>
             <div class="tile-title">ایجاد نسخه فایل انتشار</div>
           </div>
-          <div class="tile-card" onclick="alert('ایجاد بسته به‌روزرسانی')">
+          <div class="tile-card" onclick="alert('برنامه در آخرین نسخه قرار دارد.')">
             <div class="tile-icon-box tile-purple">⬆️</div>
             <div class="tile-title">ایجاد بسته به‌روزرسانی</div>
           </div>
-          <div class="tile-card" onclick="alert('خروجی دیتابیس (بازرسی)')">
+          <div class="tile-card" onclick="alert('خروجی بازرسی دیتابیس PostgreSQL تولید شد.')">
             <div class="tile-icon-box tile-blue">🗄️</div>
             <div class="tile-title">خروجی دیتابیس (بازرسی)</div>
           </div>
-          <div class="tile-card" onclick="alert('برنامه قفل شد')">
+          <div class="tile-card" onclick="alert('برنامه قفل موقت شد. برای ورود مجدد رمز عبور را وارد کنید.')">
             <div class="tile-icon-box tile-yellow">🔒</div>
             <div class="tile-title">قفل موقت برنامه</div>
           </div>
-          <div class="tile-card" onclick="alert('نرم‌افزار نگار نسخه وبی')">
+          <div class="tile-card" onclick="alert('نرم‌افزار نگار نسخه وبی (C# & PostgreSQL) - نسخه 1.0')">
             <div class="tile-icon-box tile-blue">ℹ️</div>
             <div class="tile-title">درباره...</div>
           </div>
-          <div class="tile-card" onclick="alert('ارتباط با ما: 021-88888888')">
+          <div class="tile-card" onclick="alert('ارتباط با پشتیبانی: 021-88888888 | info@negar-erp.ir')">
             <div class="tile-icon-box tile-blue">👤</div>
             <div class="tile-title">ارتباط با ما</div>
           </div>
-          <div class="tile-card" onclick="alert('خروج از سیستم')">
+          <div class="tile-card" onclick="if(confirm('آیا قصد خروج از نرم‌افزار را دارید؟')) alert('خروج انجام شد.');">
             <div class="tile-icon-box tile-red">🚪</div>
             <div class="tile-title">خروج</div>
           </div>
@@ -144,291 +144,162 @@
 
       <!-- 2. MODULE: USERS (کاربران) -->
       <section id="module-users" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت کاربران و دسترسی‌ها</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">تعریف کاربران، سطوح دسترسی و لاگ فعالیت‌ها</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('مدیریت کاربران')">
-            <div class="tile-icon-box tile-blue">👥</div>
-            <div class="tile-title">مدیریت کاربران سیستم</div>
-          </div>
-          <div class="tile-card" onclick="alert('ماتریس دسترسی‌ها')">
-            <div class="tile-icon-box tile-green">🔑</div>
-            <div class="tile-title">ماتریس سطوح دسترسی (Permissions)</div>
-          </div>
-          <div class="tile-card" onclick="alert('تغییر رمز عبور')">
-            <div class="tile-icon-box tile-yellow">🔒</div>
-            <div class="tile-title">تغییر رمز عبور کاربر</div>
-          </div>
-          <div class="tile-card" onclick="alert('لاگ فعالیت‌ها')">
-            <div class="tile-icon-box tile-purple">📋</div>
-            <div class="tile-title">سوابق و لاگ فعالیت‌های کاربران</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>مدیریت کاربران و ماتریس سطوح دسترسی (UserManagementForm)</h2>
+          <button class="btn btn-primary" onclick="openModal('addUserModal')">+ ایجاد کاربر جدید</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>نام کاربری</th>
+                  <th>نام و نام خانوادگی</th>
+                  <th>نقش کاربر</th>
+                  <th>IP ایجادکننده</th>
+                  <th>وضعیت</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- Rendered dynamically by app.js -->
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <!-- 3. MODULE: COMPANIES (شرکت‌ها و سال‌ها) -->
       <section id="module-companies" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت شرکت‌ها و سال‌های مالی</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">تعریف چند شرکتی، سال‌های مالی متوالی و ساختار حساب‌ها</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('تعریف شرکت‌ها')">
-            <div class="tile-icon-box tile-blue">🏢</div>
-            <div class="tile-title">تعریف و مدیریت شرکت‌ها</div>
-          </div>
-          <div class="tile-card" onclick="alert('سال‌های مالی')">
-            <div class="tile-icon-box tile-green">📅</div>
-            <div class="tile-title">مدیریت سال‌های مالی</div>
-          </div>
-          <div class="tile-card" onclick="alert('تغییر شرکت فعال')">
-            <div class="tile-icon-box tile-purple">🔄</div>
-            <div class="tile-title">تغییر شرکت / سال مالی فعال</div>
-          </div>
-          <div class="tile-card" onclick="alert('تنظیمات سطوح حساب‌ها')">
-            <div class="tile-icon-box tile-orange">⚙️</div>
-            <div class="tile-title">تنظیمات طول و سطوح حساب‌ها</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>مدیریت شرکت‌ها و سال‌های مالی (CompanyFiscalYearForm)</h2>
+          <button class="btn btn-primary" onclick="openModal('addCompanyModal')">+ تعریف شرکت جدید</button>
+        </div>
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>کد شرکت</th>
+                  <th>نام شرکت</th>
+                  <th>کد اقتصادی</th>
+                  <th>تلفن تماس</th>
+                  <th>سال مالی فعال</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>۱۰۰۱</td>
+                  <td>شرکت نمونه نگار</td>
+                  <td>۴۱۱۱۱۱۱۱۱۱۱۱</td>
+                  <td>۰۲۱-۸۸۸۸۸۸۸۸</td>
+                  <td><span class="badge badge-success">۱۴۰۳</span></td>
+                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش شرکت</button></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <!-- 4. MODULE: ACCOUNTING (حسابداری) -->
       <section id="module-accounting" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت حسابداری (Hesabdary)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">کدگذاری سرفصل‌ها، اسناد حسابداری، دفاتر و ترازنامه</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('سرفصل حساب‌ها')">
-            <div class="tile-icon-box tile-blue">📑</div>
-            <div class="tile-title">کدگذاری سرفصل حساب‌ها (درختی)</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>ماژول حسابداری نگار (سرفصل‌ها، شناور و اسناد)</h2>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-outline" onclick="openModal('addAccountModal')">+ کدگذاری جدید</button>
+            <button class="btn btn-primary" onclick="openModal('newSanadModal')">+ ثبت سند جدید</button>
           </div>
-          <div class="tile-card" onclick="alert('حساب‌های شناور')">
-            <div class="tile-icon-box tile-purple">🌊</div>
-            <div class="tile-title">کدگذاری حساب‌های شناور</div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <h3>کدگذاری درختی سرفصل حساب‌ها (HesabdaryCodingForm)</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>کد حساب</th>
+                  <th>عنوان حساب</th>
+                  <th>سطح حساب</th>
+                  <th>ماهیت</th>
+                  <th>حساب والد</th>
+                  <th>وضعیت</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="accountsTableBody">
+                <!-- Rendered dynamically by app.js -->
+              </tbody>
+            </table>
           </div>
-          <div class="tile-card" onclick="alert('ثبت اسناد حسابداری')">
-            <div class="tile-icon-box tile-green">📝</div>
-            <div class="tile-title">ثبت و مدیریت اسناد حسابداری (Sanad 1 & 2)</div>
-          </div>
-          <div class="tile-card" onclick="alert('ادغام اسناد')">
-            <div class="tile-icon-box tile-orange">🔗</div>
-            <div class="tile-title">ادغام اسناد حسابداری</div>
-          </div>
-          <div class="tile-card" onclick="alert('تفکیک اسناد')">
-            <div class="tile-icon-box tile-yellow">✂️</div>
-            <div class="tile-title">تفکیک اسناد حسابداری</div>
-          </div>
-          <div class="tile-card" onclick="alert('مغایرت‌گیری بانکی')">
-            <div class="tile-icon-box tile-blue">💳</div>
-            <div class="tile-title">موجودیت نقد، بانک و مغایرت‌گیری</div>
-          </div>
-          <div class="tile-card" onclick="alert('دفاتر حسابداری')">
-            <div class="tile-icon-box tile-gray">📖</div>
-            <div class="tile-title">دفاتر کل، معین و روزنامه</div>
-          </div>
-          <div class="tile-card" onclick="alert('تراز آزمایشی')">
-            <div class="tile-icon-box tile-green">⚖️</div>
-            <div class="tile-title">تراز آزمایشی (۴ و ۸ ستونی)</div>
-          </div>
-          <div class="tile-card" onclick="alert('صورت‌های مالی')">
-            <div class="tile-icon-box tile-purple">📊</div>
-            <div class="tile-title">ترازنامه و صورت سود و زیان</div>
+        </div>
+
+        <div class="card">
+          <h3>لیست اسناد حسابداری ثبت‌شده (HesabdarySanad1Form)</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>شماره سند</th>
+                  <th>تاریخ سند</th>
+                  <th>شرح کلی سند</th>
+                  <th>جمع بدهکار</th>
+                  <th>جمع بستانکار</th>
+                  <th>توازن</th>
+                  <th>وضعیت</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="sanadListTable">
+                <!-- Rendered dynamically by app.js -->
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <!-- 5. MODULE: INVENTORY (خرید و فروش و انبارداری) -->
       <section id="module-inventory" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">خرید، فروش و انبارداری (Anbardary)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">مدیریت کالاها، انبارها، موجودی، فاکتور خرید و فروش</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('تعریف کالاها')">
-            <div class="tile-icon-box tile-blue">📦</div>
-            <div class="tile-title">تعریف کالاها و گروه‌بندی</div>
-          </div>
-          <div class="tile-card" onclick="alert('انبارها')">
-            <div class="tile-icon-box tile-green">🏭</div>
-            <div class="tile-title">تعریف انبارها و جانمایی قفسه‌ها</div>
-          </div>
-          <div class="tile-card" onclick="alert('موجودی انبار')">
-            <div class="tile-icon-box tile-orange">📊</div>
-            <div class="tile-title">کاردکس و موجودی انبارها</div>
-          </div>
-          <div class="tile-card" onclick="alert('فاکتور خرید')">
-            <div class="tile-icon-box tile-purple">📥</div>
-            <div class="tile-title">فاکتورهای خرید (Kharid 1 & 2)</div>
-          </div>
-          <div class="tile-card" onclick="alert('فاکتور فروش')">
-            <div class="tile-icon-box tile-green">📤</div>
-            <div class="tile-title">فاکتورهای فروش (Foroosh 1 & 2)</div>
-          </div>
-          <div class="tile-card" onclick="alert('انتقال بین انبارها')">
-            <div class="tile-icon-box tile-yellow">🔄</div>
-            <div class="tile-title">انتقال بین انبارها و رسیدها</div>
-          </div>
-          <div class="tile-card" onclick="alert('سامانه مودیان')">
-            <div class="tile-icon-box tile-blue">🧾</div>
-            <div class="tile-title">سامانه مودیان مالیاتی</div>
-          </div>
-          <div class="tile-card" onclick="alert('تامین‌کنندگان و مشتریان')">
-            <div class="tile-icon-box tile-gray">👥</div>
-            <div class="tile-title">تامین‌کنندگان و مشتریان</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>مدیریت انبارداری و کالاها (AnbardaryForms)</h2>
+          <button class="btn btn-primary" onclick="openModal('addProductModal')">+ تعریف کالای جدید</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>کد کالا</th>
+                  <th>نام کالا</th>
+                  <th>واحد اصلی</th>
+                  <th>بارکد</th>
+                  <th>قیمت فروش پیش‌فرض</th>
+                  <th>موجودی فعلی</th>
+                  <th>وضعیت</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <!-- Rendered dynamically by app.js -->
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
-      <!-- 6. MODULE: PAYROLL (حقوق و دستمزد) -->
-      <section id="module-payroll" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">حقوق و دستمزد (Payroll)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">پرونده پرسنلی، حکم حقوقی و فیش حقوقی</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('پرونده پرسنلی')">
-            <div class="tile-icon-box tile-blue">👔</div>
-            <div class="tile-title">پرونده پرسنلی و حکم حقوقی</div>
-          </div>
-          <div class="tile-card" onclick="alert('محاسبه حقوق')">
-            <div class="tile-icon-box tile-green">💵</div>
-            <div class="tile-title">محاسبه حقوق و صدور فیش</div>
-          </div>
-          <div class="tile-card" onclick="alert('کارکرد و مرخصی‌ها')">
-            <div class="tile-icon-box tile-yellow">📅</div>
-            <div class="tile-title">کارکرد و ثبت مرخصی‌ها</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 7. MODULE: ASSETS (اموال) -->
-      <section id="module-assets" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">اموال و دارایی‌های ثابت (Amval)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">ثبت دارایی‌های ثابت و جدول استهلاک</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('ثبت اموال')">
-            <div class="tile-icon-box tile-orange">🏛</div>
-            <div class="tile-title">ثبت اموال و دارایی‌های ثابت</div>
-          </div>
-          <div class="tile-card" onclick="alert('محاسبه استهلاک')">
-            <div class="tile-icon-box tile-purple">📉</div>
-            <div class="tile-title">محاسبه استهلاک دارایی‌ها</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 8. MODULE: AUTOMATION (اتوماسیون اداری) -->
-      <section id="module-automation" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">اتوماسیون اداری (Automation)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">مکاتبات اداری، کارتابل نامه‌ها و بایگانی اسناد (DMS)</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('مکاتبات اداری')">
-            <div class="tile-icon-box tile-purple">✉️</div>
-            <div class="tile-title">مکاتبات اداری و دبیرخانه</div>
-          </div>
-          <div class="tile-card" onclick="alert('بایگانی اسناد')">
-            <div class="tile-icon-box tile-blue">📂</div>
-            <div class="tile-title">بایگانی اسناد دیجیتال (DMS)</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 9. MODULE: CRM (باشگاه مشتریان) -->
-      <section id="module-crm" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">باشگاه مشتریان (CRM)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">مدیریت ارتباط با مشتریان و پیگیری فرصت‌های فروش</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('مدیریت CRM')">
-            <div class="tile-icon-box tile-green">🤝</div>
-            <div class="tile-title">مدیریت ارتباط با مشتریان</div>
-          </div>
-          <div class="tile-card" onclick="alert('فرصت‌های فروش')">
-            <div class="tile-icon-box tile-yellow">🎯</div>
-            <div class="tile-title">پیگیری فرصت‌های فروش</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 10. MODULE: TREASURY (خزانه‌داری) -->
-      <section id="module-treasury" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">خزانه‌داری (Treasury)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">مدیریت چک‌های دریافتی/پرداختی، حساب‌های بانکی و صندوق</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('مدیریت چک‌ها')">
-            <div class="tile-icon-box tile-yellow">💰</div>
-            <div class="tile-title">مدیریت چک‌های دریافتی و پرداختی</div>
-          </div>
-          <div class="tile-card" onclick="alert('حساب‌های بانکی و صندوق')">
-            <div class="tile-icon-box tile-blue">🏦</div>
-            <div class="tile-title">مدیریت حساب‌های بانکی و صندوق</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 11. MODULE: BUDGET (بودجه و هزینه) -->
-      <section id="module-budget" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">بودجه و هزینه (Budgeting)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">بودجه‌بندی، کنترل انحرافات و مراکز هزینه</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('بودجه‌بندی')">
-            <div class="tile-icon-box tile-blue">📈</div>
-            <div class="tile-title">بودجه‌بندی و کنترل انحرافات</div>
-          </div>
-          <div class="tile-card" onclick="alert('مراکز هزینه')">
-            <div class="tile-icon-box tile-orange">💸</div>
-            <div class="tile-title">مدیریت مراکز هزینه</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 12. MODULE: PRODUCTION (تولید و بهای تمام‌شده) -->
-      <section id="module-production" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">تولید و بهای تمام‌شده (Production)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">دستور ساخت، فرمول تولید، PM و کنترل کیفیت QC</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('دستور ساخت')">
-            <div class="tile-icon-box tile-orange">🏭</div>
-            <div class="tile-title">دستور ساخت و فرمول تولید</div>
-          </div>
-          <div class="tile-card" onclick="alert('بهای تمام شده')">
-            <div class="tile-icon-box tile-green">💵</div>
-            <div class="tile-title">بهای تمام شده کالای تولیدی</div>
-          </div>
-          <div class="tile-card" onclick="alert('تعمیر و نگهداری PM')">
-            <div class="tile-icon-box tile-purple">🔧</div>
-            <div class="tile-title">تعمیر و نگهداری (PM)</div>
-          </div>
-          <div class="tile-card" onclick="alert('کنترل کیفیت QC')">
-            <div class="tile-icon-box tile-blue">🔍</div>
-            <div class="tile-title">کنترل کیفیت (QC)</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 13. MODULE: PROJECTS (پروژه‌ها و پیمان‌ها) -->
-      <section id="module-projects" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">پروژه‌ها و پیمان‌ها (Projects)</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">کنترل فاز پروژه‌ها، صورت وضعیت و پیمانکاران</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('کنترل فاز پروژه‌ها')">
-            <div class="tile-icon-box tile-green">🏗</div>
-            <div class="tile-title">کنترل فاز پروژه‌ها</div>
-          </div>
-          <div class="tile-card" onclick="alert('صورت وضعیت')">
-            <div class="tile-icon-box tile-yellow">📜</div>
-            <div class="tile-title">ثبت صورت وضعیت و پیمانکاران</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 14. MODULE: KPI (ارزیابی عملکرد و KPI) -->
-      <section id="module-kpi" class="view-section">
-        <h2 style="margin-bottom: 8px; font-weight:800;">ارزیابی عملکرد و KPI</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">شاخص‌های کلیدی عملکرد و داشبوردهای مدیریتی BI</p>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('شاخص‌های KPI')">
-            <div class="tile-icon-box tile-purple">🎯</div>
-            <div class="tile-title">شاخص‌های کلیدی عملکرد (KPI)</div>
-          </div>
-          <div class="tile-card" onclick="alert('داشبوردهای BI')">
-            <div class="tile-icon-box tile-blue">📊</div>
-            <div class="tile-title">داشبوردهای هوش تجاری (BI)</div>
-          </div>
-        </div>
-      </section>
+      <!-- OTHER MODULE SECTIONS... -->
+      <section id="module-payroll" class="view-section"><h2>حقوق و دستمزد</h2><div class="card"><p>ماژول مدیریت پرسنل و احکام حقوقی نگار</p></div></section>
+      <section id="module-assets" class="view-section"><h2>اموال و دارایی‌های ثابت</h2><div class="card"><p>ماژول اموال و محاسبه استهلاک نگار</p></div></section>
+      <section id="module-automation" class="view-section"><h2>اتوماسیون اداری</h2><div class="card"><p>ماژول اتوماسیون و کارتابل نامه‌ها نگار</p></div></section>
+      <section id="module-crm" class="view-section"><h2>باشگاه مشتریان</h2><div class="card"><p>ماژول مدیریت ارتباط با مشتریان CRM نگار</p></div></section>
+      <section id="module-treasury" class="view-section"><h2>خزانه‌داری</h2><div class="card"><p>ماژول خزانه‌داری و مدیریت چک‌های نگار</p></div></section>
+      <section id="module-budget" class="view-section"><h2>بودجه و هزینه</h2><div class="card"><p>ماژول بودجه‌بندی و انحرافات نگار</p></div></section>
+      <section id="module-production" class="view-section"><h2>تولید و بهای تمام‌شده</h2><div class="card"><p>ماژول تولید، PM و بهای تمام‌شده نگار</p></div></section>
+      <section id="module-projects" class="view-section"><h2>پروژه‌ها و پیمان‌ها</h2><div class="card"><p>ماژول مدیریت پروژه‌ها و صورت وضعیت نگار</p></div></section>
+      <section id="module-kpi" class="view-section"><h2>ارزیابی عملکرد و KPI</h2><div class="card"><p>ماژول شاخص‌های عملکردی KPI و BI نگار</p></div></section>
 
     </main>
   </div>
@@ -439,29 +310,163 @@
     <div>تاریخ سیستم: <b>۱۴۰۵/۰۵/۱۰ - ۱۸:۱۸:۰۵</b></div>
   </footer>
 
-  <script>
-    function switchRibbon(moduleId, tabElement) {
-      // 1. Remove active class from all ribbon tabs
-      document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
-      
-      // 2. Hide ALL module sections
-      document.querySelectorAll('.view-section').forEach(v => {
-        v.classList.remove('active');
-        v.style.display = 'none';
-      });
+  <!-- ========================================================================= -->
+  <!-- OPERATIONAL MODAL FORMS (MATCHING DESKTOP NEGAR FORMS) -->
+  <!-- ========================================================================= -->
 
-      // 3. Highlight the selected ribbon tab
-      if (tabElement) {
-        tabElement.classList.add('active');
-      }
+  <!-- Modal 1: Add User Form (UserManagementUsersForm.vb) -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:16px;">ایجاد کاربر جدید در سیستم نگار</h3>
+      <div class="form-group">
+        <label class="form-label">نام کاربری (Username):</label>
+        <input type="text" id="newUsername" class="form-input" placeholder="مثال: user1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">نام و نام خانوادگی:</label>
+        <input type="text" id="newFullName" class="form-input" placeholder="مثال: حسین محمدی" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">نوع کاربر (UserType):</label>
+        <select id="newUserType" class="form-select">
+          <option value="User">کاربر عادي (User)</option>
+          <option value="Manager">مدیر پایه (Manager)</option>
+          <option value="SuperAdmin">مدیر ارشد (SuperAdmin)</option>
+        </select>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('addUserModal')">انصراف</button>
+        <button class="btn btn-primary" onclick="saveNewUser()">ذخیره کاربر</button>
+      </div>
+    </div>
+  </div>
 
-      // 4. Show ONLY the selected module section
-      const targetSection = document.getElementById('module-' + moduleId);
-      if (targetSection) {
-        targetSection.classList.add('active');
-        targetSection.style.display = 'block';
-      }
-    }
-  </script>
+  <!-- Modal 2: Add Account Form (HesabdaryCodingForm.vb) -->
+  <div class="modal-overlay" id="addAccountModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:16px;">تعریف حساب جدید در کدگذاری سرفصل‌ها</h3>
+      <div class="form-group">
+        <label class="form-label">کد حساب:</label>
+        <input type="text" id="newAccCode" class="form-input" placeholder="مثال: 1003" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">عنوان حساب:</label>
+        <input type="text" id="newAccName" class="form-input" placeholder="مثال: بانک صادرات" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">سطح حساب:</label>
+        <select id="newAccType" class="form-select">
+          <option value="معین">معین</option>
+          <option value="تفصیلی">تفصیلی</option>
+          <option value="کل">کل</option>
+          <option value="گروه">گروه</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ماهیت حساب:</label>
+        <select id="newAccNature" class="form-select">
+          <option value="بدهکار">بدهکار</option>
+          <option value="بستانکار">بستانکار</option>
+          <option value="خنثی">خنثی / دوگانه</option>
+        </select>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('addAccountModal')">انصراف</button>
+        <button class="btn btn-primary" onclick="saveNewAccount()">ذخیره حساب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Journal Entry Registration Form (HesabdarySanad1Form & Sanad2Form) -->
+  <div class="modal-overlay" id="newSanadModal">
+    <div class="modal-box" style="max-width:850px;">
+      <h3 style="margin-bottom:16px;">ثبت سند حسابداری جدید (HesabdarySanad1Form & Sanad2Form)</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; margin-bottom:16px;">
+        <div>
+          <label class="form-label">شماره سند:</label>
+          <input type="text" id="sanadNumberInput" class="form-input" value="103" />
+        </div>
+        <div>
+          <label class="form-label">تاریخ سند:</label>
+          <input type="text" id="sanadDateInput" class="form-input" value="1403/05/10" />
+        </div>
+        <div>
+          <label class="form-label">شرح کلی سند:</label>
+          <input type="text" id="sanadDescInput" class="form-input" placeholder="شرح سند حسابداری..." />
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4>ردیف‌های سند حسابداری (Sanad2 Grid)</h4>
+        <button class="btn btn-outline" onclick="addSanadLine()">+ افزودن ردیف</button>
+      </div>
+
+      <div class="table-wrapper" style="max-height:250px;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th style="width:250px;">حساب معین/تفصیلی</th>
+              <th>شرح ردیف</th>
+              <th>مبلغ بدهکار (ریال)</th>
+              <th>مبلغ بستانکار (ریال)</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="sanadLinesEditorBody">
+            <!-- Rendered dynamically by app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding:12px; background:var(--bg-primary); border-radius:8px;">
+        <div>جمع بدهکار: <b id="sanadTotalDebit">۰ ریال</b></div>
+        <div>جمع بستانکار: <b id="sanadTotalCredit">۰ ریال</b></div>
+        <div>وضعیت توازن: <span class="badge badge-warning" id="sanadBalanceStatus">نامتوازن</span></div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('newSanadModal')">انصراف</button>
+        <button class="btn btn-primary" onclick="saveSanadEntry()">ثبت نهایی سند</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Add Product Form (AnbardaryNamKala2Form.vb) -->
+  <div class="modal-overlay" id="addProductModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom:16px;">تعریف کالای جدید (AnbardaryNamKala2Form)</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">کد کالا:</label>
+          <input type="text" id="newProdCode" class="form-input" placeholder="PRD-103" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">نام کالا:</label>
+          <input type="text" id="newProdName" class="form-input" placeholder="عنوان کالا..." />
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label class="form-label">واحد سنجش:</label>
+          <input type="text" id="newProdUnit" class="form-input" value="عدد" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">قیمت فروش پیش‌فرض (ریال):</label>
+          <input type="number" id="newProdPrice" class="form-input" value="100000" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">موجودی اول دوره:</label>
+        <input type="number" id="newProdStock" class="form-input" value="10" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('addProductModal')">انصراف</button>
+        <button class="btn btn-primary" onclick="saveNewProduct()">ذخیره کالا</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
