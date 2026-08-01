@@ -304,6 +304,7 @@ function showForm(formId) {
   if (formId === 'form-companies-list') renderCompaniesTable();
   if (formId === 'form-fiscal-years') renderFiscalYearsTable();
   if (formId === 'form-switch-company') renderSwitchCompanyForm();
+  if (formId === 'form-switch-year') renderSwitchYearOnlyForm();
 }
 
 // ============================
@@ -1044,6 +1045,55 @@ function applyCompanySwitch() {
   goBack();
 }
 
+function renderSwitchYearOnlyForm() {
+  const yearSel = document.getElementById('quickSwitchYear');
+  const subTitle = document.getElementById('switchYearSubtitle');
+  if (!yearSel) return;
+
+  const currentComp = SessionState.company || (AppState.companies.length > 0 ? AppState.companies[0] : null);
+  const compCode = currentComp ? currentComp.code : '';
+  const compName = currentComp ? currentComp.name : '';
+
+  if (subTitle) {
+    subTitle.textContent = `سال مالی جاری شرکت "${compName}" را انتخاب کنید:`;
+  }
+
+  const years = AppState.fiscalYears
+    .filter(fy => fy.company === compCode)
+    .sort((a, b) => Number(b.year) - Number(a.year));
+
+  if (years.length === 0) {
+    yearSel.innerHTML = '<option value="">-- سال مالی تعریف نشده --</option>';
+  } else {
+    yearSel.innerHTML = years.map(fy =>
+      `<option value="${fy.year}" ${SessionState.year === fy.year ? 'selected' : ''}>${fy.year} (${fy.status})</option>`
+    ).join('');
+  }
+}
+
+function applyYearOnlySwitch() {
+  const yearSel = document.getElementById('quickSwitchYear');
+  if (!yearSel) return;
+
+  const selectedYear = yearSel.value;
+  if (!selectedYear) {
+    alert('برای این شرکت هیچ سال مالی تعریف نشده است.');
+    return;
+  }
+
+  // Update session
+  SessionState.year = selectedYear;
+
+  // Update header
+  updateHeaderBar();
+
+  // Feedback
+  alert(`✅ سال مالی جاری با موفقیت به "${selectedYear}" تغییر یافت.`);
+
+  // Go back to tiles
+  goBack();
+}
+
 function updateHeaderBar() {
   const company = SessionState.company;
   const year    = SessionState.year;
@@ -1082,22 +1132,34 @@ document.addEventListener('DOMContentLoaded', () => {
 // Global Keyboard Shortcuts
 // ============================
 window.addEventListener('keydown', (e) => {
-  // Physical key 'A' (e.code === 'KeyA') or character 'a'/'A'/'ش'
+  const loginOverlay = document.getElementById('loginOverlay');
+  if (loginOverlay && loginOverlay.style.display !== 'none') {
+    return; // Do not open if still at login screen
+  }
+
+  // Alt + A (KeyA / ش): Switch Company & Year Form
   const isAKey = e.code === 'KeyA' || e.key === 'a' || e.key === 'A' || e.key === 'ش';
   if (e.altKey && isAKey) {
     e.preventDefault();
     e.stopPropagation();
-
-    const loginOverlay = document.getElementById('loginOverlay');
-    if (loginOverlay && loginOverlay.style.display !== 'none') {
-      return; // Do not open if still at login screen
-    }
-
     const systemTab = document.querySelector('.ribbon-tab[onclick*="system"]');
     if (systemTab) switchRibbon('system', systemTab);
     showForm('form-switch-company');
+    return;
+  }
+
+  // Alt + S (KeyS / س): Quick Switch Year Form
+  const isSKey = e.code === 'KeyS' || e.key === 's' || e.key === 'S' || e.key === 'س';
+  if (e.altKey && isSKey) {
+    e.preventDefault();
+    e.stopPropagation();
+    const systemTab = document.querySelector('.ribbon-tab[onclick*="system"]');
+    if (systemTab) switchRibbon('system', systemTab);
+    showForm('form-switch-year');
+    return;
   }
 }, true);
+
 
 
 
