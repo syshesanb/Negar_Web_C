@@ -22,59 +22,59 @@
 
     <!-- Main Module Ribbon matching Desktop Negar Navigation Ribbon -->
     <nav class="main-modules-ribbon" id="ribbonNav">
-      <div class="ribbon-tab active" onclick="switchRibbon('system')">
+      <div class="ribbon-tab active" onclick="switchRibbon('system', this)">
         <span class="ribbon-icon">⚙️</span>
         <span>سیستم</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('users')">
+      <div class="ribbon-tab" onclick="switchRibbon('users', this)">
         <span class="ribbon-icon">👥</span>
         <span>کاربران</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('companies')">
+      <div class="ribbon-tab" onclick="switchRibbon('companies', this)">
         <span class="ribbon-icon">🏢</span>
         <span>شرکت‌ها و سال‌ها</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('accounting')">
+      <div class="ribbon-tab" onclick="switchRibbon('accounting', this)">
         <span class="ribbon-icon">📊</span>
         <span>حسابداری</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('inventory')">
+      <div class="ribbon-tab" onclick="switchRibbon('inventory', this)">
         <span class="ribbon-icon">📦</span>
         <span>خرید و فروش و انبارداری</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('payroll')">
+      <div class="ribbon-tab" onclick="switchRibbon('payroll', this)">
         <span class="ribbon-icon">👔</span>
         <span>حقوق و دستمزد</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('assets')">
+      <div class="ribbon-tab" onclick="switchRibbon('assets', this)">
         <span class="ribbon-icon">🏛</span>
         <span>اموال</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('automation')">
+      <div class="ribbon-tab" onclick="switchRibbon('automation', this)">
         <span class="ribbon-icon">✉️</span>
         <span>اتوماسیون اداری</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('crm')">
+      <div class="ribbon-tab" onclick="switchRibbon('crm', this)">
         <span class="ribbon-icon">🤝</span>
         <span>باشگاه مشتریان</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('treasury')">
+      <div class="ribbon-tab" onclick="switchRibbon('treasury', this)">
         <span class="ribbon-icon">💰</span>
         <span>خزانه‌داری</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('budget')">
+      <div class="ribbon-tab" onclick="switchRibbon('budget', this)">
         <span class="ribbon-icon">📈</span>
         <span>بودجه و هزینه</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('production')">
+      <div class="ribbon-tab" onclick="switchRibbon('production', this)">
         <span class="ribbon-icon">🏭</span>
         <span>تولید و بهای تمام‌شده</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('projects')">
+      <div class="ribbon-tab" onclick="switchRibbon('projects', this)">
         <span class="ribbon-icon">🏗</span>
         <span>پروژه‌ها و پیمان‌ها</span>
       </div>
-      <div class="ribbon-tab" onclick="switchRibbon('kpi')">
+      <div class="ribbon-tab" onclick="switchRibbon('kpi', this)">
         <span class="ribbon-icon">🎯</span>
         <span>ارزیابی عملکرد و KPI</span>
       </div>
@@ -85,79 +85,67 @@
   <div class="app-container">
     <main class="main-content">
       
-      <!-- 1. MODULE: SYSTEM (سیستم) - Matching Desktop Image 1 Tiles -->
+      <!-- 1. MODULE: SYSTEM (سیستم) -->
       <section id="module-system" class="view-section active">
         <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت سیستم نگار</h2>
         <p style="color:var(--text-muted); margin-bottom: 20px;">عملیات اصلی سیستم، پشتیبان‌گیری، تبدیل اطلاعات و تنظیمات برنامه</p>
 
         <div class="tiles-grid">
-          
           <div class="tile-card" onclick="alert('تبدیل دیتا از سایر نرم‌افزارها')">
             <div class="tile-icon-box tile-orange">🔀</div>
             <div class="tile-title">تبدیل دیتا از سایر نرم‌افزارها</div>
           </div>
-
           <div class="tile-card" onclick="alert('مدیریت پیام‌های سیستم')">
             <div class="tile-icon-box tile-gray">💬</div>
             <div class="tile-title">مدیریت پیامهای : درباره... و ارتباط با ما</div>
           </div>
-
           <div class="tile-card" onclick="alert('مدیریت تم‌های برنامه')">
             <div class="tile-icon-box tile-gray">🎨</div>
             <div class="tile-title">مدیریت تمهای برنامه و فرمها</div>
           </div>
-
-          <div class="tile-card" onclick="alert('پشتیبان‌گیری اطلاعات انجام شد')">
+          <div class="tile-card" onclick="alert('پشتیبان‌گیری اطلاعات')">
             <div class="tile-icon-box tile-green">💾</div>
             <div class="tile-title">پشتیبان‌گیری اطلاعات</div>
           </div>
-
           <div class="tile-card" onclick="alert('بازیابی اطلاعات')">
             <div class="tile-icon-box tile-orange">🔄</div>
             <div class="tile-title">بازیابی اطلاعات</div>
           </div>
-
           <div class="tile-card" onclick="alert('ایجاد نسخه فایل انتشار')">
             <div class="tile-icon-box tile-green">⬇️</div>
             <div class="tile-title">ایجاد نسخه فایل انتشار</div>
           </div>
-
           <div class="tile-card" onclick="alert('ایجاد بسته به‌روزرسانی')">
             <div class="tile-icon-box tile-purple">⬆️</div>
             <div class="tile-title">ایجاد بسته به‌روزرسانی</div>
           </div>
-
-          <div class="tile-card" onclick="alert('خروجی دیتابیس بازرسی')">
+          <div class="tile-card" onclick="alert('خروجی دیتابیس (بازرسی)')">
             <div class="tile-icon-box tile-blue">🗄️</div>
             <div class="tile-title">خروجی دیتابیس (بازرسی)</div>
           </div>
-
           <div class="tile-card" onclick="alert('برنامه قفل شد')">
             <div class="tile-icon-box tile-yellow">🔒</div>
             <div class="tile-title">قفل موقت برنامه</div>
           </div>
-
-          <div class="tile-card" onclick="alert('نرم‌افزار نگار نسخه وبی v1.0')">
+          <div class="tile-card" onclick="alert('نرم‌افزار نگار نسخه وبی')">
             <div class="tile-icon-box tile-blue">ℹ️</div>
             <div class="tile-title">درباره...</div>
           </div>
-
-          <div class="tile-card" onclick="alert('ارتباط با پشتیبانی نگار: 021-88888888')">
+          <div class="tile-card" onclick="alert('ارتباط با ما: 021-88888888')">
             <div class="tile-icon-box tile-blue">👤</div>
             <div class="tile-title">ارتباط با ما</div>
           </div>
-
           <div class="tile-card" onclick="alert('خروج از سیستم')">
             <div class="tile-icon-box tile-red">🚪</div>
             <div class="tile-title">خروج</div>
           </div>
-
         </div>
       </section>
 
       <!-- 2. MODULE: USERS (کاربران) -->
       <section id="module-users" class="view-section">
-        <h2 style="margin-bottom: 16px;">مدیریت کاربران و سطوح دسترسی</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت کاربران و دسترسی‌ها</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">تعریف کاربران، سطوح دسترسی و لاگ فعالیت‌ها</p>
         <div class="tiles-grid">
           <div class="tile-card" onclick="alert('مدیریت کاربران')">
             <div class="tile-icon-box tile-blue">👥</div>
@@ -165,20 +153,25 @@
           </div>
           <div class="tile-card" onclick="alert('ماتریس دسترسی‌ها')">
             <div class="tile-icon-box tile-green">🔑</div>
-            <div class="tile-title">ماتریس سطوح دسترسی</div>
+            <div class="tile-title">ماتریس سطوح دسترسی (Permissions)</div>
           </div>
           <div class="tile-card" onclick="alert('تغییر رمز عبور')">
             <div class="tile-icon-box tile-yellow">🔒</div>
             <div class="tile-title">تغییر رمز عبور کاربر</div>
+          </div>
+          <div class="tile-card" onclick="alert('لاگ فعالیت‌ها')">
+            <div class="tile-icon-box tile-purple">📋</div>
+            <div class="tile-title">سوابق و لاگ فعالیت‌های کاربران</div>
           </div>
         </div>
       </section>
 
       <!-- 3. MODULE: COMPANIES (شرکت‌ها و سال‌ها) -->
       <section id="module-companies" class="view-section">
-        <h2 style="margin-bottom: 16px;">مدیریت شرکت‌ها و سال‌های مالی</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت شرکت‌ها و سال‌های مالی</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">تعریف چند شرکتی، سال‌های مالی متوالی و ساختار حساب‌ها</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('مدیریت شرکت‌ها')">
+          <div class="tile-card" onclick="alert('تعریف شرکت‌ها')">
             <div class="tile-icon-box tile-blue">🏢</div>
             <div class="tile-title">تعریف و مدیریت شرکت‌ها</div>
           </div>
@@ -186,16 +179,21 @@
             <div class="tile-icon-box tile-green">📅</div>
             <div class="tile-title">مدیریت سال‌های مالی</div>
           </div>
-          <div class="tile-card" onclick="alert('انتخاب شرکت فعال')">
+          <div class="tile-card" onclick="alert('تغییر شرکت فعال')">
             <div class="tile-icon-box tile-purple">🔄</div>
             <div class="tile-title">تغییر شرکت / سال مالی فعال</div>
+          </div>
+          <div class="tile-card" onclick="alert('تنظیمات سطوح حساب‌ها')">
+            <div class="tile-icon-box tile-orange">⚙️</div>
+            <div class="tile-title">تنظیمات طول و سطوح حساب‌ها</div>
           </div>
         </div>
       </section>
 
       <!-- 4. MODULE: ACCOUNTING (حسابداری) -->
       <section id="module-accounting" class="view-section">
-        <h2 style="margin-bottom: 16px;">ماژول حسابداری (Hesabdary)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت حسابداری (Hesabdary)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">کدگذاری سرفصل‌ها، اسناد حسابداری، دفاتر و ترازنامه</p>
         <div class="tiles-grid">
           <div class="tile-card" onclick="alert('سرفصل حساب‌ها')">
             <div class="tile-icon-box tile-blue">📑</div>
@@ -207,26 +205,39 @@
           </div>
           <div class="tile-card" onclick="alert('ثبت اسناد حسابداری')">
             <div class="tile-icon-box tile-green">📝</div>
-            <div class="tile-title">ثبت و مدیریت اسناد حسابداری</div>
+            <div class="tile-title">ثبت و مدیریت اسناد حسابداری (Sanad 1 & 2)</div>
+          </div>
+          <div class="tile-card" onclick="alert('ادغام اسناد')">
+            <div class="tile-icon-box tile-orange">🔗</div>
+            <div class="tile-title">ادغام اسناد حسابداری</div>
+          </div>
+          <div class="tile-card" onclick="alert('تفکیک اسناد')">
+            <div class="tile-icon-box tile-yellow">✂️</div>
+            <div class="tile-title">تفکیک اسناد حسابداری</div>
+          </div>
+          <div class="tile-card" onclick="alert('مغایرت‌گیری بانکی')">
+            <div class="tile-icon-box tile-blue">💳</div>
+            <div class="tile-title">موجودیت نقد، بانک و مغایرت‌گیری</div>
           </div>
           <div class="tile-card" onclick="alert('دفاتر حسابداری')">
-            <div class="tile-icon-box tile-yellow">📖</div>
+            <div class="tile-icon-box tile-gray">📖</div>
             <div class="tile-title">دفاتر کل، معین و روزنامه</div>
           </div>
           <div class="tile-card" onclick="alert('تراز آزمایشی')">
-            <div class="tile-icon-box tile-orange">⚖️</div>
+            <div class="tile-icon-box tile-green">⚖️</div>
             <div class="tile-title">تراز آزمایشی (۴ و ۸ ستونی)</div>
           </div>
           <div class="tile-card" onclick="alert('صورت‌های مالی')">
-            <div class="tile-icon-box tile-blue">📊</div>
+            <div class="tile-icon-box tile-purple">📊</div>
             <div class="tile-title">ترازنامه و صورت سود و زیان</div>
           </div>
         </div>
       </section>
 
-      <!-- 5. MODULE: INVENTORY (خرید، فروش و انبارداری) -->
+      <!-- 5. MODULE: INVENTORY (خرید و فروش و انبارداری) -->
       <section id="module-inventory" class="view-section">
-        <h2 style="margin-bottom: 16px;">خرید، فروش و انبارداری (Anbardary)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">خرید، فروش و انبارداری (Anbardary)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">مدیریت کالاها، انبارها، موجودی، فاکتور خرید و فروش</p>
         <div class="tiles-grid">
           <div class="tile-card" onclick="alert('تعریف کالاها')">
             <div class="tile-icon-box tile-blue">📦</div>
@@ -234,7 +245,7 @@
           </div>
           <div class="tile-card" onclick="alert('انبارها')">
             <div class="tile-icon-box tile-green">🏭</div>
-            <div class="tile-title">تعریف انبارها و قفسه‌ها</div>
+            <div class="tile-title">تعریف انبارها و جانمایی قفسه‌ها</div>
           </div>
           <div class="tile-card" onclick="alert('موجودی انبار')">
             <div class="tile-icon-box tile-orange">📊</div>
@@ -242,80 +253,180 @@
           </div>
           <div class="tile-card" onclick="alert('فاکتور خرید')">
             <div class="tile-icon-box tile-purple">📥</div>
-            <div class="tile-title">فاکتورهای خرید</div>
+            <div class="tile-title">فاکتورهای خرید (Kharid 1 & 2)</div>
           </div>
           <div class="tile-card" onclick="alert('فاکتور فروش')">
             <div class="tile-icon-box tile-green">📤</div>
-            <div class="tile-title">فاکتورهای فروش</div>
+            <div class="tile-title">فاکتورهای فروش (Foroosh 1 & 2)</div>
           </div>
           <div class="tile-card" onclick="alert('انتقال بین انبارها')">
             <div class="tile-icon-box tile-yellow">🔄</div>
-            <div class="tile-title">انتقال بین انبارها</div>
+            <div class="tile-title">انتقال بین انبارها و رسیدها</div>
+          </div>
+          <div class="tile-card" onclick="alert('سامانه مودیان')">
+            <div class="tile-icon-box tile-blue">🧾</div>
+            <div class="tile-title">سامانه مودیان مالیاتی</div>
+          </div>
+          <div class="tile-card" onclick="alert('تامین‌کنندگان و مشتریان')">
+            <div class="tile-icon-box tile-gray">👥</div>
+            <div class="tile-title">تامین‌کنندگان و مشتریان</div>
           </div>
         </div>
       </section>
 
-      <!-- OTHER MODULE TILES (Payroll, Assets, Automation, CRM, Treasury, Budget, Production, Projects, KPI) -->
+      <!-- 6. MODULE: PAYROLL (حقوق و دستمزد) -->
       <section id="module-payroll" class="view-section">
-        <h2>حقوق و دستمزد (Payroll)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">حقوق و دستمزد (Payroll)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">پرونده پرسنلی، حکم حقوقی و فیش حقوقی</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('مدیریت پرسنل')"><div class="tile-icon-box tile-blue">👔</div><div class="tile-title">پرونده پرسنلی و حکم حقوقی</div></div>
+          <div class="tile-card" onclick="alert('پرونده پرسنلی')">
+            <div class="tile-icon-box tile-blue">👔</div>
+            <div class="tile-title">پرونده پرسنلی و حکم حقوقی</div>
+          </div>
+          <div class="tile-card" onclick="alert('محاسبه حقوق')">
+            <div class="tile-icon-box tile-green">💵</div>
+            <div class="tile-title">محاسبه حقوق و صدور فیش</div>
+          </div>
+          <div class="tile-card" onclick="alert('کارکرد و مرخصی‌ها')">
+            <div class="tile-icon-box tile-yellow">📅</div>
+            <div class="tile-title">کارکرد و ثبت مرخصی‌ها</div>
+          </div>
         </div>
       </section>
 
+      <!-- 7. MODULE: ASSETS (اموال) -->
       <section id="module-assets" class="view-section">
-        <h2>اموال و دارایی‌های ثابت (Amval)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">اموال و دارایی‌های ثابت (Amval)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">ثبت دارایی‌های ثابت و جدول استهلاک</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('اموال')"><div class="tile-icon-box tile-orange">🏛</div><div class="tile-title">ثبت اموال و محاسبه استهلاک</div></div>
+          <div class="tile-card" onclick="alert('ثبت اموال')">
+            <div class="tile-icon-box tile-orange">🏛</div>
+            <div class="tile-title">ثبت اموال و دارایی‌های ثابت</div>
+          </div>
+          <div class="tile-card" onclick="alert('محاسبه استهلاک')">
+            <div class="tile-icon-box tile-purple">📉</div>
+            <div class="tile-title">محاسبه استهلاک دارایی‌ها</div>
+          </div>
         </div>
       </section>
 
+      <!-- 8. MODULE: AUTOMATION (اتوماسیون اداری) -->
       <section id="module-automation" class="view-section">
-        <h2>اتوماسیون اداری (Automation)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">اتوماسیون اداری (Automation)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">مکاتبات اداری، کارتابل نامه‌ها و بایگانی اسناد (DMS)</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('اتوماسیون')"><div class="tile-icon-box tile-purple">✉️</div><div class="tile-title">مکاتبات اداری و دبیرخانه</div></div>
+          <div class="tile-card" onclick="alert('مکاتبات اداری')">
+            <div class="tile-icon-box tile-purple">✉️</div>
+            <div class="tile-title">مکاتبات اداری و دبیرخانه</div>
+          </div>
+          <div class="tile-card" onclick="alert('بایگانی اسناد')">
+            <div class="tile-icon-box tile-blue">📂</div>
+            <div class="tile-title">بایگانی اسناد دیجیتال (DMS)</div>
+          </div>
         </div>
       </section>
 
+      <!-- 9. MODULE: CRM (باشگاه مشتریان) -->
       <section id="module-crm" class="view-section">
-        <h2>باشگاه مشتریان (CRM)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">باشگاه مشتریان (CRM)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">مدیریت ارتباط با مشتریان و پیگیری فرصت‌های فروش</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('CRM')"><div class="tile-icon-box tile-green">🤝</div><div class="tile-title">مدیریت ارتباط با مشتریان</div></div>
+          <div class="tile-card" onclick="alert('مدیریت CRM')">
+            <div class="tile-icon-box tile-green">🤝</div>
+            <div class="tile-title">مدیریت ارتباط با مشتریان</div>
+          </div>
+          <div class="tile-card" onclick="alert('فرصت‌های فروش')">
+            <div class="tile-icon-box tile-yellow">🎯</div>
+            <div class="tile-title">پیگیری فرصت‌های فروش</div>
+          </div>
         </div>
       </section>
 
+      <!-- 10. MODULE: TREASURY (خزانه‌داری) -->
       <section id="module-treasury" class="view-section">
-        <h2>خزانه‌داری (Treasury)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">خزانه‌داری (Treasury)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">مدیریت چک‌های دریافتی/پرداختی، حساب‌های بانکی و صندوق</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('چک‌ها')"><div class="tile-icon-box tile-yellow">💰</div><div class="tile-title">مدیریت چک‌ها و حساب‌های بانکی</div></div>
+          <div class="tile-card" onclick="alert('مدیریت چک‌ها')">
+            <div class="tile-icon-box tile-yellow">💰</div>
+            <div class="tile-title">مدیریت چک‌های دریافتی و پرداختی</div>
+          </div>
+          <div class="tile-card" onclick="alert('حساب‌های بانکی و صندوق')">
+            <div class="tile-icon-box tile-blue">🏦</div>
+            <div class="tile-title">مدیریت حساب‌های بانکی و صندوق</div>
+          </div>
         </div>
       </section>
 
+      <!-- 11. MODULE: BUDGET (بودجه و هزینه) -->
       <section id="module-budget" class="view-section">
-        <h2>بودجه و هزینه (Budgeting)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">بودجه و هزینه (Budgeting)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">بودجه‌بندی، کنترل انحرافات و مراکز هزینه</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('بودجه')"><div class="tile-icon-box tile-blue">📈</div><div class="tile-title">بودجه‌بندی و انحرافات</div></div>
+          <div class="tile-card" onclick="alert('بودجه‌بندی')">
+            <div class="tile-icon-box tile-blue">📈</div>
+            <div class="tile-title">بودجه‌بندی و کنترل انحرافات</div>
+          </div>
+          <div class="tile-card" onclick="alert('مراکز هزینه')">
+            <div class="tile-icon-box tile-orange">💸</div>
+            <div class="tile-title">مدیریت مراکز هزینه</div>
+          </div>
         </div>
       </section>
 
+      <!-- 12. MODULE: PRODUCTION (تولید و بهای تمام‌شده) -->
       <section id="module-production" class="view-section">
-        <h2>تولید و بهای تمام‌شده (Production)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">تولید و بهای تمام‌شده (Production)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">دستور ساخت، فرمول تولید، PM و کنترل کیفیت QC</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('تولید')"><div class="tile-icon-box tile-orange">🏭</div><div class="tile-title">دستور ساخت و بهای تمام‌شده</div></div>
+          <div class="tile-card" onclick="alert('دستور ساخت')">
+            <div class="tile-icon-box tile-orange">🏭</div>
+            <div class="tile-title">دستور ساخت و فرمول تولید</div>
+          </div>
+          <div class="tile-card" onclick="alert('بهای تمام شده')">
+            <div class="tile-icon-box tile-green">💵</div>
+            <div class="tile-title">بهای تمام شده کالای تولیدی</div>
+          </div>
+          <div class="tile-card" onclick="alert('تعمیر و نگهداری PM')">
+            <div class="tile-icon-box tile-purple">🔧</div>
+            <div class="tile-title">تعمیر و نگهداری (PM)</div>
+          </div>
+          <div class="tile-card" onclick="alert('کنترل کیفیت QC')">
+            <div class="tile-icon-box tile-blue">🔍</div>
+            <div class="tile-title">کنترل کیفیت (QC)</div>
+          </div>
         </div>
       </section>
 
+      <!-- 13. MODULE: PROJECTS (پروژه‌ها و پیمان‌ها) -->
       <section id="module-projects" class="view-section">
-        <h2>پروژه‌ها و پیمان‌ها (Projects)</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">پروژه‌ها و پیمان‌ها (Projects)</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">کنترل فاز پروژه‌ها، صورت وضعیت و پیمانکاران</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('پروژه‌ها')"><div class="tile-icon-box tile-green">🏗</div><div class="tile-title">کنترل فاز پروژه‌ها و صورت وضعیت</div></div>
+          <div class="tile-card" onclick="alert('کنترل فاز پروژه‌ها')">
+            <div class="tile-icon-box tile-green">🏗</div>
+            <div class="tile-title">کنترل فاز پروژه‌ها</div>
+          </div>
+          <div class="tile-card" onclick="alert('صورت وضعیت')">
+            <div class="tile-icon-box tile-yellow">📜</div>
+            <div class="tile-title">ثبت صورت وضعیت و پیمانکاران</div>
+          </div>
         </div>
       </section>
 
+      <!-- 14. MODULE: KPI (ارزیابی عملکرد و KPI) -->
       <section id="module-kpi" class="view-section">
-        <h2>ارزیابی عملکرد و KPI</h2>
+        <h2 style="margin-bottom: 8px; font-weight:800;">ارزیابی عملکرد و KPI</h2>
+        <p style="color:var(--text-muted); margin-bottom: 20px;">شاخص‌های کلیدی عملکرد و داشبوردهای مدیریتی BI</p>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="alert('KPI')"><div class="tile-icon-box tile-purple">🎯</div><div class="tile-title">شاخص‌های کلیدی عملکرد (KPI)</div></div>
+          <div class="tile-card" onclick="alert('شاخص‌های KPI')">
+            <div class="tile-icon-box tile-purple">🎯</div>
+            <div class="tile-title">شاخص‌های کلیدی عملکرد (KPI)</div>
+          </div>
+          <div class="tile-card" onclick="alert('داشبوردهای BI')">
+            <div class="tile-icon-box tile-blue">📊</div>
+            <div class="tile-title">داشبوردهای هوش تجاری (BI)</div>
+          </div>
         </div>
       </section>
 
@@ -329,17 +440,27 @@
   </footer>
 
   <script>
-    function switchRibbon(moduleId) {
-      // Remove active from all tabs
+    function switchRibbon(moduleId, tabElement) {
+      // 1. Remove active class from all ribbon tabs
       document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
-      // Hide all view sections
-      document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+      
+      // 2. Hide ALL module sections
+      document.querySelectorAll('.view-section').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+      });
 
-      // Highlight selected tab
-      event.currentTarget.classList.add('active');
-      // Show selected module section
+      // 3. Highlight the selected ribbon tab
+      if (tabElement) {
+        tabElement.classList.add('active');
+      }
+
+      // 4. Show ONLY the selected module section
       const targetSection = document.getElementById('module-' + moduleId);
-      if (targetSection) targetSection.classList.add('active');
+      if (targetSection) {
+        targetSection.classList.add('active');
+        targetSection.style.display = 'block';
+      }
     }
   </script>
 </body>
