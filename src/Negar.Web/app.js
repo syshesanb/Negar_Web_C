@@ -507,7 +507,6 @@ function renderAccountsTable() {
         </td>
         <td><span class="badge badge-primary">${a.type}</span></td>
         <td>${a.nature}</td>
-        <td style="color:var(--text-muted);font-size:0.82rem;">${a.parent}</td>
         <td><span class="badge badge-success">فعال</span></td>
         <td>
           <button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button>
