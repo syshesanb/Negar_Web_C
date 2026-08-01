@@ -1,125 +1,151 @@
 // =============================================================================
-// Negar Web Application Core Logic & Operational Forms Controller
-// Matching VB.NET Desktop Negar Forms (C:\Negar\Forms)
+// Negar Web App - Core Controller
+// Architecture: Each tile button shows its own form; Back button returns to tiles
 // =============================================================================
 
-// Store App State
+// ---- App State ----
 const AppState = {
-  activeCompanyId: 1,
-  activeFiscalYearId: 1,
-  activeTheme: 'blue',
-  currentUser: { username: 'admin', fullName: 'ابر مدیر سیستم', role: 'SuperAdmin' },
-  
-  // Data Repositories (In-Memory State matching PostgreSQL Seeder)
+  currentModule: 'system',   // active ribbon tab
+  currentForm: null,          // null = tiles view, otherwise form id
   users: [
-    { id: 1, username: 'admin', fullName: 'مدیر ارشد سیستم', userType: 'SuperAdmin', isActive: true, creatorIP: '127.0.0.1' },
-    { id: 2, username: 'accountant1', fullName: 'علی رضایی (حسابدار)', userType: 'User', isActive: true, creatorIP: '192.168.1.10' },
-    { id: 3, username: 'storekeeper', fullName: 'رضا حسینی (انباردار)', userType: 'User', isActive: true, creatorIP: '192.168.1.15' }
+    { id: 1, username: 'admin', fullName: 'مدیر ارشد سیستم', userType: 'SuperAdmin', isActive: true, ip: '127.0.0.1' },
+    { id: 2, username: 'accountant1', fullName: 'علی رضایی (حسابدار)', userType: 'User', isActive: true, ip: '192.168.1.10' },
+    { id: 3, username: 'storekeeper', fullName: 'رضا حسینی (انباردار)', userType: 'User', isActive: true, ip: '192.168.1.15' }
   ],
-  
-  companies: [
-    { id: 1, name: 'شرکت نمونه نگار', code: '1001', ecoCode: '411111111111', phone: '021-88888888', activeYear: '1403' }
-  ],
-
   accounts: [
     { id: 1, code: '1', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parent: '-' },
-    { id: 2, code: '10', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parent: '1 (دارایی‌های جاری)' },
-    { id: 3, code: '1001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parent: '10 (موجودی نقد و بانک)' },
-    { id: 4, code: '1002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parent: '10 (موجودی نقد و بانک)' },
-    { id: 5, code: '11', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parent: '1 (دارایی‌های جاری)' },
-    { id: 6, code: '1101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parent: '11 (حساب‌های دریافتنی)' },
-    { id: 7, code: '12', name: 'موجودی کالا', type: 'کل', nature: 'بدهکار', parent: '1 (دارایی‌های جاری)' },
-    { id: 8, code: '1201', name: 'موجودی انبار مرکزی', type: 'معین', nature: 'بدهکار', parent: '12 (موجودی کالا)' },
-    { id: 9, code: '2', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parent: '-' },
-    { id: 10, code: '20', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parent: '2 (بدهی‌های جاری)' },
-    { id: 11, code: '2001', name: 'فروشندگان و تامین کنندگان', type: 'معین', nature: 'بستانکار', parent: '20 (حساب‌های پرداختنی)' },
-    { id: 12, code: '4', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parent: '-' },
-    { id: 13, code: '40', name: 'فروش کالا و خدمات', type: 'کل', nature: 'بستانکار', parent: '4 (درآمدها)' }
+    { id: 2, code: '10', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parent: '1 - دارایی‌های جاری' },
+    { id: 3, code: '1001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parent: '10 - موجودی نقد و بانک' },
+    { id: 4, code: '1002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parent: '10 - موجودی نقد و بانک' },
+    { id: 5, code: '11', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parent: '1 - دارایی‌های جاری' },
+    { id: 6, code: '1101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parent: '11 - حساب‌های دریافتنی' },
+    { id: 7, code: '2', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parent: '-' },
+    { id: 8, code: '20', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parent: '2 - بدهی‌های جاری' },
+    { id: 9, code: '2001', name: 'تامین‌کنندگان', type: 'معین', nature: 'بستانکار', parent: '20 - حساب‌های پرداختنی' },
+    { id: 10, code: '4', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parent: '-' },
+    { id: 11, code: '40', name: 'فروش کالا', type: 'کل', nature: 'بستانکار', parent: '4 - درآمدها' },
+    { id: 12, code: '5', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parent: '-' },
+    { id: 13, code: '50', name: 'هزینه اداری', type: 'کل', nature: 'بدهکار', parent: '5 - هزینه‌ها' },
   ],
-
   shenavars: [
     { id: 1, code: 'SH-101', name: 'پروژه احداث شعبه غرب', parent: '-', status: 'فعال' },
-    { id: 2, code: 'SH-102', name: 'مرکز هزینه کارخانه شماره ۱', parent: '-', status: 'فعال' }
+    { id: 2, code: 'SH-102', name: 'مرکز هزینه کارخانه ۱', parent: '-', status: 'فعال' }
   ],
-
   sanads: [
-    {
-      id: 101,
-      date: '1403/01/05',
-      desc: 'ثبت سند افتتاحیه سال مالی جدید',
-      debit: 5000000000,
-      credit: 5000000000,
-      status: 'دائم',
-      balanced: true,
-      lines: [
-        { account: '1002 (بانک ملی شعبه مرکزی)', shenavar: '-', desc: 'مانده اول دوره بانک', debit: 3000000000, credit: 0 },
-        { account: '1201 (موجودی انبار مرکزی)', shenavar: '-', desc: 'ارزش موجودی کالا اول دوره', debit: 2000000000, credit: 0 },
-        { account: '2001 (فروشندگان و تامین کنندگان)', shenavar: '-', desc: 'بدهی اول دوره تامین کنندگان', debit: 0, credit: 5000000000 }
-      ]
-    },
-    {
-      id: 102,
-      date: '1403/05/10',
-      desc: 'ثبت فاکتور فروش شماره فروشگاه مرکزی',
-      debit: 125000000,
-      credit: 125000000,
-      status: 'تایید شده',
-      balanced: true,
-      lines: [
-        { account: '1101 (مشتریان تجاری)', shenavar: '-', desc: 'فروش به شرکت آریا', debit: 125000000, credit: 0 },
-        { account: '40 (فروش کالا و خدمات)', shenavar: '-', desc: 'فروش کالا بابت فاکتور 8001', debit: 0, credit: 125000000 }
-      ]
-    }
+    { id: 101, date: '1403/01/05', desc: 'سند افتتاحیه سال مالی', debit: 5000000000, credit: 5000000000, status: 'دائم' },
+    { id: 102, date: '1403/05/10', desc: 'فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 125000000, status: 'تایید شده' }
   ],
-
+  sanadLines: [
+    { account: '1001', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
+    { account: '1101', desc: 'تسویه حساب مشتری', debit: 0, credit: 50000000 }
+  ],
   products: [
-    { id: 1, code: 'PRD-101', name: 'لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ', unit: 'دستگاه', price: 450000000, buyPrice: 390000000, stock: 24, reorder: 5, barcode: '690123456789' },
-    { id: 2, code: 'PRD-102', name: 'مانیتور ۲۷ اینچ 4K سامسونگ', unit: 'عدد', price: 180000000, buyPrice: 155000000, stock: 15, reorder: 10, barcode: '690987654321' }
+    { id: 1, code: 'PRD-101', name: 'لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ', unit: 'دستگاه', price: 450000000, stock: 24, barcode: '690123456789' },
+    { id: 2, code: 'PRD-102', name: 'مانیتور ۲۷ اینچ 4K سامسونگ', unit: 'عدد', price: 180000000, stock: 15, barcode: '690987654321' }
   ],
-
   warehouses: [
-    { id: 1, code: 'WH-01', name: 'انبار مرکزی کالا', type: 'عمومی', keeper: 'احمد محمدی', location: 'تهران - سالن اصلی', allowNegative: false }
+    { id: 1, code: 'WH-01', name: 'انبار مرکزی کالا', type: 'عمومی', keeper: 'رضا حسینی', location: 'تهران - سالن اصلی', allowNeg: false }
   ],
-
-  invoices: [
-    { id: 'INV-8001', type: 'فروش', date: '1403/05/08', party: 'شرکت فناوری آریا', total: 630000000, warehouse: 'انبار مرکزی', status: 'ثبت نهایی' },
-    { id: 'PINV-4002', type: 'خرید', date: '1403/05/02', party: 'بازرگانی واردات پارس', total: 1850000000, warehouse: 'انبار مرکزی', status: 'ثبت نهایی' }
+  purchaseInvoices: [
+    { id: 'PINV-4001', date: '1403/05/02', party: 'بازرگانی واردات پارس', total: 1850000000, warehouse: 'انبار مرکزی', status: 'ثبت نهایی' }
+  ],
+  salesInvoices: [
+    { id: 'INV-8001', date: '1403/05/08', party: 'شرکت فناوری آریا', total: 630000000, warehouse: 'انبار مرکزی', status: 'ثبت نهایی' }
   ]
 };
 
-// Ribbon Tab Switcher
-function switchRibbon(moduleId, tabElement) {
+// ============================
+// Navigation: Ribbon Tab Switch
+// ============================
+function switchRibbon(moduleId, tabEl) {
+  AppState.currentModule = moduleId;
+  AppState.currentForm = null;
+
+  // Update active ribbon tab
   document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.view-section').forEach(v => {
-    v.classList.remove('active');
-    v.style.display = 'none';
+  if (tabEl) tabEl.classList.add('active');
+
+  // Hide forms area, show tiles
+  showTiles(moduleId);
+}
+
+function showTiles(moduleId) {
+  // Hide forms area
+  document.getElementById('formsArea').style.display = 'none';
+
+  // Hide all tile containers
+  document.querySelectorAll('.tiles-container').forEach(t => {
+    t.classList.remove('active');
+    t.style.display = 'none';
   });
 
-  if (tabElement) tabElement.classList.add('active');
-
-  const targetSection = document.getElementById('module-' + moduleId);
-  if (targetSection) {
-    targetSection.classList.add('active');
-    targetSection.style.display = 'block';
+  // Show only selected module's tiles
+  const target = document.getElementById('tiles-' + moduleId);
+  if (target) {
+    target.classList.add('active');
+    target.style.display = 'block';
   }
 }
 
-// Modal Form Management
-function openModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.add('open');
+// ============================
+// Show Form (called when a tile is clicked)
+// ============================
+function showForm(formId) {
+  AppState.currentForm = formId;
+
+  // Hide all tile containers
+  document.querySelectorAll('.tiles-container').forEach(t => {
+    t.classList.remove('active');
+    t.style.display = 'none';
+  });
+
+  // Show forms area
+  const formsArea = document.getElementById('formsArea');
+  formsArea.style.display = 'block';
+
+  // Hide all individual form sections
+  document.querySelectorAll('.form-section').forEach(f => {
+    f.style.display = 'none';
+  });
+
+  // Show selected form
+  const targetForm = document.getElementById(formId);
+  if (targetForm) {
+    targetForm.style.display = 'block';
+
+    // Set back-bar title
+    const heading = targetForm.querySelector('.form-heading');
+    const titleEl = document.getElementById('currentFormTitle');
+    if (titleEl && heading) titleEl.textContent = heading.textContent;
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+  }
+
+  // Re-render dynamic tables when their form is shown
+  if (formId === 'form-users-list') renderUsersTable();
+  if (formId === 'form-accounts-chart') renderAccountsTable();
+  if (formId === 'form-shenavar') renderShenavaarTable();
+  if (formId === 'form-sanad1') renderSanadListTable();
+  if (formId === 'form-sanad2') renderSanadEditorLines();
+  if (formId === 'form-products') renderProductsTable();
+  if (formId === 'form-warehouses') renderWarehousesTable();
+  if (formId === 'form-purchase-invoice') renderPurchaseInvoicesTable();
+  if (formId === 'form-sales-invoice') renderSalesInvoicesTable();
+  if (formId === 'form-permissions-matrix') renderPermissionsMatrix();
 }
 
-function closeModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (modal) modal.classList.remove('open');
+// ============================
+// Back Button
+// ============================
+function goBack() {
+  AppState.currentForm = null;
+  showTiles(AppState.currentModule);
 }
 
-// =============================================================================
-// Operational Handlers (Matching Desktop Forms)
-// =============================================================================
-
-// 1. User Management Form (UserManagementForm.vb)
+// ============================
+// USERS MODULE
+// ============================
 function renderUsersTable() {
   const tbody = document.getElementById('usersTableBody');
   if (!tbody) return;
@@ -128,45 +154,67 @@ function renderUsersTable() {
       <td><b>${u.username}</b></td>
       <td>${u.fullName}</td>
       <td><span class="badge badge-primary">${u.userType}</span></td>
-      <td>${u.creatorIP}</td>
+      <td>${u.ip}</td>
       <td><span class="badge ${u.isActive ? 'badge-success' : 'badge-warning'}">${u.isActive ? 'فعال' : 'غیرفعال'}</span></td>
       <td>
-        <button class="btn btn-outline" style="padding:4px 8px;" onclick="openPermissionsModal(${u.id})">🔑 تنظیم دسترسی</button>
-        <button class="btn btn-outline" style="padding:4px 8px; color:red;" onclick="deleteUser(${u.id})">🗑️ حذف</button>
+        <button class="btn btn-outline" style="padding:3px 8px;" onclick="toggleUserStatus(${u.id})">
+          ${u.isActive ? '🔴 غیرفعال' : '🟢 فعال'}
+        </button>
+        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteUser(${u.id})">🗑️ حذف</button>
       </td>
     </tr>
   `).join('');
 }
 
+function openAddUserRow() {
+  document.getElementById('addUserRow').style.display = 'block';
+  document.getElementById('newUsername').focus();
+}
+
 function saveNewUser() {
-  const username = document.getElementById('newUsername')?.value;
-  const fullName = document.getElementById('newFullName')?.value;
+  const username = document.getElementById('newUsername')?.value?.trim();
+  const fullName = document.getElementById('newFullName')?.value?.trim();
   const userType = document.getElementById('newUserType')?.value;
-  if (!username || !fullName) {
-    alert('لطفاً نام کاربری و نام کامل را وارد نمایید.');
-    return;
-  }
-  AppState.users.push({
-    id: AppState.users.length + 1,
-    username: username,
-    fullName: fullName,
-    userType: userType || 'User',
-    isActive: true,
-    creatorIP: '127.0.0.1'
-  });
+  if (!username || !fullName) { alert('نام کاربری و نام کامل الزامی هستند.'); return; }
+  if (AppState.users.find(u => u.username === username)) { alert('این نام کاربری قبلاً ثبت شده است.'); return; }
+  AppState.users.push({ id: Date.now(), username, fullName, userType, isActive: true, ip: '127.0.0.1' });
+  document.getElementById('newUsername').value = '';
+  document.getElementById('newFullName').value = '';
+  document.getElementById('addUserRow').style.display = 'none';
   renderUsersTable();
-  closeModal('addUserModal');
-  alert(`کاربر جدید "${username}" با موفقیت تعریف شد.`);
+  alert(`کاربر "${username}" با موفقیت اضافه شد.`);
+}
+
+function toggleUserStatus(userId) {
+  const user = AppState.users.find(u => u.id === userId);
+  if (user) { user.isActive = !user.isActive; renderUsersTable(); }
 }
 
 function deleteUser(userId) {
+  if (userId === 1) { alert('حذف مدیر ارشد سیستم مجاز نیست.'); return; }
   if (confirm('آیا از حذف این کاربر اطمینان دارید؟')) {
     AppState.users = AppState.users.filter(u => u.id !== userId);
     renderUsersTable();
   }
 }
 
-// 2. Chart of Accounts Form (HesabdaryCodingForm.vb)
+function renderPermissionsMatrix() {
+  const modules = ['حسابداری', 'کاربران', 'انبارداری', 'خرید', 'فروش', 'حقوق', 'اموال', 'اتوماسیون', 'CRM', 'خزانه'];
+  const tbody = document.getElementById('permissionsMatrixBody');
+  if (!tbody) return;
+  tbody.innerHTML = modules.map(m => `
+    <tr>
+      <td>${m}</td>
+      ${['مشاهده','ایجاد','ویرایش','حذف','چاپ','خروجی'].map(p => `
+        <td style="text-align:center;"><input type="checkbox" checked style="width:16px;height:16px;cursor:pointer;" /></td>
+      `).join('')}
+    </tr>
+  `).join('');
+}
+
+// ============================
+// ACCOUNTING MODULE
+// ============================
 function renderAccountsTable() {
   const tbody = document.getElementById('accountsTableBody');
   if (!tbody) return;
@@ -176,150 +224,77 @@ function renderAccountsTable() {
       <td>${a.name}</td>
       <td><span class="badge badge-primary">${a.type}</span></td>
       <td>${a.nature}</td>
-      <td>${a.parent}</td>
+      <td style="color:var(--text-muted);font-size:0.82rem;">${a.parent}</td>
       <td><span class="badge badge-success">فعال</span></td>
       <td>
-        <button class="btn btn-outline" style="padding:4px 8px;" onclick="editAccount(${a.id})">✏️ ویرایش</button>
-        <button class="btn btn-outline" style="padding:4px 8px; color:red;" onclick="deleteAccount(${a.id})">🗑️ حذف</button>
+        <button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button>
+        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteAccount(${a.id})">🗑️ حذف</button>
       </td>
     </tr>
   `).join('');
 }
 
-function saveNewAccount() {
-  const code = document.getElementById('newAccCode')?.value;
-  const name = document.getElementById('newAccName')?.value;
-  const type = document.getElementById('newAccType')?.value;
-  const nature = document.getElementById('newAccNature')?.value;
-  if (!code || !name) {
-    alert('لطفاً کد حساب و عنوان حساب را وارد کنید.');
-    return;
-  }
-  AppState.accounts.push({
-    id: AppState.accounts.length + 1,
-    code: code,
-    name: name,
-    type: type || 'معین',
-    nature: nature || 'بدهکار',
-    parent: '-'
-  });
-  renderAccountsTable();
-  closeModal('addAccountModal');
-  alert(`حساب "${name}" با موفقیت در کدگذاری ثبت گردید.`);
+function openAddAccountRow() {
+  document.getElementById('addAccountRow').style.display = 'block';
+  document.getElementById('newAccCode').focus();
 }
 
-function deleteAccount(accId) {
+function saveNewAccount() {
+  const code = document.getElementById('newAccCode')?.value?.trim();
+  const name = document.getElementById('newAccName')?.value?.trim();
+  const type = document.getElementById('newAccType')?.value;
+  const nature = document.getElementById('newAccNature')?.value;
+  if (!code || !name) { alert('کد حساب و عنوان الزامی است.'); return; }
+  if (AppState.accounts.find(a => a.code === code)) { alert('این کد حساب قبلاً ثبت شده است.'); return; }
+  AppState.accounts.push({ id: Date.now(), code, name, type, nature, parent: '-' });
+  document.getElementById('newAccCode').value = '';
+  document.getElementById('newAccName').value = '';
+  document.getElementById('addAccountRow').style.display = 'none';
+  renderAccountsTable();
+  alert(`حساب "${code} - ${name}" با موفقیت ثبت شد.`);
+}
+
+function deleteAccount(id) {
   if (confirm('آیا از حذف این حساب اطمینان دارید؟')) {
-    AppState.accounts = AppState.accounts.filter(a => a.id !== accId);
+    AppState.accounts = AppState.accounts.filter(a => a.id !== id);
     renderAccountsTable();
   }
 }
 
-// 3. Journal Entry Registration Form (HesabdarySanad1Form.vb & HesabdarySanad2Form.vb)
-let currentSanadLines = [
-  { account: '1001 (صندوق مرکزی)', shenavar: '-', desc: 'دریافت نقد', debit: 50000000, credit: 0 },
-  { account: '1101 (مشتریان تجاری)', shenavar: '-', desc: 'تسویه فاکتور مشتری', debit: 0, credit: 50000000 }
-];
-
-function renderSanadEditorLines() {
-  const tbody = document.getElementById('sanadLinesEditorBody');
+function renderShenavaarTable() {
+  const tbody = document.getElementById('shenavaarTableBody');
   if (!tbody) return;
-  
-  let totalDebit = 0;
-  let totalCredit = 0;
-
-  tbody.innerHTML = currentSanadLines.map((line, index) => {
-    totalDebit += Number(line.debit || 0);
-    totalCredit += Number(line.credit || 0);
-    return `
-      <tr>
-        <td>${index + 1}</td>
-        <td>
-          <select class="form-select" onchange="currentSanadLines[${index}].account = this.value">
-            ${AppState.accounts.map(a => `<option value="${a.code} (${a.name})" ${line.account.includes(a.code) ? 'selected' : ''}>${a.code} - ${a.name}</option>`).join('')}
-          </select>
-        </td>
-        <td>
-          <input type="text" class="form-input" value="${line.desc}" onchange="currentSanadLines[${index}].desc = this.value" />
-        </td>
-        <td>
-          <input type="number" class="form-input" value="${line.debit}" onchange="currentSanadLines[${index}].debit = Number(this.value); updateSanadTotals();" />
-        </td>
-        <td>
-          <input type="number" class="form-input" value="${line.credit}" onchange="currentSanadLines[${index}].credit = Number(this.value); updateSanadTotals();" />
-        </td>
-        <td>
-          <button class="btn btn-outline" style="color:red; padding:2px 6px;" onclick="removeSanadLine(${index})">❌</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  updateSanadTotals();
+  tbody.innerHTML = AppState.shenavars.map(s => `
+    <tr>
+      <td><b>${s.code}</b></td>
+      <td>${s.name}</td>
+      <td>${s.parent}</td>
+      <td><span class="badge badge-success">${s.status}</span></td>
+      <td>
+        <button class="btn btn-outline" style="padding:3px 8px;">✏️</button>
+        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteShenavar('${s.code}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
 }
 
-function updateSanadTotals() {
-  const totalDebit = currentSanadLines.reduce((sum, l) => sum + Number(l.debit || 0), 0);
-  const totalCredit = currentSanadLines.reduce((sum, l) => sum + Number(l.credit || 0), 0);
-  const diff = totalDebit - totalCredit;
-
-  const debitEl = document.getElementById('sanadTotalDebit');
-  const creditEl = document.getElementById('sanadTotalCredit');
-  const statusEl = document.getElementById('sanadBalanceStatus');
-
-  if (debitEl) debitEl.textContent = totalDebit.toLocaleString() + ' ریال';
-  if (creditEl) creditEl.textContent = totalCredit.toLocaleString() + ' ریال';
-  
-  if (statusEl) {
-    if (diff === 0 && totalDebit > 0) {
-      statusEl.className = 'badge badge-success';
-      statusEl.textContent = 'متوازن ✅';
-    } else {
-      statusEl.className = 'badge badge-warning';
-      statusEl.textContent = `نامتوازن (اختلاف: ${Math.abs(diff).toLocaleString()})`;
-    }
+function addShenavaar() {
+  const code = prompt('کد شناور جدید:');
+  const name = prompt('عنوان شناور:');
+  if (code && name) {
+    AppState.shenavars.push({ id: Date.now(), code, name, parent: '-', status: 'فعال' });
+    renderShenavaarTable();
   }
 }
 
-function addSanadLine() {
-  currentSanadLines.push({ account: '1001 (صندوق مرکزی)', shenavar: '-', desc: '', debit: 0, credit: 0 });
-  renderSanadEditorLines();
-}
-
-function removeSanadLine(index) {
-  currentSanadLines.splice(index, 1);
-  renderSanadEditorLines();
-}
-
-function saveSanadEntry() {
-  const sanadNo = document.getElementById('sanadNumberInput')?.value || (AppState.sanads.length + 101);
-  const sanadDate = document.getElementById('sanadDateInput')?.value || '1403/05/10';
-  const sanadDesc = document.getElementById('sanadDescInput')?.value || 'سند حسابداری جدید';
-
-  const totalDebit = currentSanadLines.reduce((sum, l) => sum + Number(l.debit || 0), 0);
-  const totalCredit = currentSanadLines.reduce((sum, l) => sum + Number(l.credit || 0), 0);
-
-  if (totalDebit !== totalCredit) {
-    alert('امکان ثبت سند نامتوازن وجود ندارد. جمع بدهکار و بستانکار باید برابر باشد.');
-    return;
+function deleteShenavar(code) {
+  if (confirm('حذف این حساب شناور؟')) {
+    AppState.shenavars = AppState.shenavars.filter(s => s.code !== code);
+    renderShenavaarTable();
   }
-
-  AppState.sanads.push({
-    id: sanadNo,
-    date: sanadDate,
-    desc: sanadDesc,
-    debit: totalDebit,
-    credit: totalCredit,
-    status: 'تایید شده',
-    balanced: true,
-    lines: [...currentSanadLines]
-  });
-
-  renderSanadListTable();
-  closeModal('newSanadModal');
-  alert(`سند شماره ${sanadNo} با موفقیت در سیستم ثبت گردید.`);
 }
 
+// Sanad 1 (list)
 function renderSanadListTable() {
   const tbody = document.getElementById('sanadListTable');
   if (!tbody) return;
@@ -333,21 +308,94 @@ function renderSanadListTable() {
       <td><span class="badge badge-success">متوازن ✅</span></td>
       <td><span class="badge badge-primary">${s.status}</span></td>
       <td>
-        <button class="btn btn-outline" style="padding:4px 8px;" onclick="viewSanadDetail(${s.id})">🔍 جزئیات</button>
-        <button class="btn btn-outline" style="padding:4px 8px; color:red;" onclick="deleteSanad(${s.id})">🗑️ حذف</button>
+        <button class="btn btn-outline" style="padding:3px 8px;" onclick="editSanad(${s.id})">✏️ ویرایش</button>
+        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteSanad(${s.id})">🗑️ حذف</button>
       </td>
     </tr>
   `).join('');
 }
 
-function deleteSanad(sanadId) {
-  if (confirm(`آیا از حذف سند شماره ${sanadId} اطمینان دارید؟`)) {
-    AppState.sanads = AppState.sanads.filter(s => s.id !== sanadId);
+function deleteSanad(id) {
+  if (confirm(`حذف سند #${id}؟`)) {
+    AppState.sanads = AppState.sanads.filter(s => s.id !== id);
     renderSanadListTable();
   }
 }
 
-// 4. Products Form (AnbardaryNamKala2Form.vb)
+function editSanad(id) {
+  showForm('form-sanad2');
+  document.getElementById('sanadNumberInput').value = id;
+}
+
+// Sanad 2 (editor)
+function renderSanadEditorLines() {
+  const tbody = document.getElementById('sanadLinesEditorBody');
+  if (!tbody) return;
+  tbody.innerHTML = AppState.sanadLines.map((line, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>
+        <select class="form-select" onchange="AppState.sanadLines[${i}].account=this.value" style="min-width:200px;">
+          ${AppState.accounts.map(a =>
+            `<option value="${a.code}" ${line.account === a.code ? 'selected' : ''}>${a.code} - ${a.name}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td><input type="text" class="form-input" value="${line.desc}" onchange="AppState.sanadLines[${i}].desc=this.value" /></td>
+      <td><input type="number" class="form-input" value="${line.debit}" onchange="AppState.sanadLines[${i}].debit=Number(this.value);updateSanadTotals();" style="width:130px;" /></td>
+      <td><input type="number" class="form-input" value="${line.credit}" onchange="AppState.sanadLines[${i}].credit=Number(this.value);updateSanadTotals();" style="width:130px;" /></td>
+      <td><button class="btn btn-outline" style="padding:2px 6px;color:red;" onclick="removeSanadLine(${i})">❌</button></td>
+    </tr>
+  `).join('');
+  updateSanadTotals();
+}
+
+function addSanadLine() {
+  AppState.sanadLines.push({ account: '1001', desc: '', debit: 0, credit: 0 });
+  renderSanadEditorLines();
+}
+
+function removeSanadLine(i) {
+  AppState.sanadLines.splice(i, 1);
+  renderSanadEditorLines();
+}
+
+function updateSanadTotals() {
+  const td = AppState.sanadLines.reduce((s, l) => s + Number(l.debit || 0), 0);
+  const tc = AppState.sanadLines.reduce((s, l) => s + Number(l.credit || 0), 0);
+  const diff = td - tc;
+  const debitEl = document.getElementById('sanadTotalDebit');
+  const creditEl = document.getElementById('sanadTotalCredit');
+  const statusEl = document.getElementById('sanadBalanceStatus');
+  if (debitEl) debitEl.textContent = td.toLocaleString() + ' ریال';
+  if (creditEl) creditEl.textContent = tc.toLocaleString() + ' ریال';
+  if (statusEl) {
+    if (diff === 0 && td > 0) {
+      statusEl.className = 'badge badge-success';
+      statusEl.textContent = 'متوازن ✅';
+    } else {
+      statusEl.className = 'badge badge-warning';
+      statusEl.textContent = `نامتوازن (اختلاف: ${Math.abs(diff).toLocaleString()})`;
+    }
+  }
+}
+
+function saveSanadEntry() {
+  const td = AppState.sanadLines.reduce((s, l) => s + Number(l.debit || 0), 0);
+  const tc = AppState.sanadLines.reduce((s, l) => s + Number(l.credit || 0), 0);
+  if (td !== tc) { alert('امکان ثبت سند نامتوازن وجود ندارد.'); return; }
+  const no = document.getElementById('sanadNumberInput')?.value;
+  const date = document.getElementById('sanadDateInput')?.value;
+  const desc = document.getElementById('sanadDescInput')?.value || 'سند حسابداری';
+  AppState.sanads.push({ id: no, date, desc, debit: td, credit: tc, status: 'موقت' });
+  AppState.sanadLines = [{ account: '1001', desc: '', debit: 0, credit: 0 }, { account: '1101', desc: '', debit: 0, credit: 0 }];
+  alert(`سند شماره ${no} با موفقیت ثبت شد.`);
+  showForm('form-sanad1');
+}
+
+// ============================
+// INVENTORY MODULE
+// ============================
 function renderProductsTable() {
   const tbody = document.getElementById('productsTableBody');
   if (!tbody) return;
@@ -356,79 +404,151 @@ function renderProductsTable() {
       <td><b>${p.code}</b></td>
       <td>${p.name}</td>
       <td>${p.unit}</td>
-      <td>${p.barcode}</td>
+      <td style="font-size:0.8rem;">${p.barcode}</td>
       <td>${p.price.toLocaleString()} ریال</td>
       <td>${p.stock}</td>
-      <td><span class="badge badge-success">موجود</span></td>
       <td>
-        <button class="btn btn-outline" style="padding:4px 8px;" onclick="editProduct(${p.id})">✏️ ویرایش</button>
-        <button class="btn btn-outline" style="padding:4px 8px; color:red;" onclick="deleteProduct(${p.id})">🗑️ حذف</button>
+        <button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button>
+        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteProduct(${p.id})">🗑️</button>
       </td>
     </tr>
   `).join('');
 }
 
-function saveNewProduct() {
-  const code = document.getElementById('newProdCode')?.value;
-  const name = document.getElementById('newProdName')?.value;
-  const unit = document.getElementById('newProdUnit')?.value;
-  const price = document.getElementById('newProdPrice')?.value;
-  const stock = document.getElementById('newProdStock')?.value;
-
-  if (!code || !name) {
-    alert('لطفاً کد کالا و نام کالا را وارد نمایید.');
-    return;
-  }
-
-  AppState.products.push({
-    id: AppState.products.length + 1,
-    code: code,
-    name: name,
-    unit: unit || 'عدد',
-    price: Number(price) || 0,
-    buyPrice: Number(price) * 0.8 || 0,
-    stock: Number(stock) || 0,
-    reorder: 5,
-    barcode: '690' + Math.floor(Math.random() * 1000000000)
-  });
-
-  renderProductsTable();
-  closeModal('addProductModal');
-  alert(`کالای جدید "${name}" با موفقیت تعریف شد.`);
+function openAddProductRow() {
+  document.getElementById('addProductRow').style.display = 'block';
+  document.getElementById('newProdCode').focus();
 }
 
-function deleteProduct(prodId) {
-  if (confirm('آیا از حذف این کالا اطمینان دارید؟')) {
-    AppState.products = AppState.products.filter(p => p.id !== prodId);
+function saveNewProduct() {
+  const code = document.getElementById('newProdCode')?.value?.trim();
+  const name = document.getElementById('newProdName')?.value?.trim();
+  const unit = document.getElementById('newProdUnit')?.value;
+  const price = Number(document.getElementById('newProdPrice')?.value || 0);
+  const stock = Number(document.getElementById('newProdStock')?.value || 0);
+  if (!code || !name) { alert('کد کالا و نام کالا الزامی است.'); return; }
+  AppState.products.push({ id: Date.now(), code, name, unit, price, stock, barcode: '690' + Math.floor(Math.random() * 1e9) });
+  document.getElementById('newProdCode').value = '';
+  document.getElementById('newProdName').value = '';
+  document.getElementById('addProductRow').style.display = 'none';
+  renderProductsTable();
+  alert(`کالای "${name}" با موفقیت ثبت شد.`);
+}
+
+function deleteProduct(id) {
+  if (confirm('حذف این کالا؟')) {
+    AppState.products = AppState.products.filter(p => p.id !== id);
     renderProductsTable();
   }
 }
 
-// 5. Database Backup & Restore (BackupRestoreForm.vb)
-function executeDatabaseBackup() {
-  alert('در حال پشتیبان‌گیری از دیتابیس PostgreSQL...');
-  setTimeout(() => {
-    alert('فایل پشتیبان دیتابیس (negar_db_backup_1403.sql) با موفقیت دانلود شد.');
-  }, 1000);
+function renderWarehousesTable() {
+  const tbody = document.getElementById('warehousesTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = AppState.warehouses.map(w => `
+    <tr>
+      <td><b>${w.code}</b></td>
+      <td>${w.name}</td>
+      <td>${w.type}</td>
+      <td>${w.keeper}</td>
+      <td>${w.location}</td>
+      <td>${w.allowNeg ? 'بله' : 'خیر'}</td>
+      <td><button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button></td>
+    </tr>
+  `).join('');
 }
 
-function executeDatabaseRestore() {
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.onchange = e => {
-    alert('در حال بازیابی اطلاعات دیتابیس...');
-    setTimeout(() => {
-      alert('بازیابی دیتابیس با موفقیت کامل انجام گردید.');
-    }, 1200);
-  };
-  fileInput.click();
+function renderPurchaseInvoicesTable() {
+  const tbody = document.getElementById('purchaseInvoicesBody');
+  if (!tbody) return;
+  tbody.innerHTML = AppState.purchaseInvoices.map(inv => `
+    <tr>
+      <td><b>${inv.id}</b></td>
+      <td>${inv.date}</td>
+      <td>${inv.party}</td>
+      <td>${inv.warehouse}</td>
+      <td>${inv.total.toLocaleString()} ریال</td>
+      <td><span class="badge badge-success">${inv.status}</span></td>
+      <td><button class="btn btn-outline" style="padding:3px 8px;">📋 جزئیات</button></td>
+    </tr>
+  `).join('');
 }
 
-// Initialize on page load
+function renderSalesInvoicesTable() {
+  const tbody = document.getElementById('salesInvoicesBody');
+  if (!tbody) return;
+  tbody.innerHTML = AppState.salesInvoices.map(inv => `
+    <tr>
+      <td><b>${inv.id}</b></td>
+      <td>${inv.date}</td>
+      <td>${inv.party}</td>
+      <td>${inv.warehouse}</td>
+      <td>${inv.total.toLocaleString()} ریال</td>
+      <td><span class="badge badge-success">${inv.status}</span></td>
+      <td><button class="btn btn-outline" style="padding:3px 8px;">📋 جزئیات</button></td>
+    </tr>
+  `).join('');
+}
+
+function showCardex() {
+  document.getElementById('cardexResult').style.display = 'block';
+  document.getElementById('cardexTableBody').innerHTML = `
+    <tr><td>1403/01/05</td><td>موجودی اول دوره</td><td>100</td><td>-</td><td>100</td><td>390,000,000</td><td>39,000,000,000</td></tr>
+    <tr><td>1403/05/02</td><td>رسید خرید PINV-4001</td><td>50</td><td>-</td><td>150</td><td>392,000,000</td><td>58,800,000,000</td></tr>
+    <tr><td>1403/05/08</td><td>حواله فروش INV-8001</td><td>-</td><td>25</td><td>125</td><td>391,333,333</td><td>48,916,666,625</td></tr>
+  `;
+}
+
+// ============================
+// SYSTEM MODULE
+// ============================
+function doBackup() {
+  const name = document.getElementById('backupFileName')?.value || 'backup.sql';
+  const log = document.getElementById('backupLog');
+  if (log) {
+    log.style.display = 'block';
+    log.innerHTML = `
+      <div class="log-line">▶ شروع پشتیبان‌گیری از دیتابیس negar_db ...</div>
+      <div class="log-line">✔ جدول users: 3 رکورد</div>
+      <div class="log-line">✔ جدول accounts: 13 رکورد</div>
+      <div class="log-line">✔ جدول sanads: 2 رکورد</div>
+      <div class="log-line">✔ جدول products: 2 رکورد</div>
+      <div class="log-line" style="color:var(--success-color);">✅ پشتیبان‌گیری با موفقیت کامل شد → ${name}</div>
+    `;
+  }
+}
+
+function doRestore() {
+  const file = document.getElementById('restoreFile')?.files[0];
+  if (!file) { alert('لطفاً فایل پشتیبان را انتخاب کنید.'); return; }
+  if (confirm(`آیا از بازیابی فایل "${file.name}" اطمینان دارید؟ این عملیات تمامی داده‌های فعلی را جایگزین می‌کند!`)) {
+    setTimeout(() => alert('✅ بازیابی دیتابیس با موفقیت انجام شد.'), 1000);
+  }
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  alert(`تم "${theme}" با موفقیت اعمال شد.`);
+}
+
+function lockApp() {
+  const pwd = document.getElementById('lockPassword')?.value;
+  if (!pwd) { alert('لطفاً رمز قفل را وارد کنید.'); return; }
+  alert('برنامه قفل شد. برای ورود مجدد رمز عبور خود را وارد کنید.');
+}
+
+// ============================
+// Init on page load
+// ============================
 document.addEventListener('DOMContentLoaded', () => {
-  renderUsersTable();
-  renderAccountsTable();
-  renderSanadListTable();
-  renderSanadEditorLines();
-  renderProductsTable();
+  // Show system tiles by default
+  showTiles('system');
+  // Update system clock every second
+  setInterval(() => {
+    const el = document.getElementById('statusBarTime');
+    if (el) {
+      const now = new Date();
+      el.innerHTML = `ساعت سیستم: <b>${now.toLocaleTimeString('fa-IR')}</b>`;
+    }
+  }, 1000);
 });

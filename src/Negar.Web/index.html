@@ -3,303 +3,1294 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب (C# & PostgreSQL)</title>
-  <link rel="manifest" href="manifest.json" />
+  <title>نگار تحت وب - سیستم یکپارچه مالی، حسابداری، انبارداری</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- Top Desktop Header Bar -->
+  <!-- Top Header Bar -->
   <header class="desktop-header">
     <div class="title-bar">
-      <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب (C# & PostgreSQL)</div>
-      <div style="display:flex; gap:16px; align-items:center;">
+      <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</div>
+      <div style="display:flex;gap:16px;align-items:center;">
         <span>کاربر: <b>ابر مدیر (admin)</b></span>
         <span>شرکت: <b>شرکت نمونه نگار</b></span>
         <span>سال مالی: <b>۱۴۰۳</b></span>
       </div>
     </div>
-
-    <!-- Main Module Ribbon matching Desktop Negar Navigation Ribbon -->
     <nav class="main-modules-ribbon" id="ribbonNav">
-      <div class="ribbon-tab active" onclick="switchRibbon('system', this)">
-        <span class="ribbon-icon">⚙️</span>
-        <span>سیستم</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('users', this)">
-        <span class="ribbon-icon">👥</span>
-        <span>کاربران</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('companies', this)">
-        <span class="ribbon-icon">🏢</span>
-        <span>شرکت‌ها و سال‌ها</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('accounting', this)">
-        <span class="ribbon-icon">📊</span>
-        <span>حسابداری</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('inventory', this)">
-        <span class="ribbon-icon">📦</span>
-        <span>خرید و فروش و انبارداری</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('payroll', this)">
-        <span class="ribbon-icon">👔</span>
-        <span>حقوق و دستمزد</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('assets', this)">
-        <span class="ribbon-icon">🏛</span>
-        <span>اموال</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('automation', this)">
-        <span class="ribbon-icon">✉️</span>
-        <span>اتوماسیون اداری</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('crm', this)">
-        <span class="ribbon-icon">🤝</span>
-        <span>باشگاه مشتریان</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('treasury', this)">
-        <span class="ribbon-icon">💰</span>
-        <span>خزانه‌داری</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('budget', this)">
-        <span class="ribbon-icon">📈</span>
-        <span>بودجه و هزینه</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('production', this)">
-        <span class="ribbon-icon">🏭</span>
-        <span>تولید و بهای تمام‌شده</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('projects', this)">
-        <span class="ribbon-icon">🏗</span>
-        <span>پروژه‌ها و پیمان‌ها</span>
-      </div>
-      <div class="ribbon-tab" onclick="switchRibbon('kpi', this)">
-        <span class="ribbon-icon">🎯</span>
-        <span>ارزیابی عملکرد و KPI</span>
-      </div>
+      <div class="ribbon-tab active" onclick="switchRibbon('system',this)">⚙️ سیستم</div>
+      <div class="ribbon-tab" onclick="switchRibbon('users',this)">👥 کاربران</div>
+      <div class="ribbon-tab" onclick="switchRibbon('companies',this)">🏢 شرکت‌ها و سال‌ها</div>
+      <div class="ribbon-tab" onclick="switchRibbon('accounting',this)">📊 حسابداری</div>
+      <div class="ribbon-tab" onclick="switchRibbon('inventory',this)">📦 خرید و فروش و انبارداری</div>
+      <div class="ribbon-tab" onclick="switchRibbon('payroll',this)">👔 حقوق و دستمزد</div>
+      <div class="ribbon-tab" onclick="switchRibbon('assets',this)">🏛 اموال</div>
+      <div class="ribbon-tab" onclick="switchRibbon('automation',this)">✉️ اتوماسیون اداری</div>
+      <div class="ribbon-tab" onclick="switchRibbon('crm',this)">🤝 باشگاه مشتریان</div>
+      <div class="ribbon-tab" onclick="switchRibbon('treasury',this)">💰 خزانه‌داری</div>
+      <div class="ribbon-tab" onclick="switchRibbon('budget',this)">📈 بودجه و هزینه</div>
+      <div class="ribbon-tab" onclick="switchRibbon('production',this)">🏭 تولید</div>
+      <div class="ribbon-tab" onclick="switchRibbon('projects',this)">🏗 پروژه‌ها</div>
+      <div class="ribbon-tab" onclick="switchRibbon('kpi',this)">🎯 ارزیابی عملکرد</div>
     </nav>
   </header>
 
-  <!-- Main View Container -->
+  <!-- Main Area: shows tiles OR form, never both at the same time -->
   <div class="app-container">
-    <main class="main-content">
-      
-      <!-- 1. MODULE: SYSTEM (سیستم) -->
-      <section id="module-system" class="view-section active">
-        <h2 style="margin-bottom: 8px; font-weight:800;">مدیریت سیستم نگار</h2>
-        <p style="color:var(--text-muted); margin-bottom: 20px;">عملیات اصلی سیستم، پشتیبان‌گیری، تبدیل اطلاعات و تنظیمات برنامه</p>
+    <main class="main-content" id="mainContent">
 
+      <!-- ================================================================
+           TILES CONTAINERS (one per ribbon tab)
+           ================================================================ -->
+
+      <!-- SYSTEM TILES -->
+      <div id="tiles-system" class="tiles-container active">
+        <div class="page-title">⚙️ مدیریت سیستم نگار</div>
         <div class="tiles-grid">
-          <div class="tile-card" onclick="openModal('dataMigrationModal')">
+          <div class="tile-card" onclick="showForm('form-data-migration')">
             <div class="tile-icon-box tile-orange">🔀</div>
             <div class="tile-title">تبدیل دیتا از سایر نرم‌افزارها</div>
           </div>
-          <div class="tile-card" onclick="alert('پیام‌های سیستم: تمام سرویس‌ها فعال هستند.')">
+          <div class="tile-card" onclick="showForm('form-system-messages')">
             <div class="tile-icon-box tile-gray">💬</div>
-            <div class="tile-title">مدیریت پیامهای : درباره... و ارتباط با ما</div>
+            <div class="tile-title">مدیریت پیامهای سیستم و ارتباط با ما</div>
           </div>
-          <div class="tile-card" onclick="openModal('themeModal')">
+          <div class="tile-card" onclick="showForm('form-theme-manager')">
             <div class="tile-icon-box tile-gray">🎨</div>
             <div class="tile-title">مدیریت تمهای برنامه و فرمها</div>
           </div>
-          <div class="tile-card" onclick="executeDatabaseBackup()">
+          <div class="tile-card" onclick="showForm('form-backup')">
             <div class="tile-icon-box tile-green">💾</div>
             <div class="tile-title">پشتیبان‌گیری اطلاعات</div>
           </div>
-          <div class="tile-card" onclick="executeDatabaseRestore()">
+          <div class="tile-card" onclick="showForm('form-restore')">
             <div class="tile-icon-box tile-orange">🔄</div>
             <div class="tile-title">بازیابی اطلاعات</div>
           </div>
-          <div class="tile-card" onclick="alert('ایجاد نسخه انتشار: پکیج Negar_Release_v1.zip آماده شد.')">
+          <div class="tile-card" onclick="showForm('form-release')">
             <div class="tile-icon-box tile-green">⬇️</div>
             <div class="tile-title">ایجاد نسخه فایل انتشار</div>
           </div>
-          <div class="tile-card" onclick="alert('برنامه در آخرین نسخه قرار دارد.')">
+          <div class="tile-card" onclick="showForm('form-update')">
             <div class="tile-icon-box tile-purple">⬆️</div>
             <div class="tile-title">ایجاد بسته به‌روزرسانی</div>
           </div>
-          <div class="tile-card" onclick="alert('خروجی بازرسی دیتابیس PostgreSQL تولید شد.')">
+          <div class="tile-card" onclick="showForm('form-db-audit')">
             <div class="tile-icon-box tile-blue">🗄️</div>
             <div class="tile-title">خروجی دیتابیس (بازرسی)</div>
           </div>
-          <div class="tile-card" onclick="alert('برنامه قفل موقت شد. برای ورود مجدد رمز عبور را وارد کنید.')">
+          <div class="tile-card" onclick="showForm('form-lock')">
             <div class="tile-icon-box tile-yellow">🔒</div>
             <div class="tile-title">قفل موقت برنامه</div>
           </div>
-          <div class="tile-card" onclick="alert('نرم‌افزار نگار نسخه وبی (C# & PostgreSQL) - نسخه 1.0')">
+          <div class="tile-card" onclick="showForm('form-about')">
             <div class="tile-icon-box tile-blue">ℹ️</div>
             <div class="tile-title">درباره...</div>
           </div>
-          <div class="tile-card" onclick="alert('ارتباط با پشتیبانی: 021-88888888 | info@negar-erp.ir')">
+          <div class="tile-card" onclick="showForm('form-contact')">
             <div class="tile-icon-box tile-blue">👤</div>
             <div class="tile-title">ارتباط با ما</div>
           </div>
-          <div class="tile-card" onclick="if(confirm('آیا قصد خروج از نرم‌افزار را دارید؟')) alert('خروج انجام شد.');">
+          <div class="tile-card tile-card-danger" onclick="showForm('form-exit')">
             <div class="tile-icon-box tile-red">🚪</div>
-            <div class="tile-title">خروج</div>
+            <div class="tile-title">خروج از سیستم</div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- 2. MODULE: USERS (کاربران) -->
-      <section id="module-users" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>مدیریت کاربران و ماتریس سطوح دسترسی (UserManagementForm)</h2>
-          <button class="btn btn-primary" onclick="openModal('addUserModal')">+ ایجاد کاربر جدید</button>
-        </div>
-
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>نام کاربری</th>
-                  <th>نام و نام خانوادگی</th>
-                  <th>نقش کاربر</th>
-                  <th>IP ایجادکننده</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="usersTableBody">
-                <!-- Rendered dynamically by app.js -->
-              </tbody>
-            </table>
+      <!-- USERS TILES -->
+      <div id="tiles-users" class="tiles-container">
+        <div class="page-title">👥 مدیریت کاربران و دسترسی‌ها</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-users-list')">
+            <div class="tile-icon-box tile-blue">👥</div>
+            <div class="tile-title">مدیریت کاربران سیستم</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-permissions-matrix')">
+            <div class="tile-icon-box tile-green">🔑</div>
+            <div class="tile-title">ماتریس سطوح دسترسی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-change-password')">
+            <div class="tile-icon-box tile-yellow">🔒</div>
+            <div class="tile-title">تغییر رمز عبور کاربر</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-activity-log')">
+            <div class="tile-icon-box tile-purple">📋</div>
+            <div class="tile-title">سوابق و لاگ فعالیت‌های کاربران</div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- 3. MODULE: COMPANIES (شرکت‌ها و سال‌ها) -->
-      <section id="module-companies" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>مدیریت شرکت‌ها و سال‌های مالی (CompanyFiscalYearForm)</h2>
-          <button class="btn btn-primary" onclick="openModal('addCompanyModal')">+ تعریف شرکت جدید</button>
+      <!-- COMPANIES TILES -->
+      <div id="tiles-companies" class="tiles-container">
+        <div class="page-title">🏢 مدیریت شرکت‌ها و سال‌های مالی</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-companies-list')">
+            <div class="tile-icon-box tile-blue">🏢</div>
+            <div class="tile-title">تعریف و مدیریت شرکت‌ها</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-fiscal-years')">
+            <div class="tile-icon-box tile-green">📅</div>
+            <div class="tile-title">مدیریت سال‌های مالی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-switch-company')">
+            <div class="tile-icon-box tile-purple">🔄</div>
+            <div class="tile-title">تغییر شرکت / سال مالی فعال</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-account-levels')">
+            <div class="tile-icon-box tile-orange">⚙️</div>
+            <div class="tile-title">تنظیمات طول و سطوح حساب‌ها</div>
+          </div>
         </div>
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد شرکت</th>
-                  <th>نام شرکت</th>
-                  <th>کد اقتصادی</th>
-                  <th>تلفن تماس</th>
-                  <th>سال مالی فعال</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
+      </div>
+
+      <!-- ACCOUNTING TILES -->
+      <div id="tiles-accounting" class="tiles-container">
+        <div class="page-title">📊 ماژول حسابداری نگار (HesabdariForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-accounts-chart')">
+            <div class="tile-icon-box tile-blue">📑</div>
+            <div class="tile-title">کدگذاری سرفصل حساب‌ها (درختی)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-shenavar')">
+            <div class="tile-icon-box tile-purple">🌊</div>
+            <div class="tile-title">کدگذاری حساب‌های شناور</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-sanad1')">
+            <div class="tile-icon-box tile-green">📝</div>
+            <div class="tile-title">ثبت و مدیریت اسناد (Sanad 1)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-sanad2')">
+            <div class="tile-icon-box tile-orange">✏️</div>
+            <div class="tile-title">ردیف‌های سند حسابداری (Sanad 2)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-sanad-merge')">
+            <div class="tile-icon-box tile-orange">🔗</div>
+            <div class="tile-title">ادغام اسناد حسابداری</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-sanad-split')">
+            <div class="tile-icon-box tile-yellow">✂️</div>
+            <div class="tile-title">تفکیک اسناد حسابداری</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-bank-reconcile')">
+            <div class="tile-icon-box tile-blue">💳</div>
+            <div class="tile-title">مغایرت‌گیری بانکی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-ledger')">
+            <div class="tile-icon-box tile-gray">📖</div>
+            <div class="tile-title">دفاتر کل، معین و روزنامه</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-trial-balance')">
+            <div class="tile-icon-box tile-green">⚖️</div>
+            <div class="tile-title">تراز آزمایشی (۴ و ۸ ستونی)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-financial-statements')">
+            <div class="tile-icon-box tile-purple">📊</div>
+            <div class="tile-title">ترازنامه و صورت سود و زیان</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTORY TILES -->
+      <div id="tiles-inventory" class="tiles-container">
+        <div class="page-title">📦 خرید، فروش و انبارداری (AnbardaryForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-product-groups')">
+            <div class="tile-icon-box tile-gray">🗂️</div>
+            <div class="tile-title">گروه‌بندی کالاها (درختی)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-products')">
+            <div class="tile-icon-box tile-blue">📦</div>
+            <div class="tile-title">تعریف و مدیریت کالاها</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-warehouses')">
+            <div class="tile-icon-box tile-green">🏭</div>
+            <div class="tile-title">تعریف انبارها و جانمایی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-cardex')">
+            <div class="tile-icon-box tile-orange">📊</div>
+            <div class="tile-title">کاردکس و موجودی انبارها</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-purchase-invoice')">
+            <div class="tile-icon-box tile-purple">📥</div>
+            <div class="tile-title">فاکتورهای خرید (Kharid)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-sales-invoice')">
+            <div class="tile-icon-box tile-green">📤</div>
+            <div class="tile-title">فاکتورهای فروش (Foroosh)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-warehouse-transfer')">
+            <div class="tile-icon-box tile-yellow">🔄</div>
+            <div class="tile-title">انتقال بین انبارها</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-tax-system')">
+            <div class="tile-icon-box tile-blue">🧾</div>
+            <div class="tile-title">سامانه مودیان مالیاتی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-parties')">
+            <div class="tile-icon-box tile-gray">🤝</div>
+            <div class="tile-title">تامین‌کنندگان و مشتریان</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYROLL TILES -->
+      <div id="tiles-payroll" class="tiles-container">
+        <div class="page-title">👔 حقوق و دستمزد (PayrollForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-personnel')">
+            <div class="tile-icon-box tile-blue">👔</div>
+            <div class="tile-title">پرونده پرسنلی و حکم حقوقی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-payslip')">
+            <div class="tile-icon-box tile-green">💵</div>
+            <div class="tile-title">محاسبه حقوق و صدور فیش</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-attendance')">
+            <div class="tile-icon-box tile-yellow">📅</div>
+            <div class="tile-title">کارکرد و ثبت مرخصی‌ها</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASSETS TILES -->
+      <div id="tiles-assets" class="tiles-container">
+        <div class="page-title">🏛 اموال و دارایی‌های ثابت (AmvalForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-assets-list')">
+            <div class="tile-icon-box tile-orange">🏛</div>
+            <div class="tile-title">ثبت اموال و دارایی‌های ثابت</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-depreciation')">
+            <div class="tile-icon-box tile-purple">📉</div>
+            <div class="tile-title">محاسبه و ثبت استهلاک دارایی‌ها</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTOMATION TILES -->
+      <div id="tiles-automation" class="tiles-container">
+        <div class="page-title">✉️ اتوماسیون اداری (AutomationForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-letters')">
+            <div class="tile-icon-box tile-purple">✉️</div>
+            <div class="tile-title">مکاتبات اداری و دبیرخانه</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-dms')">
+            <div class="tile-icon-box tile-blue">📂</div>
+            <div class="tile-title">بایگانی اسناد دیجیتال (DMS)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM TILES -->
+      <div id="tiles-crm" class="tiles-container">
+        <div class="page-title">🤝 باشگاه مشتریان (CRMForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-crm-customers')">
+            <div class="tile-icon-box tile-green">🤝</div>
+            <div class="tile-title">مدیریت ارتباط با مشتریان</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-crm-opportunities')">
+            <div class="tile-icon-box tile-yellow">🎯</div>
+            <div class="tile-title">پیگیری فرصت‌های فروش</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TREASURY TILES -->
+      <div id="tiles-treasury" class="tiles-container">
+        <div class="page-title">💰 خزانه‌داری (TreasuryForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-checks')">
+            <div class="tile-icon-box tile-yellow">💰</div>
+            <div class="tile-title">مدیریت چک‌های دریافتی و پرداختی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-bank-accounts')">
+            <div class="tile-icon-box tile-blue">🏦</div>
+            <div class="tile-title">مدیریت حساب‌های بانکی و صندوق</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUDGET TILES -->
+      <div id="tiles-budget" class="tiles-container">
+        <div class="page-title">📈 بودجه و هزینه (BudgetForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-budget-plan')">
+            <div class="tile-icon-box tile-blue">📈</div>
+            <div class="tile-title">بودجه‌بندی و کنترل انحرافات</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-cost-centers')">
+            <div class="tile-icon-box tile-orange">💸</div>
+            <div class="tile-title">مدیریت مراکز هزینه</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTION TILES -->
+      <div id="tiles-production" class="tiles-container">
+        <div class="page-title">🏭 تولید و بهای تمام‌شده (ProductionForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-bom')">
+            <div class="tile-icon-box tile-orange">🏭</div>
+            <div class="tile-title">دستور ساخت و فرمول تولید (BOM)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-cost-calc')">
+            <div class="tile-icon-box tile-green">💵</div>
+            <div class="tile-title">بهای تمام شده کالای تولیدی</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-pm')">
+            <div class="tile-icon-box tile-purple">🔧</div>
+            <div class="tile-title">تعمیر و نگهداری (PM)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-qc')">
+            <div class="tile-icon-box tile-blue">🔍</div>
+            <div class="tile-title">کنترل کیفیت (QC)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS TILES -->
+      <div id="tiles-projects" class="tiles-container">
+        <div class="page-title">🏗 پروژه‌ها و پیمان‌ها (ProjectForms)</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-projects-list')">
+            <div class="tile-icon-box tile-green">🏗</div>
+            <div class="tile-title">کنترل فاز پروژه‌ها</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-progress-report')">
+            <div class="tile-icon-box tile-yellow">📜</div>
+            <div class="tile-title">ثبت صورت وضعیت و پیمانکاران</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI TILES -->
+      <div id="tiles-kpi" class="tiles-container">
+        <div class="page-title">🎯 ارزیابی عملکرد و KPI</div>
+        <div class="tiles-grid">
+          <div class="tile-card" onclick="showForm('form-kpi-list')">
+            <div class="tile-icon-box tile-purple">🎯</div>
+            <div class="tile-title">شاخص‌های کلیدی عملکرد (KPI)</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-bi-dashboard')">
+            <div class="tile-icon-box tile-blue">📊</div>
+            <div class="tile-title">داشبوردهای هوش تجاری (BI)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           FORMS AREA (hidden by default, shown when tile is clicked)
+           ================================================================ -->
+      <div id="formsArea" style="display:none;">
+
+        <!-- BACK BUTTON (always shown when a form is active) -->
+        <div class="back-bar">
+          <button class="btn-back" onclick="goBack()">
+            ← بازگشت به منوی اصلی
+          </button>
+          <span id="currentFormTitle" class="back-bar-title"></span>
+        </div>
+
+        <!-- ---- SYSTEM FORMS ---- -->
+
+        <div id="form-backup" class="form-section">
+          <h2 class="form-heading">💾 پشتیبان‌گیری اطلاعات دیتابیس (BackupForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">مسیر ذخیره فایل پشتیبان:</label>
+                <input type="text" class="form-input" value="C:\Negar_Backup\" readonly />
+              </div>
+              <div class="form-group">
+                <label class="form-label">نام فایل پشتیبان:</label>
+                <input type="text" class="form-input" id="backupFileName" value="negar_db_backup_1403-05-10.sql" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">نوع پشتیبان:</label>
+                <select class="form-select">
+                  <option>پشتیبان کامل (Full Backup)</option>
+                  <option>پشتیبان اضافی (Incremental)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">فشرده‌سازی:</label>
+                <select class="form-select">
+                  <option>بدون فشرده‌سازی (SQL Plain)</option>
+                  <option>فشرده‌شده (gzip)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="doBackup()">💾 شروع پشتیبان‌گیری</button>
+            </div>
+            <div id="backupLog" class="log-box" style="display:none;"></div>
+          </div>
+        </div>
+
+        <div id="form-restore" class="form-section">
+          <h2 class="form-heading">🔄 بازیابی اطلاعات دیتابیس (RestoreForm)</h2>
+          <div class="card form-card">
+            <div class="form-group">
+              <label class="form-label">انتخاب فایل پشتیبان برای بازیابی:</label>
+              <input type="file" class="form-input" id="restoreFile" accept=".sql,.gz" />
+            </div>
+            <div class="alert-box alert-warning">⚠️ هشدار: بازیابی اطلاعات، تمامی داده‌های فعلی دیتابیس را جایگزین می‌کند. از انجام این عملیات اطمینان کامل داشته باشید.</div>
+            <div class="form-actions">
+              <button class="btn btn-danger" onclick="doRestore()">🔄 شروع بازیابی اطلاعات</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-theme-manager" class="form-section">
+          <h2 class="form-heading">🎨 مدیریت تمهای برنامه (ThemeManagerForm)</h2>
+          <div class="card form-card">
+            <div class="theme-grid">
+              <div class="theme-item" onclick="setTheme('blue')">
+                <div class="theme-preview theme-preview-blue"></div>
+                <div class="theme-name">آبی تیره (Blue Dark)</div>
+              </div>
+              <div class="theme-item" onclick="setTheme('dark')">
+                <div class="theme-preview theme-preview-dark"></div>
+                <div class="theme-name">تیره کامل (Full Dark)</div>
+              </div>
+              <div class="theme-item" onclick="setTheme('light')">
+                <div class="theme-preview theme-preview-light"></div>
+                <div class="theme-name">روشن (Light Mode)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-lock" class="form-section">
+          <h2 class="form-heading">🔒 قفل موقت برنامه (LockForm)</h2>
+          <div class="card form-card" style="max-width:400px;margin:auto;text-align:center;">
+            <div style="font-size:4rem;margin-bottom:16px;">🔒</div>
+            <p style="margin-bottom:16px;">برای قفل کردن موقت برنامه روی دکمه زیر کلیک کنید.</p>
+            <div class="form-group">
+              <label class="form-label">رمز قفل:</label>
+              <input type="password" class="form-input" id="lockPassword" placeholder="رمز عبور خود را وارد کنید" />
+            </div>
+            <button class="btn btn-primary" onclick="lockApp()">🔒 قفل برنامه</button>
+          </div>
+        </div>
+
+        <div id="form-about" class="form-section">
+          <h2 class="form-heading">ℹ️ درباره نرم‌افزار نگار</h2>
+          <div class="card form-card" style="max-width:500px;margin:auto;text-align:center;">
+            <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+            <h3 style="margin-bottom:8px;">نگار تحت وب - نسخه ۱.۰</h3>
+            <p style="color:var(--text-muted);margin-bottom:8px;">سیستم یکپارچه مالی، حسابداری، انبارداری</p>
+            <p style="color:var(--text-muted);margin-bottom:8px;">پلتفرم: C# .NET 8 + ASP.NET Core + PostgreSQL</p>
+            <hr style="border-color:var(--border-color);margin:16px 0;" />
+            <p style="color:var(--text-muted);">توسعه‌دهنده: تیم نگار</p>
+            <p style="color:var(--text-muted);">تمامی حقوق محفوظ است © ۱۴۰۳</p>
+          </div>
+        </div>
+
+        <div id="form-contact" class="form-section">
+          <h2 class="form-heading">👤 ارتباط با ما (ContactForm)</h2>
+          <div class="card form-card" style="max-width:500px;margin:auto;">
+            <div class="info-row"><span>📞 تلفن پشتیبانی:</span><b>۰۲۱-۸۸۸۸۸۸۸۸</b></div>
+            <div class="info-row"><span>📧 ایمیل:</span><b>support@negar-erp.ir</b></div>
+            <div class="info-row"><span>🌐 وبسایت:</span><b>www.negar-erp.ir</b></div>
+            <div class="info-row"><span>🕐 ساعات پشتیبانی:</span><b>شنبه تا پنجشنبه - ۸ تا ۱۷</b></div>
+            <hr style="border-color:var(--border-color);margin:16px 0;" />
+            <div class="form-group">
+              <label class="form-label">ارسال پیام:</label>
+              <textarea class="form-input" rows="4" placeholder="پیام خود را بنویسید..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="alert('پیام شما با موفقیت ارسال شد.')">📨 ارسال پیام</button>
+          </div>
+        </div>
+
+        <div id="form-exit" class="form-section">
+          <h2 class="form-heading">🚪 خروج از سیستم</h2>
+          <div class="card form-card" style="max-width:400px;margin:auto;text-align:center;">
+            <div style="font-size:3rem;margin-bottom:16px;">🚪</div>
+            <p style="margin-bottom:20px;">آیا از خروج از سیستم نگار اطمینان دارید؟</p>
+            <div style="display:flex;gap:12px;justify-content:center;">
+              <button class="btn btn-outline" onclick="goBack()">انصراف</button>
+              <button class="btn btn-danger" onclick="alert('از سیستم خارج شدید.')">بله، خروج</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-data-migration" class="form-section">
+          <h2 class="form-heading">🔀 تبدیل دیتا از سایر نرم‌افزارها (DataMigrationForm)</h2>
+          <div class="card form-card">
+            <div class="form-group">
+              <label class="form-label">نرم‌افزار مبدا:</label>
+              <select class="form-select">
+                <option>هلو</option><option>سپیدار</option><option>رافع</option><option>راهکار</option><option>فارسیکام</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">فایل داده‌های مبدا:</label>
+              <input type="file" class="form-input" />
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="alert('تبدیل دیتا شروع شد... لطفا صبر کنید.')">🔀 شروع تبدیل داده‌ها</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-system-messages" class="form-section">
+          <h2 class="form-heading">💬 مدیریت پیام‌های سیستم</h2>
+          <div class="card form-card">
+            <div class="form-group">
+              <label class="form-label">متن پیام "درباره ما":</label>
+              <textarea class="form-input" rows="4">این نرم‌افزار توسط تیم نگار توسعه داده شده است.</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">متن پیام "ارتباط با ما":</label>
+              <textarea class="form-input" rows="4">برای ارتباط با پشتیبانی با شماره ۰۲۱-۸۸۸۸۸۸۸۸ تماس حاصل فرمایید.</textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="alert('پیام‌ها ذخیره شدند.')">💾 ذخیره</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-release" class="form-section">
+          <h2 class="form-heading">⬇️ ایجاد نسخه فایل انتشار</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">نسخه:</label><input type="text" class="form-input" value="1.0.0" /></div>
+            <div class="form-group"><label class="form-label">توضیحات نسخه:</label><textarea class="form-input" rows="3" placeholder="تغییرات این نسخه..."></textarea></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('فایل انتشار Negar_Release_v1.0.zip ایجاد شد.')">⬇️ ایجاد فایل انتشار</button></div>
+          </div>
+        </div>
+
+        <div id="form-update" class="form-section">
+          <h2 class="form-heading">⬆️ ایجاد بسته به‌روزرسانی</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">نسخه جدید:</label><input type="text" class="form-input" value="1.0.1" /></div>
+            <div class="form-group"><label class="form-label">تغییرات این نسخه:</label><textarea class="form-input" rows="3" placeholder="رفع باگ‌ها و بهبودها..."></textarea></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('بسته به‌روزرسانی Negar_Update_v1.0.1.zip ایجاد شد.')">⬆️ ایجاد بسته به‌روزرسانی</button></div>
+          </div>
+        </div>
+
+        <div id="form-db-audit" class="form-section">
+          <h2 class="form-heading">🗄️ خروجی دیتابیس (بازرسی)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">جداول برای خروجی:</label>
+              <select class="form-select" multiple style="height:150px;">
+                <option selected>users</option><option selected>sanads</option><option selected>sanad_details</option>
+                <option selected>accounts</option><option selected>products</option><option>invoices</option>
+              </select>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('فایل خروجی بازرسی دیتابیس تولید شد.')">🗄️ دریافت خروجی</button></div>
+          </div>
+        </div>
+
+        <!-- ---- USER FORMS ---- -->
+        <div id="form-users-list" class="form-section">
+          <h2 class="form-heading">👥 مدیریت کاربران سیستم (UserManagementForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary" onclick="openAddUserRow()">+ کاربر جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>نام کاربری</th><th>نام کامل</th><th>نقش</th><th>آی‌پی</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody id="usersTableBody"></tbody></table>
+            </div>
+            <div id="addUserRow" style="display:none;" class="inline-form">
+              <h4>افزودن کاربر جدید</h4>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">نام کاربری:</label><input type="text" id="newUsername" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">نام کامل:</label><input type="text" id="newFullName" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">نقش:</label>
+                  <select id="newUserType" class="form-select">
+                    <option value="User">کاربر عادی</option>
+                    <option value="Manager">مدیر</option>
+                    <option value="SuperAdmin">مدیر ارشد</option>
+                  </select>
+                </div>
+                <div class="form-group" style="align-self:flex-end;">
+                  <button class="btn btn-primary" onclick="saveNewUser()">ذخیره</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addUserRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-permissions-matrix" class="form-section">
+          <h2 class="form-heading">🔑 ماتریس سطوح دسترسی (PermissionsForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table>
+                <thead><tr><th>ماژول</th><th>مشاهده</th><th>ایجاد</th><th>ویرایش</th><th>حذف</th><th>چاپ</th><th>خروجی</th></tr></thead>
+                <tbody id="permissionsMatrixBody"></tbody>
+              </table>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('ماتریس دسترسی‌ها ذخیره شد.')">💾 ذخیره تنظیمات دسترسی</button></div>
+          </div>
+        </div>
+
+        <div id="form-change-password" class="form-section">
+          <h2 class="form-heading">🔒 تغییر رمز عبور کاربر</h2>
+          <div class="card form-card" style="max-width:400px;margin:auto;">
+            <div class="form-group"><label class="form-label">نام کاربری:</label><input type="text" class="form-input" value="admin" /></div>
+            <div class="form-group"><label class="form-label">رمز عبور فعلی:</label><input type="password" class="form-input" /></div>
+            <div class="form-group"><label class="form-label">رمز عبور جدید:</label><input type="password" class="form-input" /></div>
+            <div class="form-group"><label class="form-label">تکرار رمز عبور جدید:</label><input type="password" class="form-input" /></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('رمز عبور با موفقیت تغییر یافت.')">🔒 تغییر رمز عبور</button></div>
+          </div>
+        </div>
+
+        <div id="form-activity-log" class="form-section">
+          <h2 class="form-heading">📋 سوابق و لاگ فعالیت‌های کاربران (ActivityLogForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table><thead><tr><th>تاریخ و ساعت</th><th>کاربر</th><th>عملیات</th><th>جزئیات</th><th>آی‌پی</th></tr></thead>
               <tbody>
-                <tr>
-                  <td>۱۰۰۱</td>
-                  <td>شرکت نمونه نگار</td>
-                  <td>۴۱۱۱۱۱۱۱۱۱۱۱</td>
-                  <td>۰۲۱-۸۸۸۸۸۸۸۸</td>
-                  <td><span class="badge badge-success">۱۴۰۳</span></td>
-                  <td><button class="btn btn-outline" style="padding:4px 8px;">ویرایش شرکت</button></td>
-                </tr>
+                <tr><td>۱۴۰۳/۰۵/۱۰ - ۱۸:۴۵</td><td>admin</td><td>ثبت سند</td><td>سند شماره #۱۰۲ ثبت گردید</td><td>127.0.0.1</td></tr>
+                <tr><td>۱۴۰۳/۰۵/۱۰ - ۱۷:۳۰</td><td>accountant1</td><td>ویرایش کالا</td><td>کالا PRD-101 ویرایش شد</td><td>192.168.1.10</td></tr>
+                <tr><td>۱۴۰۳/۰۵/۰۹ - ۱۶:۱۵</td><td>admin</td><td>ورود به سیستم</td><td>ورود موفق</td><td>127.0.0.1</td></tr>
               </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. MODULE: ACCOUNTING (حسابداری) -->
-      <section id="module-accounting" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>ماژول حسابداری نگار (سرفصل‌ها، شناور و اسناد)</h2>
-          <div style="display:flex; gap:10px;">
-            <button class="btn btn-outline" onclick="openModal('addAccountModal')">+ کدگذاری جدید</button>
-            <button class="btn btn-primary" onclick="openModal('newSanadModal')">+ ثبت سند جدید</button>
+              </table>
+            </div>
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:20px;">
-          <h3>کدگذاری درختی سرفصل حساب‌ها (HesabdaryCodingForm)</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد حساب</th>
-                  <th>عنوان حساب</th>
-                  <th>سطح حساب</th>
-                  <th>ماهیت</th>
-                  <th>حساب والد</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="accountsTableBody">
-                <!-- Rendered dynamically by app.js -->
-              </tbody>
-            </table>
+        <!-- ---- COMPANIES FORMS ---- -->
+        <div id="form-companies-list" class="form-section">
+          <h2 class="form-heading">🏢 مدیریت شرکت‌ها (CompanyForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary">+ تعریف شرکت جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد شرکت</th><th>نام شرکت</th><th>کد اقتصادی</th><th>تلفن</th><th>سال مالی فعال</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>۱۰۰۱</td><td><b>شرکت نمونه نگار</b></td><td>۴۱۱۱۱۱۱۱۱۱۱۱</td><td>۰۲۱-۸۸۸۸۸۸۸۸</td><td><span class="badge badge-success">۱۴۰۳</span></td>
+                <td><button class="btn btn-outline" style="padding:4px 8px;" onclick="alert('فرم ویرایش شرکت')">✏️ ویرایش</button></td></tr>
+              </tbody></table>
+            </div>
           </div>
         </div>
 
-        <div class="card">
-          <h3>لیست اسناد حسابداری ثبت‌شده (HesabdarySanad1Form)</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>شماره سند</th>
-                  <th>تاریخ سند</th>
-                  <th>شرح کلی سند</th>
-                  <th>جمع بدهکار</th>
-                  <th>جمع بستانکار</th>
-                  <th>توازن</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="sanadListTable">
-                <!-- Rendered dynamically by app.js -->
-              </tbody>
-            </table>
+        <div id="form-fiscal-years" class="form-section">
+          <h2 class="form-heading">📅 مدیریت سال‌های مالی (FiscalYearForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table><thead><tr><th>سال مالی</th><th>تاریخ شروع</th><th>تاریخ پایان</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td><b>۱۴۰۳</b></td><td>۱۴۰۳/۰۱/۰۱</td><td>۱۴۰۳/۱۲/۲۹</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:4px 8px;">بستن دوره</button></td></tr>
+                <tr><td>۱۴۰۲</td><td>۱۴۰۲/۰۱/۰۱</td><td>۱۴۰۲/۱۲/۲۹</td><td><span class="badge badge-warning">بسته</span></td><td><button class="btn btn-outline" style="padding:4px 8px;">مشاهده</button></td></tr>
+              </tbody></table>
+            </div>
           </div>
         </div>
-      </section>
 
-      <!-- 5. MODULE: INVENTORY (خرید و فروش و انبارداری) -->
-      <section id="module-inventory" class="view-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2>مدیریت انبارداری و کالاها (AnbardaryForms)</h2>
-          <button class="btn btn-primary" onclick="openModal('addProductModal')">+ تعریف کالای جدید</button>
-        </div>
-
-        <div class="card">
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>کد کالا</th>
-                  <th>نام کالا</th>
-                  <th>واحد اصلی</th>
-                  <th>بارکد</th>
-                  <th>قیمت فروش پیش‌فرض</th>
-                  <th>موجودی فعلی</th>
-                  <th>وضعیت</th>
-                  <th>عملیات</th>
-                </tr>
-              </thead>
-              <tbody id="productsTableBody">
-                <!-- Rendered dynamically by app.js -->
-              </tbody>
-            </table>
+        <div id="form-switch-company" class="form-section">
+          <h2 class="form-heading">🔄 تغییر شرکت / سال مالی فعال</h2>
+          <div class="card form-card" style="max-width:400px;margin:auto;">
+            <div class="form-group"><label class="form-label">انتخاب شرکت:</label>
+              <select class="form-select"><option>شرکت نمونه نگار (۱۰۰۱)</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">انتخاب سال مالی:</label>
+              <select class="form-select"><option selected>۱۴۰۳</option><option>۱۴۰۲</option></select>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('شرکت و سال مالی تغییر یافت.')">✅ اعمال تغییر</button></div>
           </div>
         </div>
-      </section>
 
-      <!-- OTHER MODULE SECTIONS... -->
-      <section id="module-payroll" class="view-section"><h2>حقوق و دستمزد</h2><div class="card"><p>ماژول مدیریت پرسنل و احکام حقوقی نگار</p></div></section>
-      <section id="module-assets" class="view-section"><h2>اموال و دارایی‌های ثابت</h2><div class="card"><p>ماژول اموال و محاسبه استهلاک نگار</p></div></section>
-      <section id="module-automation" class="view-section"><h2>اتوماسیون اداری</h2><div class="card"><p>ماژول اتوماسیون و کارتابل نامه‌ها نگار</p></div></section>
-      <section id="module-crm" class="view-section"><h2>باشگاه مشتریان</h2><div class="card"><p>ماژول مدیریت ارتباط با مشتریان CRM نگار</p></div></section>
-      <section id="module-treasury" class="view-section"><h2>خزانه‌داری</h2><div class="card"><p>ماژول خزانه‌داری و مدیریت چک‌های نگار</p></div></section>
-      <section id="module-budget" class="view-section"><h2>بودجه و هزینه</h2><div class="card"><p>ماژول بودجه‌بندی و انحرافات نگار</p></div></section>
-      <section id="module-production" class="view-section"><h2>تولید و بهای تمام‌شده</h2><div class="card"><p>ماژول تولید، PM و بهای تمام‌شده نگار</p></div></section>
-      <section id="module-projects" class="view-section"><h2>پروژه‌ها و پیمان‌ها</h2><div class="card"><p>ماژول مدیریت پروژه‌ها و صورت وضعیت نگار</p></div></section>
-      <section id="module-kpi" class="view-section"><h2>ارزیابی عملکرد و KPI</h2><div class="card"><p>ماژول شاخص‌های عملکردی KPI و BI نگار</p></div></section>
+        <div id="form-account-levels" class="form-section">
+          <h2 class="form-heading">⚙️ تنظیمات طول و سطوح حساب‌ها</h2>
+          <div class="card form-card" style="max-width:400px;margin:auto;">
+            <div class="form-group"><label class="form-label">طول کد گروه:</label><input type="number" class="form-input" value="1" /></div>
+            <div class="form-group"><label class="form-label">طول کد کل:</label><input type="number" class="form-input" value="2" /></div>
+            <div class="form-group"><label class="form-label">طول کد معین:</label><input type="number" class="form-input" value="4" /></div>
+            <div class="form-group"><label class="form-label">طول کد تفصیلی:</label><input type="number" class="form-input" value="6" /></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('تنظیمات سطوح حساب ذخیره شد.')">💾 ذخیره تنظیمات</button></div>
+          </div>
+        </div>
+
+        <!-- ---- ACCOUNTING FORMS ---- -->
+        <div id="form-accounts-chart" class="form-section">
+          <h2 class="form-heading">📑 کدگذاری سرفصل حساب‌ها (HesabdaryCodingForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;gap:8px;">
+              <button class="btn btn-outline" onclick="openAddAccountRow()">+ حساب جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد حساب</th><th>عنوان حساب</th><th>سطح</th><th>ماهیت</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody id="accountsTableBody"></tbody></table>
+            </div>
+            <div id="addAccountRow" style="display:none;" class="inline-form">
+              <h4>افزودن حساب جدید</h4>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newAccCode" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newAccName" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">سطح:</label>
+                  <select id="newAccType" class="form-select"><option>معین</option><option>تفصیلی</option><option>کل</option><option>گروه</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">ماهیت:</label>
+                  <select id="newAccNature" class="form-select"><option>بدهکار</option><option>بستانکار</option><option>خنثی</option></select>
+                </div>
+                <div class="form-group" style="align-self:flex-end;">
+                  <button class="btn btn-primary" onclick="saveNewAccount()">ذخیره</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addAccountRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-shenavar" class="form-section">
+          <h2 class="form-heading">🌊 کدگذاری حساب‌های شناور (ShenavaarCodingForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary" onclick="addShenavaar()">+ شناور جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد شناور</th><th>عنوان شناور</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody id="shenavaarTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-sanad1" class="form-section">
+          <h2 class="form-heading">📝 لیست اسناد حسابداری (HesabdarySanad1Form)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary" onclick="showForm('form-sanad2')">+ ثبت سند جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره سند</th><th>تاریخ</th><th>شرح سند</th><th>جمع بدهکار</th><th>جمع بستانکار</th><th>توازن</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody id="sanadListTable"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-sanad2" class="form-section">
+          <h2 class="form-heading">✏️ ثبت / ویرایش سند حسابداری (HesabdarySanad2Form)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">شماره سند:</label><input type="text" id="sanadNumberInput" class="form-input" value="103" /></div>
+              <div class="form-group"><label class="form-label">تاریخ سند:</label><input type="text" id="sanadDateInput" class="form-input" value="1403/05/10" /></div>
+              <div class="form-group"><label class="form-label">شرح کلی سند:</label><input type="text" id="sanadDescInput" class="form-input" placeholder="شرح سند..." /></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;">
+              <h4>ردیف‌های سند حسابداری</h4>
+              <button class="btn btn-outline" onclick="addSanadLine()">+ افزودن ردیف</button>
+            </div>
+            <div class="table-wrapper" style="max-height:260px;">
+              <table><thead><tr><th>#</th><th style="min-width:220px;">حساب معین/تفصیلی</th><th style="min-width:200px;">شرح ردیف</th><th>مبلغ بدهکار</th><th>مبلغ بستانکار</th><th>حذف</th></tr></thead>
+              <tbody id="sanadLinesEditorBody"></tbody></table>
+            </div>
+            <div class="sanad-totals-bar">
+              <div>جمع بدهکار: <b id="sanadTotalDebit">۰ ریال</b></div>
+              <div>جمع بستانکار: <b id="sanadTotalCredit">۰ ریال</b></div>
+              <div>توازن سند: <span id="sanadBalanceStatus" class="badge badge-warning">نامتوازن</span></div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-outline" onclick="showForm('form-sanad1')">بازگشت به لیست اسناد</button>
+              <button class="btn btn-primary" onclick="saveSanadEntry()">✅ ثبت نهایی سند</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-sanad-merge" class="form-section">
+          <h2 class="form-heading">🔗 ادغام اسناد حسابداری (SanadMergeForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">اسناد برای ادغام (جداسازی با کاما):</label><input type="text" class="form-input" placeholder="مثال: 101, 102, 103" /></div>
+            <div class="form-group"><label class="form-label">شرح سند ادغامی:</label><input type="text" class="form-input" placeholder="شرح سند جدید ادغامی..." /></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('ادغام اسناد با موفقیت انجام شد.')">🔗 ادغام اسناد</button></div>
+          </div>
+        </div>
+
+        <div id="form-sanad-split" class="form-section">
+          <h2 class="form-heading">✂️ تفکیک سند حسابداری (SanadSplitForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">شماره سند برای تفکیک:</label><input type="text" class="form-input" placeholder="شماره سند..." /></div>
+            <div class="form-group"><label class="form-label">تعداد ردیف‌های هر سند جدید:</label><input type="number" class="form-input" value="5" /></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('تفکیک سند با موفقیت انجام شد.')">✂️ تفکیک سند</button></div>
+          </div>
+        </div>
+
+        <div id="form-bank-reconcile" class="form-section">
+          <h2 class="form-heading">💳 مغایرت‌گیری بانکی (BankReconcileForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">انتخاب حساب بانک:</label>
+                <select class="form-select"><option>بانک ملی شعبه مرکزی - ۱۰۰۲</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">تاریخ صورتحساب بانک:</label><input type="text" class="form-input" value="1403/05/01" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">مانده دفاتر نگار (ریال):</label><input type="text" class="form-input" value="3,450,000,000" readonly /></div>
+              <div class="form-group"><label class="form-label">مانده صورتحساب بانک (ریال):</label><input type="text" class="form-input" placeholder="مانده بانک را وارد کنید..." /></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش مغایرت‌گیری بانکی تولید شد.')">📊 مغایرت‌گیری</button></div>
+          </div>
+        </div>
+
+        <div id="form-ledger" class="form-section">
+          <h2 class="form-heading">📖 دفاتر حسابداری (LedgerForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">نوع دفتر:</label>
+                <select class="form-select"><option>دفتر روزنامه</option><option>دفتر کل</option><option>دفتر معین</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
+              <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش دفاتر حسابداری تولید شد.')">📊 نمایش دفتر</button></div>
+          </div>
+        </div>
+
+        <div id="form-trial-balance" class="form-section">
+          <h2 class="form-heading">⚖️ تراز آزمایشی (TrialBalanceForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">نوع تراز:</label>
+                <select class="form-select"><option>تراز ۲ ستونی</option><option>تراز ۴ ستونی</option><option>تراز ۶ ستونی</option><option>تراز ۸ ستونی</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">سطح نمایش:</label>
+                <select class="form-select"><option>گروه</option><option>کل</option><option>معین</option><option>تفصیلی</option></select>
+              </div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش تراز آزمایشی تولید شد.')">⚖️ نمایش تراز</button></div>
+          </div>
+        </div>
+
+        <div id="form-financial-statements" class="form-section">
+          <h2 class="form-heading">📊 صورت‌های مالی (FinancialStatementsForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">نوع گزارش مالی:</label>
+              <select class="form-select"><option>ترازنامه (Balance Sheet)</option><option>صورت سود و زیان (P&L)</option><option>صورت جریان وجوه نقد</option></select>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('صورت مالی تولید شد.')">📊 نمایش صورت مالی</button></div>
+          </div>
+        </div>
+
+        <!-- ---- INVENTORY FORMS ---- -->
+        <div id="form-product-groups" class="form-section">
+          <h2 class="form-heading">🗂️ گروه‌بندی کالاها (ProductGroupsForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary">+ گروه جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد گروه</th><th>نام گروه</th><th>گروه والد</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>GRP-01</td><td>لوازم جانبی کامپیوتر</td><td>-</td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button> <button class="btn btn-outline" style="padding:3px 8px;color:red;">🗑️</button></td></tr>
+                <tr><td>GRP-02</td><td>لپ‌تاپ و نوت‌بوک</td><td>-</td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button> <button class="btn btn-outline" style="padding:3px 8px;color:red;">🗑️</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-products" class="form-section">
+          <h2 class="form-heading">📦 تعریف و مدیریت کالاها (AnbardaryNamKala2Form)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary" onclick="openAddProductRow()">+ کالای جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد کالا</th><th>نام کالا</th><th>واحد</th><th>بارکد</th><th>قیمت فروش</th><th>موجودی</th><th>عملیات</th></tr></thead>
+              <tbody id="productsTableBody"></tbody></table>
+            </div>
+            <div id="addProductRow" style="display:none;" class="inline-form">
+              <h4>افزودن کالای جدید</h4>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">کد کالا:</label><input type="text" id="newProdCode" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">نام کالا:</label><input type="text" id="newProdName" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">واحد:</label><input type="text" id="newProdUnit" class="form-input" value="عدد" /></div>
+                <div class="form-group"><label class="form-label">قیمت (ریال):</label><input type="number" id="newProdPrice" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">موجودی:</label><input type="number" id="newProdStock" class="form-input" value="0" /></div>
+                <div class="form-group" style="align-self:flex-end;">
+                  <button class="btn btn-primary" onclick="saveNewProduct()">ذخیره</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addProductRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-warehouses" class="form-section">
+          <h2 class="form-heading">🏭 تعریف انبارها و جانمایی (WarehouseForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد انبار</th><th>نام انبار</th><th>نوع انبار</th><th>انباردار</th><th>محل انبار</th><th>موجودی منفی</th><th>عملیات</th></tr></thead>
+              <tbody id="warehousesTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-cardex" class="form-section">
+          <h2 class="form-heading">📊 کاردکس و موجودی انبارها (CardexForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">کالا:</label>
+                <select class="form-select" id="cardexProductSelect"><option>انتخاب کالا...</option></select>
+              </div>
+              <div class="form-group"><label class="form-label">انبار:</label>
+                <select class="form-select"><option>انبار مرکزی</option></select>
+              </div>
+              <div class="form-group" style="align-self:flex-end;"><button class="btn btn-primary" onclick="showCardex()">🔍 نمایش کاردکس</button></div>
+            </div>
+            <div id="cardexResult" style="display:none;" class="table-wrapper">
+              <table><thead><tr><th>تاریخ</th><th>نوع سند</th><th>ورودی (تعداد)</th><th>خروجی (تعداد)</th><th>موجودی</th><th>قیمت واحد</th><th>مبلغ کل</th></tr></thead>
+              <tbody id="cardexTableBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-purchase-invoice" class="form-section">
+          <h2 class="form-heading">📥 فاکتورهای خرید (KharidForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary">+ فاکتور خرید جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره فاکتور</th><th>تاریخ</th><th>تامین‌کننده</th><th>انبار</th><th>مبلغ کل</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody id="purchaseInvoicesBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-sales-invoice" class="form-section">
+          <h2 class="form-heading">📤 فاکتورهای فروش (ForooshForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary">+ فاکتور فروش جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره فاکتور</th><th>تاریخ</th><th>مشتری</th><th>انبار</th><th>مبلغ کل</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody id="salesInvoicesBody"></tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-warehouse-transfer" class="form-section">
+          <h2 class="form-heading">🔄 انتقال بین انبارها (TransferForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">از انبار:</label><select class="form-select"><option>انبار مرکزی</option></select></div>
+              <div class="form-group"><label class="form-label">به انبار:</label><select class="form-select"><option>انبار شعبه</option></select></div>
+              <div class="form-group"><label class="form-label">تاریخ انتقال:</label><input type="text" class="form-input" value="1403/05/10" /></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('حواله انتقال بین انبارها صادر شد.')">🔄 صدور حواله انتقال</button></div>
+          </div>
+        </div>
+
+        <div id="form-tax-system" class="form-section">
+          <h2 class="form-heading">🧾 سامانه مودیان مالیاتی (TaxSystemForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">شناسه یکتای مودیان:</label><input type="text" class="form-input" placeholder="شناسه مودیان..." /></div>
+            <div class="form-group"><label class="form-label">دوره مالیاتی:</label><select class="form-select"><option>بهار ۱۴۰۳</option><option>تابستان ۱۴۰۳</option></select></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('صورتحساب‌ها به سامانه مودیان ارسال شدند.')">🧾 ارسال به سامانه مودیان</button></div>
+          </div>
+        </div>
+
+        <div id="form-parties" class="form-section">
+          <h2 class="form-heading">🤝 مدیریت تامین‌کنندگان و مشتریان (PartiesForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary">+ طرف حساب جدید</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد</th><th>نام</th><th>نوع</th><th>تلفن</th><th>کد اقتصادی</th><th>مانده حساب</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>C-101</td><td>شرکت فناوری آریا</td><td><span class="badge badge-success">مشتری</span></td><td>021-44444444</td><td>411000000000</td><td class="text-debit">۱۲۵,۰۰۰,۰۰۰ ریال (بدهکار)</td>
+                <td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
+                <tr><td>V-201</td><td>بازرگانی واردات پارس</td><td><span class="badge badge-warning">تامین‌کننده</span></td><td>021-55555555</td><td>422000000000</td><td class="text-credit">۱,۸۵۰,۰۰۰,۰۰۰ ریال (بستانکار)</td>
+                <td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- PAYROLL FORMS ---- -->
+        <div id="form-personnel" class="form-section">
+          <h2 class="form-heading">👔 پرونده پرسنلی و حکم حقوقی (PersonnelForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ پرسنل جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد پرسنلی</th><th>نام کامل</th><th>واحد سازمانی</th><th>سمت</th><th>حقوق پایه</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>EMP-001</td><td>علی رضایی</td><td>حسابداری</td><td>حسابدار ارشد</td><td>۲۵,۰۰۰,۰۰۰ ریال</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
+                <tr><td>EMP-002</td><td>رضا حسینی</td><td>انبارداری</td><td>انباردار</td><td>۱۸,۰۰۰,۰۰۰ ریال</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-payslip" class="form-section">
+          <h2 class="form-heading">💵 محاسبه حقوق و صدور فیش (PayslipForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">ماه محاسبه:</label><select class="form-select"><option>مرداد ۱۴۰۳</option><option>تیر ۱۴۰۳</option></select></div>
+              <div class="form-group"><label class="form-label">واحد سازمانی:</label><select class="form-select"><option>همه واحدها</option><option>حسابداری</option><option>انبارداری</option></select></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('فیش حقوقی مرداد ۱۴۰۳ محاسبه و صادر گردید.')">💵 محاسبه و صدور فیش</button></div>
+          </div>
+        </div>
+
+        <div id="form-attendance" class="form-section">
+          <h2 class="form-heading">📅 کارکرد و ثبت مرخصی‌ها (AttendanceForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">انتخاب پرسنل:</label><select class="form-select"><option>علی رضایی (EMP-001)</option><option>رضا حسینی (EMP-002)</option></select></div>
+            <div class="form-group"><label class="form-label">نوع غیبت / مرخصی:</label><select class="form-select"><option>مرخصی استحقاقی</option><option>مرخصی استعلاجی</option><option>غیبت موجه</option></select></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" placeholder="1403/05/10" /></div>
+              <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" placeholder="1403/05/12" /></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('کارکرد / مرخصی ثبت شد.')">📅 ثبت کارکرد / مرخصی</button></div>
+          </div>
+        </div>
+
+        <!-- ---- ASSETS FORMS ---- -->
+        <div id="form-assets-list" class="form-section">
+          <h2 class="form-heading">🏛 اموال و دارایی‌های ثابت (AmvalForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ اموال جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد اموال</th><th>نام دارایی</th><th>دسته‌بندی</th><th>تاریخ خرید</th><th>ارزش اولیه</th><th>استهلاک انباشته</th><th>ارزش دفتری</th></tr></thead>
+              <tbody>
+                <tr><td>FA-001</td><td>ساختمان اداری</td><td>دارایی ثابت مشهود</td><td>1395/01/15</td><td>۵,۰۰۰,۰۰۰,۰۰۰</td><td>۸۰۰,۰۰۰,۰۰۰</td><td>۴,۲۰۰,۰۰۰,۰۰۰</td></tr>
+                <tr><td>FA-002</td><td>خودرو سازمانی</td><td>وسایل نقلیه</td><td>1400/06/01</td><td>۸۰۰,۰۰۰,۰۰۰</td><td>۲۴۰,۰۰۰,۰۰۰</td><td>۵۶۰,۰۰۰,۰۰۰</td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-depreciation" class="form-section">
+          <h2 class="form-heading">📉 محاسبه و ثبت استهلاک (DepreciationForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">دوره محاسبه:</label><select class="form-select"><option>سال مالی ۱۴۰۳</option><option>سال مالی ۱۴۰۲</option></select></div>
+            <div class="form-group"><label class="form-label">روش استهلاک:</label><select class="form-select"><option>خط مستقیم (SLM)</option><option>مانده نزولی (DBM)</option><option>بر اساس کارکرد</option></select></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('جدول استهلاک محاسبه و سند حسابداری مربوطه صادر گردید.')">📉 محاسبه و ثبت استهلاک</button></div>
+          </div>
+        </div>
+
+        <!-- ---- AUTOMATION FORMS ---- -->
+        <div id="form-letters" class="form-section">
+          <h2 class="form-heading">✉️ مکاتبات اداری و دبیرخانه (LettersForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;gap:8px;">
+              <button class="btn btn-outline">+ نامه وارده</button>
+              <button class="btn btn-primary">+ نامه صادره</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره</th><th>تاریخ</th><th>نوع نامه</th><th>از / به</th><th>موضوع</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>1403/100</td><td>1403/05/01</td><td><span class="badge badge-primary">وارده</span></td><td>اداره مالیات</td><td>درخواست ارائه اسناد</td><td><span class="badge badge-warning">در دست بررسی</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">📎 ضمیمه</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-dms" class="form-section">
+          <h2 class="form-heading">📂 بایگانی اسناد دیجیتال (DMSForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">📎 آپلود سند</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>نام فایل</th><th>نوع</th><th>حجم</th><th>آپلودکننده</th><th>تاریخ</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>قرارداد_پیمانکار.pdf</td><td>PDF</td><td>2.3 MB</td><td>admin</td><td>1403/04/15</td><td><button class="btn btn-outline" style="padding:3px 8px;">⬇️ دانلود</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- CRM FORMS ---- -->
+        <div id="form-crm-customers" class="form-section">
+          <h2 class="form-heading">🤝 مدیریت ارتباط با مشتریان (CRMForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table><thead><tr><th>مشتری</th><th>تلفن</th><th>آخرین تماس</th><th>فرصت فروش</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>شرکت فناوری آریا</td><td>021-44444444</td><td>1403/05/08</td><td>توسعه سیستم انبار</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">📞 پیگیری</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-crm-opportunities" class="form-section">
+          <h2 class="form-heading">🎯 پیگیری فرصت‌های فروش (OpportunitiesForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ فرصت جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>عنوان</th><th>مشتری</th><th>ارزش تخمینی</th><th>احتمال</th><th>مرحله</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>پروژه استقرار ERP</td><td>گروه صنعتی الف</td><td>۵۰۰,۰۰۰,۰۰۰ ریال</td><td>۶۰٪</td><td><span class="badge badge-warning">مذاکره</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- TREASURY FORMS ---- -->
+        <div id="form-checks" class="form-section">
+          <h2 class="form-heading">💰 مدیریت چک‌ها (ChecksForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-outline">+ چک دریافتی</button>
+              <button class="btn btn-primary">+ چک پرداختی</button>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره چک</th><th>بانک</th><th>مبلغ</th><th>تاریخ سررسید</th><th>نوع</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>1234567</td><td>ملی</td><td>۱۵۰,۰۰۰,۰۰۰</td><td>1403/06/01</td><td><span class="badge badge-success">دریافتی</span></td><td><span class="badge badge-warning">در جریان</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">وصول</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-bank-accounts" class="form-section">
+          <h2 class="form-heading">🏦 مدیریت حساب‌های بانکی و صندوق (BankAccountsForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table><thead><tr><th>نام</th><th>نوع</th><th>شماره حساب</th><th>بانک / شعبه</th><th>مانده جاری</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>صندوق مرکزی</td><td>صندوق</td><td>-</td><td>-</td><td>۴۵,۰۰۰,۰۰۰ ریال</td><td><button class="btn btn-outline" style="padding:3px 8px;">گردش</button></td></tr>
+                <tr><td>بانک ملی مرکزی</td><td>حساب بانکی</td><td>0105000000001</td><td>بانک ملی - شعبه مرکزی</td><td>۳,۴۰۰,۰۰۰,۰۰۰ ریال</td><td><button class="btn btn-outline" style="padding:3px 8px;">گردش</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- BUDGET FORMS ---- -->
+        <div id="form-budget-plan" class="form-section">
+          <h2 class="form-heading">📈 بودجه‌بندی و کنترل انحرافات (BudgetPlanForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">سال بودجه:</label><input type="text" class="form-input" value="۱۴۰۳" /></div>
+              <div class="form-group"><label class="form-label">مرکز هزینه:</label><select class="form-select"><option>همه مراکز</option><option>واحد اداری</option><option>واحد تولید</option></select></div>
+            </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>ردیف بودجه</th><th>بودجه مصوب</th><th>مصرف واقعی</th><th>انحراف</th><th>درصد مصرف</th></tr></thead>
+              <tbody>
+                <tr><td>هزینه پرسنلی</td><td>۲۰۰,۰۰۰,۰۰۰</td><td>۱۶۵,۰۰۰,۰۰۰</td><td class="text-credit">۳۵,۰۰۰,۰۰۰ (مثبت)</td><td>۸۲٪</td></tr>
+                <tr><td>هزینه اداری</td><td>۵۰,۰۰۰,۰۰۰</td><td>۵۸,۰۰۰,۰۰۰</td><td class="text-debit">۸,۰۰۰,۰۰۰- (منفی)</td><td>۱۱۶٪</td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-cost-centers" class="form-section">
+          <h2 class="form-heading">💸 مدیریت مراکز هزینه (CostCentersForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ مرکز هزینه جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد</th><th>نام مرکز هزینه</th><th>مدیر مسئول</th><th>هزینه دوره جاری</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>CC-01</td><td>واحد اداری</td><td>علی رضایی</td><td>۵۸,۰۰۰,۰۰۰ ریال</td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- PRODUCTION FORMS ---- -->
+        <div id="form-bom" class="form-section">
+          <h2 class="form-heading">🏭 دستور ساخت و فرمول تولید (BOMForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ دستور ساخت جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد محصول</th><th>نام محصول</th><th>تعداد اجزاء (BOM)</th><th>زمان ساخت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>FG-001</td><td>محصول نهایی الف</td><td>۵ جز</td><td>۴ ساعت</td><td><button class="btn btn-outline" style="padding:3px 8px;">📋 نمایش BOM</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-cost-calc" class="form-section">
+          <h2 class="form-heading">💵 بهای تمام شده کالای تولیدی (CostCalcForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">محصول:</label><select class="form-select"><option>محصول نهایی الف (FG-001)</option></select></div>
+              <div class="form-group"><label class="form-label">دوره:</label><select class="form-select"><option>مرداد ۱۴۰۳</option></select></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('محاسبه بهای تمام شده انجام شد.')">💵 محاسبه بهای تمام شده</button></div>
+          </div>
+        </div>
+
+        <div id="form-pm" class="form-section">
+          <h2 class="form-heading">🔧 تعمیر و نگهداری پیشگیرانه (PMForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ دستور کار جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره</th><th>ماشین / تجهیز</th><th>نوع PM</th><th>تاریخ برنامه</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>PM-001</td><td>دستگاه تراش شماره ۱</td><td>PM دوره‌ای</td><td>1403/06/01</td><td><span class="badge badge-warning">برنامه‌ریزی‌شده</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">اجرا</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-qc" class="form-section">
+          <h2 class="form-heading">🔍 کنترل کیفیت (QCForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ بازرسی جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>شماره</th><th>محصول</th><th>تعداد بازرسی</th><th>تعداد مردودی</th><th>درصد پذیرش</th><th>نتیجه</th></tr></thead>
+              <tbody>
+                <tr><td>QC-001</td><td>محصول نهایی الف</td><td>۱۰۰</td><td>۳</td><td>۹۷٪</td><td><span class="badge badge-success">قبول</span></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- PROJECTS FORMS ---- -->
+        <div id="form-projects-list" class="form-section">
+          <h2 class="form-heading">🏗 کنترل فاز پروژه‌ها (ProjectsForm)</h2>
+          <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ پروژه جدید</button></div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد پروژه</th><th>نام پروژه</th><th>کارفرما</th><th>ارزش قرارداد</th><th>پیشرفت</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <tbody>
+                <tr><td>PRJ-001</td><td>احداث شعبه غرب</td><td>مدیریت ارشد</td><td>۵,۰۰۰,۰۰۰,۰۰۰</td><td><progress value="65" max="100" style="width:80px;">۶۵٪</progress> ۶۵٪</td><td><span class="badge badge-success">در حال اجرا</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">📋 فازها</button></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-progress-report" class="form-section">
+          <h2 class="form-heading">📜 صورت وضعیت و پیمانکاران (ProgressReportForm)</h2>
+          <div class="card form-card">
+            <div class="form-group"><label class="form-label">انتخاب پروژه:</label><select class="form-select"><option>احداث شعبه غرب (PRJ-001)</option></select></div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('صورت وضعیت پیمانکار صادر شد.')">📜 صدور صورت وضعیت</button></div>
+          </div>
+        </div>
+
+        <!-- ---- KPI FORMS ---- -->
+        <div id="form-kpi-list" class="form-section">
+          <h2 class="form-heading">🎯 شاخص‌های کلیدی عملکرد (KPIForm)</h2>
+          <div class="card form-card">
+            <div class="table-wrapper">
+              <table><thead><tr><th>شاخص KPI</th><th>هدف</th><th>واقعی</th><th>درصد تحقق</th><th>وضعیت</th></tr></thead>
+              <tbody>
+                <tr><td>نسبت نقدینگی</td><td>۲.۰</td><td>۱.۸</td><td>۹۰٪</td><td><span class="badge badge-warning">قابل قبول</span></td></tr>
+                <tr><td>حاشیه سود ناخالص</td><td>۳۵٪</td><td>۳۸٪</td><td>۱۰۹٪</td><td><span class="badge badge-success">عالی</span></td></tr>
+                <tr><td>دوره وصول مطالبات</td><td>۳۰ روز</td><td>۴۵ روز</td><td>۶۷٪</td><td><span class="badge badge-danger" style="background:#ef4444;color:#fff;">ضعیف</span></td></tr>
+              </tbody></table>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-bi-dashboard" class="form-section">
+          <h2 class="form-heading">📊 داشبوردهای هوش تجاری (BI Dashboard)</h2>
+          <div class="card form-card">
+            <div class="kpi-cards-row">
+              <div class="kpi-card"><div class="kpi-icon">📝</div><div class="kpi-label">کل اسناد حسابداری</div><div class="kpi-value">۱۴۸</div></div>
+              <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">تعداد کالاهای فعال</div><div class="kpi-value">۳۵۰</div></div>
+              <div class="kpi-card"><div class="kpi-icon">💰</div><div class="kpi-label">فروش سال جاری (ریال)</div><div class="kpi-value">۴,۲۵۰,۰۰۰,۰۰۰</div></div>
+              <div class="kpi-card"><div class="kpi-icon">⚖️</div><div class="kpi-label">توازن اسناد</div><div class="kpi-value" style="color:var(--success-color);">متوازن ✅</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- end formsArea -->
 
     </main>
   </div>
@@ -307,165 +1298,8 @@
   <!-- Status Bar Footer -->
   <footer class="status-bar">
     <div>کاربر: <b>ابر مدیر (admin)</b> | شرکت: <b>شرکت نمونه نگار</b> | سال مالی: <b>۱۴۰۳</b></div>
-    <div>تاریخ سیستم: <b>۱۴۰۵/۰۵/۱۰ - ۱۸:۱۸:۰۵</b></div>
+    <div id="statusBarTime">تاریخ سیستم: <b>۱۴۰۵/۰۵/۱۰ - ۱۸:۵۰</b></div>
   </footer>
-
-  <!-- ========================================================================= -->
-  <!-- OPERATIONAL MODAL FORMS (MATCHING DESKTOP NEGAR FORMS) -->
-  <!-- ========================================================================= -->
-
-  <!-- Modal 1: Add User Form (UserManagementUsersForm.vb) -->
-  <div class="modal-overlay" id="addUserModal">
-    <div class="modal-box">
-      <h3 style="margin-bottom:16px;">ایجاد کاربر جدید در سیستم نگار</h3>
-      <div class="form-group">
-        <label class="form-label">نام کاربری (Username):</label>
-        <input type="text" id="newUsername" class="form-input" placeholder="مثال: user1" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">نام و نام خانوادگی:</label>
-        <input type="text" id="newFullName" class="form-input" placeholder="مثال: حسین محمدی" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">نوع کاربر (UserType):</label>
-        <select id="newUserType" class="form-select">
-          <option value="User">کاربر عادي (User)</option>
-          <option value="Manager">مدیر پایه (Manager)</option>
-          <option value="SuperAdmin">مدیر ارشد (SuperAdmin)</option>
-        </select>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn btn-outline" onclick="closeModal('addUserModal')">انصراف</button>
-        <button class="btn btn-primary" onclick="saveNewUser()">ذخیره کاربر</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 2: Add Account Form (HesabdaryCodingForm.vb) -->
-  <div class="modal-overlay" id="addAccountModal">
-    <div class="modal-box">
-      <h3 style="margin-bottom:16px;">تعریف حساب جدید در کدگذاری سرفصل‌ها</h3>
-      <div class="form-group">
-        <label class="form-label">کد حساب:</label>
-        <input type="text" id="newAccCode" class="form-input" placeholder="مثال: 1003" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">عنوان حساب:</label>
-        <input type="text" id="newAccName" class="form-input" placeholder="مثال: بانک صادرات" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">سطح حساب:</label>
-        <select id="newAccType" class="form-select">
-          <option value="معین">معین</option>
-          <option value="تفصیلی">تفصیلی</option>
-          <option value="کل">کل</option>
-          <option value="گروه">گروه</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">ماهیت حساب:</label>
-        <select id="newAccNature" class="form-select">
-          <option value="بدهکار">بدهکار</option>
-          <option value="بستانکار">بستانکار</option>
-          <option value="خنثی">خنثی / دوگانه</option>
-        </select>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn btn-outline" onclick="closeModal('addAccountModal')">انصراف</button>
-        <button class="btn btn-primary" onclick="saveNewAccount()">ذخیره حساب</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 3: Journal Entry Registration Form (HesabdarySanad1Form & Sanad2Form) -->
-  <div class="modal-overlay" id="newSanadModal">
-    <div class="modal-box" style="max-width:850px;">
-      <h3 style="margin-bottom:16px;">ثبت سند حسابداری جدید (HesabdarySanad1Form & Sanad2Form)</h3>
-      <div style="display:grid; grid-template-columns: 1fr 1fr 2fr; gap:12px; margin-bottom:16px;">
-        <div>
-          <label class="form-label">شماره سند:</label>
-          <input type="text" id="sanadNumberInput" class="form-input" value="103" />
-        </div>
-        <div>
-          <label class="form-label">تاریخ سند:</label>
-          <input type="text" id="sanadDateInput" class="form-input" value="1403/05/10" />
-        </div>
-        <div>
-          <label class="form-label">شرح کلی سند:</label>
-          <input type="text" id="sanadDescInput" class="form-input" placeholder="شرح سند حسابداری..." />
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <h4>ردیف‌های سند حسابداری (Sanad2 Grid)</h4>
-        <button class="btn btn-outline" onclick="addSanadLine()">+ افزودن ردیف</button>
-      </div>
-
-      <div class="table-wrapper" style="max-height:250px;">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th style="width:250px;">حساب معین/تفصیلی</th>
-              <th>شرح ردیف</th>
-              <th>مبلغ بدهکار (ریال)</th>
-              <th>مبلغ بستانکار (ریال)</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody id="sanadLinesEditorBody">
-            <!-- Rendered dynamically by app.js -->
-          </tbody>
-        </table>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding:12px; background:var(--bg-primary); border-radius:8px;">
-        <div>جمع بدهکار: <b id="sanadTotalDebit">۰ ریال</b></div>
-        <div>جمع بستانکار: <b id="sanadTotalCredit">۰ ریال</b></div>
-        <div>وضعیت توازن: <span class="badge badge-warning" id="sanadBalanceStatus">نامتوازن</span></div>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn btn-outline" onclick="closeModal('newSanadModal')">انصراف</button>
-        <button class="btn btn-primary" onclick="saveSanadEntry()">ثبت نهایی سند</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 4: Add Product Form (AnbardaryNamKala2Form.vb) -->
-  <div class="modal-overlay" id="addProductModal">
-    <div class="modal-box">
-      <h3 style="margin-bottom:16px;">تعریف کالای جدید (AnbardaryNamKala2Form)</h3>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="form-group">
-          <label class="form-label">کد کالا:</label>
-          <input type="text" id="newProdCode" class="form-input" placeholder="PRD-103" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">نام کالا:</label>
-          <input type="text" id="newProdName" class="form-input" placeholder="عنوان کالا..." />
-        </div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="form-group">
-          <label class="form-label">واحد سنجش:</label>
-          <input type="text" id="newProdUnit" class="form-input" value="عدد" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">قیمت فروش پیش‌فرض (ریال):</label>
-          <input type="number" id="newProdPrice" class="form-input" value="100000" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">موجودی اول دوره:</label>
-        <input type="number" id="newProdStock" class="form-input" value="10" />
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn btn-outline" onclick="closeModal('addProductModal')">انصراف</button>
-        <button class="btn btn-primary" onclick="saveNewProduct()">ذخیره کالا</button>
-      </div>
-    </div>
-  </div>
 
   <script src="app.js"></script>
 </body>
