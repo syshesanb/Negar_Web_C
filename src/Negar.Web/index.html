@@ -740,12 +740,58 @@
         <div id="form-fiscal-years" class="form-section">
           <h2 class="form-heading">📅 مدیریت سال‌های مالی (FiscalYearForm)</h2>
           <div class="card form-card">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary" onclick="openFiscalYearForm(null)">+ تعریف سال مالی جدید</button>
+            </div>
             <div class="table-wrapper">
-              <table><thead><tr><th>سال مالی</th><th>تاریخ شروع</th><th>تاریخ پایان</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody>
-                <tr><td><b>۱۴۰۳</b></td><td>۱۴۰۳/۰۱/۰۱</td><td>۱۴۰۳/۱۲/۲۹</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:4px 8px;">بستن دوره</button></td></tr>
-                <tr><td>۱۴۰۲</td><td>۱۴۰۲/۰۱/۰۱</td><td>۱۴۰۲/۱۲/۲۹</td><td><span class="badge badge-warning">بسته</span></td><td><button class="btn btn-outline" style="padding:4px 8px;">مشاهده</button></td></tr>
-              </tbody></table>
+              <table>
+                <thead>
+                  <tr>
+                    <th>سال مالی</th>
+                    <th>تاریخ شروع</th>
+                    <th>تاریخ پایان</th>
+                    <th>شرکت مربوطه</th>
+                    <th>توضیحات</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="fiscalYearsTableBody"></tbody>
+              </table>
+            </div>
+
+            <!-- Inline Add / Edit Fiscal Year Form -->
+            <div id="fiscalYearFormPanel" style="display:none;" class="inline-form">
+              <h4 id="fiscalYearFormTitle">تعریف سال مالی جدید</h4>
+              <input type="hidden" id="editingFiscalYearId" value="" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">سال مالی: *</label>
+                  <input type="text" id="fyYear" class="form-input" placeholder="مثال: 1404" maxlength="4" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">تاریخ شروع: *</label>
+                  <input type="text" id="fyStartDate" class="form-input" placeholder="مثال: 1404/01/01" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">تاریخ پایان: *</label>
+                  <input type="text" id="fyEndDate" class="form-input" placeholder="مثال: 1404/12/29" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">شرکت مربوطه:</label>
+                  <select id="fyCompany" class="form-select">
+                    <option value="1001">شرکت نمونه نگار (۱۰۰۱)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">توضیحات سال مالی:</label>
+                <input type="text" id="fyNotes" class="form-input" placeholder="توضیحات اختیاری..." />
+              </div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+                <button class="btn btn-outline" onclick="closeFiscalYearForm()">انصراف</button>
+                <button class="btn btn-primary" onclick="saveFiscalYear()">💾 ذخیره سال مالی</button>
+              </div>
             </div>
           </div>
         </div>

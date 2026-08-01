@@ -23,6 +23,11 @@ const AppState = {
       activeYear: '1403'
     }
   ],
+  fiscalYears: [
+    { id: 1, year: '1403', startDate: '1403/01/01', endDate: '1403/12/29', company: '1001', notes: 'سال مالی جاری', status: 'فعال' },
+    { id: 2, year: '1402', startDate: '1402/01/01', endDate: '1402/12/29', company: '1001', notes: 'سال مالی قبل', status: 'بسته' },
+    { id: 3, year: '1401', startDate: '1401/01/01', endDate: '1401/12/29', company: '1001', notes: 'سال مالی بسته', status: 'بسته' }
+  ],
   users: [
     { id: 1, username: 'admin', fullName: 'مدیر ارشد سیستم', userType: 'SuperAdmin', isActive: true, ip: '127.0.0.1' },
     { id: 2, username: 'accountant1', fullName: 'علی رضایی (حسابدار)', userType: 'User', isActive: true, ip: '192.168.1.10' },
@@ -150,6 +155,7 @@ function showForm(formId) {
   if (formId === 'form-sales-invoice') renderSalesInvoicesTable();
   if (formId === 'form-permissions-matrix') renderPermissionsMatrix();
   if (formId === 'form-companies-list') renderCompaniesTable();
+  if (formId === 'form-fiscal-years') renderFiscalYearsTable();
 }
 
 // ============================
@@ -687,7 +693,143 @@ function deleteCompany(companyId) {
 }
 
 // ============================
+// FISCAL YEARS MODULE
+// ============================
+function renderFiscalYearsTable() {
+  const tbody = document.getElementById('fiscalYearsTableBody');
+  if (!tbody) return;
+
+  // Sort by year descending (newest first)
+  const sorted = [...AppState.fiscalYears].sort((a, b) => Number(b.year) - Number(a.year));
+
+  tbody.innerHTML = sorted.map(fy => {
+    const companyName = AppState.companies.find(c => c.code === fy.company)?.name || fy.company;
+    const statusBadge = fy.status === 'فعال'
+      ? '<span class="badge badge-success">فعال ✅</span>'
+      : '<span class="badge badge-warning">بسته 🔒</span>';
+    return `
+      <tr>
+        <td><b>${fy.year}</b></td>
+        <td>${fy.startDate}</td>
+        <td>${fy.endDate}</td>
+        <td>${companyName}</td>
+        <td style="color:var(--text-muted);font-size:0.82rem;">${fy.notes || '-'}</td>
+        <td style="text-align:center;">${statusBadge}</td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 10px;" onclick="openFiscalYearForm(${fy.id})">✏️ ویرایش</button>
+          <button class="btn btn-outline" style="padding:3px 10px;color:red;" onclick="deleteFiscalYear(${fy.id})">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openFiscalYearForm(fiscalYearId) {
+  const panel = document.getElementById('fiscalYearFormPanel');
+  const title = document.getElementById('fiscalYearFormTitle');
+  if (!panel) return;
+
+  // Refresh company dropdown from AppState
+  const select = document.getElementById('fyCompany');
+  if (select) {
+    select.innerHTML = AppState.companies.map(c =>
+      `<option value="${c.code}">${c.name} (${c.code})</option>`
+    ).join('');
+  }
+
+  panel.style.display = 'block';
+
+  if (fiscalYearId === null) {
+    // NEW mode
+    title.textContent = '➕ تعریف سال مالی جدید';
+    document.getElementById('editingFiscalYearId').value = '';
+    document.getElementById('fyYear').value = '';
+    document.getElementById('fyStartDate').value = '';
+    document.getElementById('fyEndDate').value = '';
+    document.getElementById('fyNotes').value = '';
+    if (select && AppState.companies.length > 0) {
+      select.value = AppState.companies[0].code;
+    }
+  } else {
+    // EDIT mode
+    const fy = AppState.fiscalYears.find(f => f.id === fiscalYearId);
+    if (!fy) return;
+    title.textContent = `✏️ ویرایش سال مالی: ${fy.year}`;
+    document.getElementById('editingFiscalYearId').value = fy.id;
+    document.getElementById('fyYear').value = fy.year;
+    document.getElementById('fyStartDate').value = fy.startDate;
+    document.getElementById('fyEndDate').value = fy.endDate;
+    document.getElementById('fyNotes').value = fy.notes || '';
+    if (select) select.value = fy.company;
+  }
+
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  document.getElementById('fyYear').focus();
+}
+
+function closeFiscalYearForm() {
+  const panel = document.getElementById('fiscalYearFormPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function saveFiscalYear() {
+  const editingId = document.getElementById('editingFiscalYearId')?.value;
+  const year = document.getElementById('fyYear')?.value?.trim();
+  const startDate = document.getElementById('fyStartDate')?.value?.trim();
+  const endDate = document.getElementById('fyEndDate')?.value?.trim();
+  const company = document.getElementById('fyCompany')?.value;
+  const notes = document.getElementById('fyNotes')?.value?.trim();
+
+  // Validation
+  if (!year) { alert('سال مالی الزامی است.'); document.getElementById('fyYear').focus(); return; }
+  if (!/^\d{4}$/.test(year)) { alert('سال مالی باید یک عدد ۴ رقمی باشد. مثال: 1404'); document.getElementById('fyYear').focus(); return; }
+  if (!startDate) { alert('تاریخ شروع الزامی است.'); document.getElementById('fyStartDate').focus(); return; }
+  if (!endDate) { alert('تاریخ پایان الزامی است.'); document.getElementById('fyEndDate').focus(); return; }
+
+  if (editingId) {
+    // UPDATE
+    const idx = AppState.fiscalYears.findIndex(f => f.id === Number(editingId));
+    if (idx !== -1) {
+      AppState.fiscalYears[idx] = { ...AppState.fiscalYears[idx], year, startDate, endDate, company, notes };
+      alert(`سال مالی ${year} با موفقیت بروزرسانی شد.`);
+    }
+  } else {
+    // Check duplicate year for same company
+    if (AppState.fiscalYears.find(f => f.year === year && f.company === company)) {
+      alert(`سال مالی "${year}" قبلاً برای این شرکت تعریف شده است.`);
+      document.getElementById('fyYear').focus();
+      return;
+    }
+    // CREATE
+    AppState.fiscalYears.push({
+      id: Date.now(),
+      year, startDate, endDate, company, notes,
+      status: 'بسته'  // New fiscal years start as closed until activated
+    });
+    alert(`سال مالی ${year} با موفقیت تعریف شد.`);
+  }
+
+  closeFiscalYearForm();
+  renderFiscalYearsTable();
+}
+
+function deleteFiscalYear(fyId) {
+  const fy = AppState.fiscalYears.find(f => f.id === fyId);
+  if (!fy) return;
+  if (fy.status === 'فعال') {
+    alert('امکان حذف سال مالی فعال وجود ندارد. ابتدا سال مالی دیگری را فعال کنید.');
+    return;
+  }
+  if (confirm(`آیا از حذف سال مالی "${fy.year}" اطمینان دارید؟`)) {
+    AppState.fiscalYears = AppState.fiscalYears.filter(f => f.id !== fyId);
+    renderFiscalYearsTable();
+    alert(`سال مالی ${fy.year} با موفقیت حذف شد.`);
+  }
+}
+
+// ============================
 // Init on page load
+
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
   // Show system tiles by default
