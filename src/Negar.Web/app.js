@@ -181,19 +181,19 @@ const AppState = {
     { id: 3, username: 'storekeeper', fullName: 'رضا حسینی (انباردار)', userType: 'User', isActive: true, ip: '192.168.1.15' }
   ],
   accounts: [
-    { id: 1, code: '1', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parent: '-' },
-    { id: 2, code: '10', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parent: '1 - دارایی‌های جاری' },
-    { id: 3, code: '1001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parent: '10 - موجودی نقد و بانک' },
-    { id: 4, code: '1002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parent: '10 - موجودی نقد و بانک' },
-    { id: 5, code: '11', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parent: '1 - دارایی‌های جاری' },
-    { id: 6, code: '1101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parent: '11 - حساب‌های دریافتنی' },
-    { id: 7, code: '2', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parent: '-' },
-    { id: 8, code: '20', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parent: '2 - بدهی‌های جاری' },
-    { id: 9, code: '2001', name: 'تامین‌کنندگان', type: 'معین', nature: 'بستانکار', parent: '20 - حساب‌های پرداختنی' },
-    { id: 10, code: '4', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parent: '-' },
-    { id: 11, code: '40', name: 'فروش کالا', type: 'کل', nature: 'بستانکار', parent: '4 - درآمدها' },
-    { id: 12, code: '5', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parent: '-' },
-    { id: 13, code: '50', name: 'هزینه اداری', type: 'کل', nature: 'بدهکار', parent: '5 - هزینه‌ها' },
+    { id: 1, code: '1', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 2, code: '10', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 3, code: '1001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
+    { id: 4, code: '1002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
+    { id: 5, code: '11', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 6, code: '1101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parentId: 5 },
+    { id: 7, code: '2', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 8, code: '20', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parentId: 7 },
+    { id: 9, code: '2001', name: 'تامین‌کنندگان', type: 'معین', nature: 'بستانکار', parentId: 8 },
+    { id: 10, code: '4', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 11, code: '40', name: 'فروش کالا', type: 'کل', nature: 'بستانکار', parentId: 10 },
+    { id: 12, code: '5', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 13, code: '50', name: 'هزینه اداری', type: 'کل', nature: 'بدهکار', parentId: 12 },
   ],
   shenavars: [
     { id: 1, code: 'SH-101', name: 'پروژه احداث شعبه غرب', parent: '-', status: 'فعال' },
@@ -433,33 +433,25 @@ function renderPermissionsMatrix() {
 // ============================
 // ACCOUNTING MODULE
 // ============================
-// Set of expanded account codes for treeview datagrid
-const expandedAccountCodes = new Set();
+// Set of expanded account IDs for treeview datagrid
+const expandedAccountIds = new Set();
 
-function toggleAccountExpand(code) {
-  if (expandedAccountCodes.has(code)) {
-    expandedAccountCodes.delete(code);
+function toggleAccountExpand(accId) {
+  if (expandedAccountIds.has(accId)) {
+    expandedAccountIds.delete(accId);
   } else {
-    expandedAccountCodes.add(code);
+    expandedAccountIds.add(accId);
   }
   renderAccountsTable();
-}
-
-function getAccountParentCode(a) {
-  if (!a.parent || a.parent === '-' || a.parent.trim() === '') return null;
-  const parts = a.parent.split('-');
-  return parts[0].trim();
 }
 
 function getAccountLevel(a) {
   let level = 0;
   let curr = a;
   let visited = new Set();
-  while (curr && !visited.has(curr.code)) {
-    visited.add(curr.code);
-    const parentCode = getAccountParentCode(curr);
-    if (!parentCode) break;
-    curr = AppState.accounts.find(x => x.code === parentCode);
+  while (curr && curr.parentId && !visited.has(curr.id)) {
+    visited.add(curr.id);
+    curr = AppState.accounts.find(x => x.id === curr.parentId);
     if (curr) level++;
     else break;
   }
@@ -469,12 +461,10 @@ function getAccountLevel(a) {
 function isAccountVisible(a) {
   let curr = a;
   let visited = new Set();
-  while (curr && !visited.has(curr.code)) {
-    visited.add(curr.code);
-    const parentCode = getAccountParentCode(curr);
-    if (!parentCode) return true; // Root level accounts are always visible
-    if (!expandedAccountCodes.has(parentCode)) return false; // Parent not expanded
-    curr = AppState.accounts.find(x => x.code === parentCode);
+  while (curr && curr.parentId && !visited.has(curr.id)) {
+    visited.add(curr.id);
+    if (!expandedAccountIds.has(curr.parentId)) return false;
+    curr = AppState.accounts.find(x => x.id === curr.parentId);
   }
   return true;
 }
@@ -483,16 +473,15 @@ function renderAccountsTable() {
   const tbody = document.getElementById('accountsTableBody');
   if (!tbody) return;
 
-  // Filter accounts by visibility in tree
   const visibleAccounts = AppState.accounts.filter(isAccountVisible);
 
   tbody.innerHTML = visibleAccounts.map(a => {
     const level = getAccountLevel(a);
-    const hasChildren = AppState.accounts.some(child => getAccountParentCode(child) === a.code);
-    const isExpanded = expandedAccountCodes.has(a.code);
+    const hasChildren = AppState.accounts.some(child => child.parentId === a.id);
+    const isExpanded = expandedAccountIds.has(a.id);
 
     const toggleBtnHtml = hasChildren
-      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleAccountExpand('${a.code}')">${isExpanded ? '-' : '+'}</button>`
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleAccountExpand(${a.id})">${isExpanded ? '-' : '+'}</button>`
       : '';
 
     const indentPx = level * 22;
@@ -518,6 +507,11 @@ function renderAccountsTable() {
 }
 
 function openAddAccountRow() {
+  const select = document.getElementById('newAccParentId');
+  if (select) {
+    select.innerHTML = '<option value="">بدون والد (حساب اصلی/گروه)</option>' +
+      AppState.accounts.map(a => `<option value="${a.id}">${a.code} - ${a.name}</option>`).join('');
+  }
   document.getElementById('addAccountRow').style.display = 'block';
   document.getElementById('newAccCode').focus();
 }
@@ -527,9 +521,13 @@ function saveNewAccount() {
   const name = document.getElementById('newAccName')?.value?.trim();
   const type = document.getElementById('newAccType')?.value;
   const nature = document.getElementById('newAccNature')?.value;
+  const parentVal = document.getElementById('newAccParentId')?.value;
+  const parentId = parentVal ? Number(parentVal) : null;
+
   if (!code || !name) { alert('کد حساب و عنوان الزامی است.'); return; }
   if (AppState.accounts.find(a => a.code === code)) { alert('این کد حساب قبلاً ثبت شده است.'); return; }
-  AppState.accounts.push({ id: Date.now(), code, name, type, nature, parent: '-' });
+
+  AppState.accounts.push({ id: Date.now(), code, name, type, nature, parentId });
   document.getElementById('newAccCode').value = '';
   document.getElementById('newAccName').value = '';
   document.getElementById('addAccountRow').style.display = 'none';
