@@ -1201,54 +1201,209 @@ function copyActiveVoucher() {
 }
 
 // Sanad 2 (editor)
+let focusedLineIndex = 0;
+
+function updateFocusedPaths(i) {
+  focusedLineIndex = i;
+  const line = AppState.sanadLines[i];
+  if (!line) return;
+  
+  // Find selected account path
+  const acc = AppState.accounts.find(a => a.code === line.account);
+  let accPath = 'کد و نام حساب سرفصل ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span>';
+  if (acc) {
+    const pathParts = [];
+    let curr = acc;
+    while (curr) {
+      pathParts.unshift(`${curr.code} : ${curr.name}`);
+      curr = curr.parentId ? AppState.accounts.find(x => x.id === curr.parentId) : null;
+    }
+    accPath = `کد و نام حساب سرفصل ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${pathParts.join(' / ')}</span>`;
+  }
+  
+  // Find selected shenavar path
+  const shen = AppState.shenavars.find(s => s.code === line.shenavarCode);
+  let shenPath = 'کد و نام حساب شناور ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">بدون شناور</span>';
+  if (shen) {
+    const pathParts = [];
+    let curr = shen;
+    while (curr) {
+      pathParts.unshift(`${curr.code} : ${curr.name}`);
+      curr = curr.parentId ? AppState.shenavars.find(x => x.id === curr.parentId) : null;
+    }
+    shenPath = `کد و نام حساب شناور ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${pathParts.join(' / ')}</span>`;
+  }
+  
+  const accEl = document.getElementById('focusedAccountPath');
+  const shenEl = document.getElementById('focusedShenavarPath');
+  if (accEl) accEl.innerHTML = accPath;
+  if (shenEl) shenEl.innerHTML = shenPath;
+}
+
+function updateSanadLineField(i, field, value) {
+  if (!AppState.sanadLines[i]) return;
+  if (field === 'debit' || field === 'credit') {
+    AppState.sanadLines[i][field] = Number(value || 0);
+    updateSanadTotals();
+  } else {
+    AppState.sanadLines[i][field] = value;
+  }
+  if (field === 'account' || field === 'shenavarCode') {
+    updateFocusedPaths(i);
+  }
+}
+
 function renderSanadEditorLines() {
   const tbody = document.getElementById('sanadLinesEditorBody');
   if (!tbody) return;
-  tbody.innerHTML = AppState.sanadLines.map((line, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>
-        <select class="form-select" onchange="AppState.sanadLines[${i}].account=this.value" style="min-width:200px;">
-          ${AppState.accounts.map(a =>
-            `<option value="${a.code}" ${line.account === a.code ? 'selected' : ''}>${a.code} - ${a.name}</option>`
-          ).join('')}
-        </select>
-      </td>
-      <td><input type="text" class="form-input" value="${line.desc}" onchange="AppState.sanadLines[${i}].desc=this.value" /></td>
-      <td><input type="number" class="form-input" value="${line.debit}" onchange="AppState.sanadLines[${i}].debit=Number(this.value);updateSanadTotals();" style="width:130px;" /></td>
-      <td><input type="number" class="form-input" value="${line.credit}" onchange="AppState.sanadLines[${i}].credit=Number(this.value);updateSanadTotals();" style="width:130px;" /></td>
-      <td><button class="btn btn-outline" style="padding:2px 6px;color:red;" onclick="removeSanadLine(${i})">❌</button></td>
-    </tr>
-  `).join('');
+
+  tbody.innerHTML = AppState.sanadLines.map((line, i) => {
+    // Default values for missing properties
+    if (!line.account) line.account = '011001';
+    if (!line.shenavarCode) line.shenavarCode = '';
+    if (!line.txNo) line.txNo = '';
+    if (!line.txDate) line.txDate = '';
+
+    const isSelected = (i === focusedLineIndex);
+    const rowClass = isSelected ? 'selected-parent-row' : '';
+
+    return `
+      <tr class="${rowClass}" onclick="updateFocusedPaths(${i})" style="cursor:pointer;">
+        <!-- Row No -->
+        <td style="text-align:center; font-weight:bold;">${i + 1}</td>
+        
+        <!-- Account Code Dropdown -->
+        <td>
+          <select class="form-select" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'account', this.value)">
+            ${AppState.accounts.map(a => 
+              `<option value="${a.code}" ${line.account === a.code ? 'selected' : ''}>${a.code} - ${a.name}</option>`
+            ).join('')}
+          </select>
+        </td>
+        
+        <!-- SF button helper -->
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('سرفصل حساب: ' + '${line.account}')">...</button></td>
+        
+        <!-- Floating Account Dropdown -->
+        <td>
+          <select class="form-select" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'shenavarCode', this.value)">
+            <option value="">بدون شناور</option>
+            ${AppState.shenavars.map(s => 
+              `<option value="${s.code}" ${line.shenavarCode === s.code ? 'selected' : ''}>${s.code} - ${s.name}</option>`
+            ).join('')}
+          </select>
+        </td>
+        
+        <!-- SH button helper -->
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert( '${line.shenavarCode}' ? 'شناور: ' + '${line.shenavarCode}' : 'حساب بدون شناور است' )">...</button></td>
+        
+        <!-- Description -->
+        <td>
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.desc || ''}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'desc', this.value)" />
+        </td>
+        
+        <!-- Debit -->
+        <td>
+          <input type="number" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${line.debit || 0}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'debit', this.value)" />
+        </td>
+        
+        <!-- Credit -->
+        <td>
+          <input type="number" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${line.credit || 0}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'credit', this.value)" />
+        </td>
+        
+        <!-- TT Transaction Type Helper -->
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('نوع تراکنش پیش‌فرض')">...</button></td>
+        
+        <!-- Transaction Number -->
+        <td>
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.txNo}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'txNo', this.value)" />
+        </td>
+        
+        <!-- Transaction Date -->
+        <td>
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.txDate}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'txDate', this.value)" />
+        </td>
+        
+        <!-- Action: Delete -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:2px 6px; color:red; border:none; background:transparent;" onclick="event.stopPropagation(); removeSanadLine(${i})">❌</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
   updateSanadTotals();
+  updateFocusedPaths(focusedLineIndex);
 }
 
 function addSanadLine() {
-  AppState.sanadLines.push({ account: '1001', desc: '', debit: 0, credit: 0 });
+  AppState.sanadLines.push({ account: '011001', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
+  focusedLineIndex = AppState.sanadLines.length - 1;
   renderSanadEditorLines();
 }
 
 function removeSanadLine(i) {
   AppState.sanadLines.splice(i, 1);
+  if (AppState.sanadLines.length === 0) {
+    AppState.sanadLines.push({ account: '011001', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
+  }
+  focusedLineIndex = Math.max(0, i - 1);
   renderSanadEditorLines();
+}
+
+function copyFocusedSanadLine(direction) {
+  if (focusedLineIndex === null || !AppState.sanadLines[focusedLineIndex]) {
+    alert('لطفاً ابتدا روی یکی از ردیف‌های سند کلیک کنید تا به عنوان سطر جاری انتخاب شود.');
+    return;
+  }
+  const sourceLine = { ...AppState.sanadLines[focusedLineIndex] };
+  if (direction === 'above') {
+    AppState.sanadLines.splice(focusedLineIndex, 0, sourceLine);
+    focusedLineIndex = focusedLineIndex + 1;
+  } else {
+    AppState.sanadLines.splice(focusedLineIndex + 1, 0, sourceLine);
+    focusedLineIndex = focusedLineIndex + 1;
+  }
+  renderSanadEditorLines();
+}
+
+function deleteFocusedSanadLine() {
+  if (focusedLineIndex === null || !AppState.sanadLines[focusedLineIndex]) {
+    alert('لطفاً ابتدا روی یکی از ردیف‌های سند کلیک کنید.');
+    return;
+  }
+  removeSanadLine(focusedLineIndex);
 }
 
 function updateSanadTotals() {
   const td = AppState.sanadLines.reduce((s, l) => s + Number(l.debit || 0), 0);
   const tc = AppState.sanadLines.reduce((s, l) => s + Number(l.credit || 0), 0);
   const diff = td - tc;
-  const debitEl = document.getElementById('sanadTotalDebit');
-  const creditEl = document.getElementById('sanadTotalCredit');
-  const statusEl = document.getElementById('sanadBalanceStatus');
-  if (debitEl) debitEl.textContent = td.toLocaleString() + ' ریال';
-  if (creditEl) creditEl.textContent = tc.toLocaleString() + ' ریال';
-  if (statusEl) {
+
+  const debitEl = document.getElementById('footerTotalDebit');
+  const creditEl = document.getElementById('footerTotalCredit');
+  const diffDebitEl = document.getElementById('footerDiffDebit');
+  const diffCreditEl = document.getElementById('footerDiffCredit');
+  const badgeEl = document.getElementById('sanadBalanceStatusBadge');
+
+  if (debitEl) debitEl.value = td.toLocaleString();
+  if (creditEl) creditEl.value = tc.toLocaleString();
+
+  if (diffDebitEl) diffDebitEl.value = diff > 0 ? diff.toLocaleString() : '0';
+  if (diffCreditEl) diffCreditEl.value = diff < 0 ? Math.abs(diff).toLocaleString() : '0';
+
+  if (badgeEl) {
     if (diff === 0 && td > 0) {
-      statusEl.className = 'badge badge-success';
-      statusEl.textContent = 'متوازن ✅';
+      badgeEl.className = 'badge badge-success';
+      badgeEl.textContent = 'تراز';
+      badgeEl.style.background = 'rgba(16,185,129,0.15)';
+      badgeEl.style.color = '#10b981';
     } else {
-      statusEl.className = 'badge badge-warning';
-      statusEl.textContent = `نامتوازن (اختلاف: ${Math.abs(diff).toLocaleString()})`;
+      badgeEl.className = 'badge badge-danger';
+      badgeEl.textContent = 'نامتوازن';
+      badgeEl.style.background = 'rgba(239,68,68,0.15)';
+      badgeEl.style.color = '#ef4444';
     }
   }
 }
@@ -1269,9 +1424,10 @@ function openNewSanadForm() {
   document.getElementById('sanadDateInput').value = todayStr;
   document.getElementById('sanadDescInput').value = '';
   
+  focusedLineIndex = 0;
   AppState.sanadLines = [
-    { account: '011001', desc: 'توضیحات ردیف ۱', debit: 0, credit: 0 },
-    { account: '011002', desc: 'توضیحات ردیف ۲', debit: 0, credit: 0 }
+    { account: '011001', shenavarCode: '', desc: 'توضیحات ردیف ۱', debit: 0, credit: 0, txNo: '', txDate: '' },
+    { account: '022001', shenavarCode: '', desc: 'توضیحات ردیف ۲', debit: 0, credit: 0, txNo: '', txDate: '' }
   ];
   renderSanadEditorLines();
 }
@@ -1319,7 +1475,7 @@ function saveSanadEntry() {
     alert(`سند شماره ${no} با موفقیت ثبت شد.`);
   }
 
-  AppState.sanadLines = [{ account: '011001', desc: '', debit: 0, credit: 0 }, { account: '011002', desc: '', debit: 0, credit: 0 }];
+  AppState.sanadLines = [{ account: '011001', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' }];
   closeSanadEditor();
 }
 
