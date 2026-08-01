@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl" data-theme="blue">
 <head>
   <meta charset="UTF-8" />
@@ -664,14 +664,75 @@
           <h2 class="form-heading">🏢 مدیریت شرکت‌ها (CompanyForm)</h2>
           <div class="card form-card">
             <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
-              <button class="btn btn-primary">+ تعریف شرکت جدید</button>
+              <button class="btn btn-primary" onclick="openCompanyForm(null)">+ تعریف شرکت جدید</button>
             </div>
             <div class="table-wrapper">
-              <table><thead><tr><th>کد شرکت</th><th>نام شرکت</th><th>کد اقتصادی</th><th>تلفن</th><th>سال مالی فعال</th><th>عملیات</th></tr></thead>
-              <tbody>
-                <tr><td>۱۰۰۱</td><td><b>شرکت نمونه نگار</b></td><td>۴۱۱۱۱۱۱۱۱۱۱۱</td><td>۰۲۱-۸۸۸۸۸۸۸۸</td><td><span class="badge badge-success">۱۴۰۳</span></td>
-                <td><button class="btn btn-outline" style="padding:4px 8px;" onclick="alert('فرم ویرایش شرکت')">✏️ ویرایش</button></td></tr>
-              </tbody></table>
+              <table>
+                <thead><tr><th>کد شرکت</th><th>نام شرکت</th><th>کد اقتصادی</th><th>تلفن</th><th>آدرس</th><th>سال مالی فعال</th><th>عملیات</th></tr></thead>
+                <tbody id="companiesTableBody"></tbody>
+              </table>
+            </div>
+            <div id="companyFormPanel" style="display:none;" class="inline-form">
+              <h4 id="companyFormTitle">تعریف شرکت جدید</h4>
+              <input type="hidden" id="editingCompanyId" value="" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">کد شرکت: *</label>
+                  <input type="text" id="compCode" class="form-input" placeholder="مثال: 1002" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">نام شرکت: *</label>
+                  <input type="text" id="compName" class="form-input" placeholder="مثال: شرکت نمونه جدید" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">کد اقتصادی:</label>
+                  <input type="text" id="compEcoCode" class="form-input" placeholder="411000000000" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">شماره تلفن:</label>
+                  <input type="text" id="compPhone" class="form-input" placeholder="021-XXXXXXXX" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">شماره فکس:</label>
+                  <input type="text" id="compFax" class="form-input" placeholder="021-XXXXXXXX" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">کد پستی:</label>
+                  <input type="text" id="compPostalCode" class="form-input" placeholder="1234567890" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">ایمیل شرکت:</label>
+                  <input type="email" id="compEmail" class="form-input" placeholder="info@company.ir" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">وبسایت:</label>
+                  <input type="text" id="compWebsite" class="form-input" placeholder="www.company.ir" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">سال مالی فعال:</label>
+                  <select id="compActiveYear" class="form-select">
+                    <option value="1403">۱۴۰۳</option>
+                    <option value="1402">۱۴۰۲</option>
+                    <option value="1404">۱۴۰۴</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">آدرس کامل شرکت:</label>
+                <textarea id="compAddress" class="form-input" rows="2" placeholder="تهران، خیابان..."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">توضیحات / یادداشت:</label>
+                <textarea id="compNotes" class="form-input" rows="2" placeholder="توضیحات اضافی..."></textarea>
+              </div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+                <button class="btn btn-outline" onclick="closeCompanyForm()">انصراف</button>
+                <button class="btn btn-primary" onclick="saveCompany()">💾 ذخیره شرکت</button>
+              </div>
             </div>
           </div>
         </div>

@@ -7,6 +7,22 @@
 const AppState = {
   currentModule: 'system',   // active ribbon tab
   currentForm: null,          // null = tiles view, otherwise form id
+  companies: [
+    {
+      id: 1,
+      code: '1001',
+      name: 'شرکت نمونه نگار',
+      ecoCode: '411111111111',
+      phone: '021-88888888',
+      fax: '021-88888889',
+      postalCode: '1234567890',
+      email: 'info@negar-erp.ir',
+      website: 'www.negar-erp.ir',
+      address: 'تهران، خیابان ولیعصر، پلاک ۱۰۰',
+      notes: 'شرکت اصلی و پیش‌فرض سیستم نگار',
+      activeYear: '1403'
+    }
+  ],
   users: [
     { id: 1, username: 'admin', fullName: 'مدیر ارشد سیستم', userType: 'SuperAdmin', isActive: true, ip: '127.0.0.1' },
     { id: 2, username: 'accountant1', fullName: 'علی رضایی (حسابدار)', userType: 'User', isActive: true, ip: '192.168.1.10' },
@@ -133,6 +149,7 @@ function showForm(formId) {
   if (formId === 'form-purchase-invoice') renderPurchaseInvoicesTable();
   if (formId === 'form-sales-invoice') renderSalesInvoicesTable();
   if (formId === 'form-permissions-matrix') renderPermissionsMatrix();
+  if (formId === 'form-companies-list') renderCompaniesTable();
 }
 
 // ============================
@@ -535,6 +552,138 @@ function lockApp() {
   const pwd = document.getElementById('lockPassword')?.value;
   if (!pwd) { alert('لطفاً رمز قفل را وارد کنید.'); return; }
   alert('برنامه قفل شد. برای ورود مجدد رمز عبور خود را وارد کنید.');
+}
+
+// ============================
+// COMPANIES MODULE
+// ============================
+function renderCompaniesTable() {
+  const tbody = document.getElementById('companiesTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = AppState.companies.map(c => `
+    <tr>
+      <td><b>${c.code}</b></td>
+      <td><b>${c.name}</b></td>
+      <td style="font-size:0.82rem;">${c.ecoCode || '-'}</td>
+      <td>${c.phone || '-'}</td>
+      <td style="font-size:0.82rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.address || ''}">${c.address || '-'}</td>
+      <td style="text-align:center;"><span class="badge badge-success">${c.activeYear}</span></td>
+      <td>
+        <button class="btn btn-outline" style="padding:3px 10px;" onclick="openCompanyForm(${c.id})">✏️ ویرایش</button>
+        <button class="btn btn-outline" style="padding:3px 10px;color:red;" onclick="deleteCompany(${c.id})">🗑️ حذف</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openCompanyForm(companyId) {
+  const panel = document.getElementById('companyFormPanel');
+  const title = document.getElementById('companyFormTitle');
+  if (!panel) return;
+
+  // Scroll the inline form into view
+  panel.style.display = 'block';
+
+  if (companyId === null) {
+    // NEW company mode
+    title.textContent = '➕ تعریف شرکت جدید';
+    document.getElementById('editingCompanyId').value = '';
+    document.getElementById('compCode').value = '';
+    document.getElementById('compName').value = '';
+    document.getElementById('compEcoCode').value = '';
+    document.getElementById('compPhone').value = '';
+    document.getElementById('compFax').value = '';
+    document.getElementById('compPostalCode').value = '';
+    document.getElementById('compEmail').value = '';
+    document.getElementById('compWebsite').value = '';
+    document.getElementById('compAddress').value = '';
+    document.getElementById('compNotes').value = '';
+    document.getElementById('compActiveYear').value = '1403';
+  } else {
+    // EDIT mode: load existing data
+    const company = AppState.companies.find(c => c.id === companyId);
+    if (!company) return;
+    title.textContent = `✏️ ویرایش شرکت: ${company.name}`;
+    document.getElementById('editingCompanyId').value = company.id;
+    document.getElementById('compCode').value = company.code;
+    document.getElementById('compName').value = company.name;
+    document.getElementById('compEcoCode').value = company.ecoCode || '';
+    document.getElementById('compPhone').value = company.phone || '';
+    document.getElementById('compFax').value = company.fax || '';
+    document.getElementById('compPostalCode').value = company.postalCode || '';
+    document.getElementById('compEmail').value = company.email || '';
+    document.getElementById('compWebsite').value = company.website || '';
+    document.getElementById('compAddress').value = company.address || '';
+    document.getElementById('compNotes').value = company.notes || '';
+    document.getElementById('compActiveYear').value = company.activeYear || '1403';
+  }
+
+  // Scroll panel into view smoothly
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  document.getElementById('compCode').focus();
+}
+
+function closeCompanyForm() {
+  const panel = document.getElementById('companyFormPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function saveCompany() {
+  const editingId = document.getElementById('editingCompanyId')?.value;
+  const code = document.getElementById('compCode')?.value?.trim();
+  const name = document.getElementById('compName')?.value?.trim();
+  const ecoCode = document.getElementById('compEcoCode')?.value?.trim();
+  const phone = document.getElementById('compPhone')?.value?.trim();
+  const fax = document.getElementById('compFax')?.value?.trim();
+  const postalCode = document.getElementById('compPostalCode')?.value?.trim();
+  const email = document.getElementById('compEmail')?.value?.trim();
+  const website = document.getElementById('compWebsite')?.value?.trim();
+  const address = document.getElementById('compAddress')?.value?.trim();
+  const notes = document.getElementById('compNotes')?.value?.trim();
+  const activeYear = document.getElementById('compActiveYear')?.value;
+
+  // Validation
+  if (!code) { alert('کد شرکت الزامی است.'); document.getElementById('compCode').focus(); return; }
+  if (!name) { alert('نام شرکت الزامی است.'); document.getElementById('compName').focus(); return; }
+
+  if (editingId) {
+    // UPDATE existing company
+    const idx = AppState.companies.findIndex(c => c.id === Number(editingId));
+    if (idx !== -1) {
+      AppState.companies[idx] = { ...AppState.companies[idx], code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear };
+      alert(`شرکت "${name}" با موفقیت بروزرسانی شد.`);
+    }
+  } else {
+    // CHECK duplicate code
+    if (AppState.companies.find(c => c.code === code)) {
+      alert(`کد شرکت "${code}" قبلاً ثبت شده است. لطفاً کد منحصربفرد وارد کنید.`);
+      document.getElementById('compCode').focus();
+      return;
+    }
+    // CREATE new company
+    AppState.companies.push({
+      id: Date.now(),
+      code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear
+    });
+    alert(`شرکت جدید "${name}" با موفقیت ثبت شد.`);
+  }
+
+  closeCompanyForm();
+  renderCompaniesTable();
+}
+
+function deleteCompany(companyId) {
+  const company = AppState.companies.find(c => c.id === companyId);
+  if (!company) return;
+  if (AppState.companies.length === 1) {
+    alert('حداقل یک شرکت باید در سیستم تعریف شده باشد. امکان حذف آخرین شرکت وجود ندارد.');
+    return;
+  }
+  if (confirm(`آیا از حذف شرکت "${company.name}" (کد: ${company.code}) اطمینان دارید؟`)) {
+    AppState.companies = AppState.companies.filter(c => c.id !== companyId);
+    renderCompaniesTable();
+    alert(`شرکت "${company.name}" با موفقیت حذف شد.`);
+  }
 }
 
 // ============================
