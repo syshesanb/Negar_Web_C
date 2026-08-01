@@ -333,25 +333,32 @@ INSERT INTO "RolePermissions" ("UserID", "PermissionID", "CanView", "CanCreate",
 SELECT 1, "PermissionID", TRUE, TRUE, TRUE, TRUE, TRUE, TRUE FROM "Permissions"
 ON CONFLICT ("UserID", "PermissionID") DO NOTHING;
 
-INSERT INTO "SarfaslHesab" ("CompanyID", "AccountCode", "AccountName", "AccountType", "AccountNature") VALUES
-(1, '1', 'دارایی‌های جاری', 'گروه', 'بدهکار'),
-(1, '10', 'موجودی نقد و بانک', 'کل', 'بدهکار'),
-(1, '1001', 'صندوق مرکزی', 'معین', 'بدهکار'),
-(1, '1002', 'بانک ملی شعبه مرکزی', 'معین', 'بدهکار'),
-(1, '11', 'حساب‌های دریافتنی', 'کل', 'بدهکار'),
-(1, '1101', 'مشتریان تجاری', 'معین', 'بدهکار'),
-(1, '12', 'موجودی کالا', 'کل', 'بدهکار'),
-(1, '1201', 'موجودی انبار مرکزی', 'معین', 'بدهکار'),
-(1, '2', 'بدهی‌های جاری', 'گروه', 'بستانکار'),
-(1, '20', 'حساب‌های پرداختنی', 'کل', 'بستانکار'),
-(1, '2001', 'فروشندگان و تامین کنندگان', 'معین', 'بستانکار'),
-(1, '3', 'حقوق صاحبان سهام', 'گروه', 'بستانکار'),
-(1, '30', 'سرمایه اول دوره', 'کل', 'بستانکار'),
-(1, '4', 'درآمدها', 'گروه', 'بستانکار'),
-(1, '40', 'فروش کالا و خدمات', 'کل', 'بستانکار'),
-(1, '5', 'هزینه‌ها', 'گروه', 'بدهکار'),
-(1, '50', 'بهای تمام شده کالای فروش رفته', 'کل', 'بدهکار'),
-(1, '51', 'هزینه‌های عمومی و اداری', 'کل', 'بدهکار')
+-- Seeding accounts with hierarchical parent-child relationships using subqueries
+INSERT INTO "SarfaslHesab" ("CompanyID", "AccountCode", "AccountName", "AccountType", "AccountNature", "ParentAccountID") VALUES
+(1, '01', 'دارایی‌های جاری', 'گروه', 'بدهکار', NULL),
+(1, '02', 'بدهی‌های جاری', 'گروه', 'بستانکار', NULL),
+(1, '03', 'حقوق صاحبان سهام', 'گروه', 'بستانکار', NULL),
+(1, '04', 'درآمدها', 'گروه', 'بستانکار', NULL),
+(1, '05', 'هزینه‌ها', 'گروه', 'بدهکار', NULL)
+ON CONFLICT ("CompanyID", "AccountCode") DO NOTHING;
+
+INSERT INTO "SarfaslHesab" ("CompanyID", "AccountCode", "AccountName", "AccountType", "AccountNature", "ParentAccountID") VALUES
+(1, '0110', 'موجودی نقد و بانک', 'کل', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '01')),
+(1, '0111', 'حساب‌های دریافتنی', 'کل', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '01')),
+(1, '0112', 'موجودی کالا', 'کل', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '01')),
+(1, '0220', 'حساب‌های پرداختنی', 'کل', 'بستانکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '02')),
+(1, '0330', 'سرمایه اول دوره', 'کل', 'بستانکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '03')),
+(1, '0440', 'فروش کالا و خدمات', 'کل', 'بستانکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '04')),
+(1, '0550', 'بهای تمام شده کالای فروش رفته', 'کل', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '05')),
+(1, '0551', 'هزینه‌های عمومی و اداری', 'کل', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '05'))
+ON CONFLICT ("CompanyID", "AccountCode") DO NOTHING;
+
+INSERT INTO "SarfaslHesab" ("CompanyID", "AccountCode", "AccountName", "AccountType", "AccountNature", "ParentAccountID") VALUES
+(1, '011001', 'صندوق مرکزی', 'معین', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '0110')),
+(1, '011002', 'بانک ملی شعبه مرکزی', 'معین', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '0110')),
+(1, '011101', 'مشتریان تجاری', 'معین', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '0111')),
+(1, '011201', 'موجودی انبار مرکزی', 'معین', 'بدهکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '0112')),
+(1, '022001', 'فروشندگان و تامین کنندگان', 'معین', 'بستانکار', (SELECT "AccountID" FROM "SarfaslHesab" WHERE "CompanyID" = 1 AND "AccountCode" = '0220'))
 ON CONFLICT ("CompanyID", "AccountCode") DO NOTHING;
 
 INSERT INTO "AppSettings" ("SettingKey", "SettingValue", "SettingCategory") VALUES
