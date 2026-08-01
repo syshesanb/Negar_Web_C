@@ -225,46 +225,14 @@
       <!-- ACCOUNTING TILES -->
       <div id="tiles-accounting" class="tiles-container">
         <div class="page-title">📊 ماژول حسابداری نگار (HesabdariForms)</div>
-        <div class="tiles-grid">
-          <div class="tile-card" onclick="showForm('form-accounts-chart')">
-            <div class="tile-icon-box tile-blue">📑</div>
-            <div class="tile-title">کدگذاری سرفصل حساب‌ها (درختی)</div>
+        <div class="tiles-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 720px; margin: 40px auto 0;">
+          <div class="tile-card" onclick="openHesabdariMain('coding')" style="padding: 36px 24px; text-align: center; cursor: pointer;">
+            <div class="tile-icon-box tile-green" style="font-size: 3.2rem; margin: 0 auto 16px; width: 84px; height: 84px;">🧮</div>
+            <div class="tile-title" style="font-size: 1.2rem; font-weight: 800;">کدینگ، ثبت اسناد و دفاتر</div>
           </div>
-          <div class="tile-card" onclick="showForm('form-shenavar')">
-            <div class="tile-icon-box tile-purple">🌊</div>
-            <div class="tile-title">کدگذاری حساب‌های شناور</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-sanad1')">
-            <div class="tile-icon-box tile-green">📝</div>
-            <div class="tile-title">ثبت و مدیریت اسناد (Sanad 1)</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-sanad2')">
-            <div class="tile-icon-box tile-orange">✏️</div>
-            <div class="tile-title">ردیف‌های سند حسابداری (Sanad 2)</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-sanad-merge')">
-            <div class="tile-icon-box tile-orange">🔗</div>
-            <div class="tile-title">ادغام اسناد حسابداری</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-sanad-split')">
-            <div class="tile-icon-box tile-yellow">✂️</div>
-            <div class="tile-title">تفکیک اسناد حسابداری</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-bank-reconcile')">
-            <div class="tile-icon-box tile-blue">💳</div>
-            <div class="tile-title">مغایرت‌گیری بانکی</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-ledger')">
-            <div class="tile-icon-box tile-gray">📖</div>
-            <div class="tile-title">دفاتر کل، معین و روزنامه</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-trial-balance')">
-            <div class="tile-icon-box tile-green">⚖️</div>
-            <div class="tile-title">تراز آزمایشی (۴ و ۸ ستونی)</div>
-          </div>
-          <div class="tile-card" onclick="showForm('form-financial-statements')">
-            <div class="tile-icon-box tile-purple">📊</div>
-            <div class="tile-title">ترازنامه و صورت سود و زیان</div>
+          <div class="tile-card" onclick="openHesabdariMain('reports')" style="padding: 36px 24px; text-align: center; cursor: pointer;">
+            <div class="tile-icon-box tile-blue" style="font-size: 3.2rem; margin: 0 auto 16px; width: 84px; height: 84px;">📊</div>
+            <div class="tile-title" style="font-size: 1.2rem; font-weight: 800;">گزارشات و ترازهای حسابداری</div>
           </div>
         </div>
       </div>
@@ -920,163 +888,226 @@
           </div>
         </div>
 
-        <!-- ---- ACCOUNTING FORMS ---- -->
-        <div id="form-accounts-chart" class="form-section">
-          <h2 class="form-heading">📑 کدگذاری سرفصل حساب‌ها (HesabdaryCodingForm)</h2>
-          <div class="card form-card">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;gap:8px;">
-              <button class="btn btn-outline" onclick="openAddAccountRow()">+ حساب جدید</button>
-            </div>
-            <div class="table-wrapper">
-              <table><thead><tr><th>کد حساب</th><th>عنوان حساب</th><th>سطح</th><th>ماهیت</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody id="accountsTableBody"></tbody></table>
-            </div>
-            <div id="addAccountRow" style="display:none;" class="inline-form">
-              <h4>افزودن حساب جدید</h4>
+        <!-- ---- HESABDARI MAIN MODULE WITH 12 SUB-TABS ---- -->
+        <div id="form-hesabdari-main" class="form-section">
+          <h2 class="form-heading">📊 ماژول حسابداری نگار (HesabdariForms)</h2>
+
+          <!-- Sub-tabs Navigation Bar -->
+          <div class="hesabdari-subtabs-bar">
+            <div class="subtab-item" data-tab="settings" onclick="switchHesabdariTab('settings')">تنظیمات اولیه حساب‌ها</div>
+            <div class="subtab-item active" data-tab="accounts" onclick="switchHesabdariTab('accounts')">سرفصل حساب‌ها</div>
+            <div class="subtab-item" data-tab="shenavar" onclick="switchHesabdariTab('shenavar')">حساب‌های شناور</div>
+            <div class="subtab-item" data-tab="sanad" onclick="switchHesabdariTab('sanad')">ثبت سند حسابداری</div>
+            <div class="subtab-item" data-tab="bank" onclick="switchHesabdariTab('bank')">مغایرت بانکی</div>
+            <div class="subtab-item" data-tab="taraz" onclick="switchHesabdariTab('taraz')">تراز آزمایشی</div>
+            <div class="subtab-item" data-tab="ledger" onclick="switchHesabdariTab('ledger')">دفتر حساب</div>
+            <div class="subtab-item" data-tab="taraz-shenavar" onclick="switchHesabdariTab('taraz-shenavar')">تراز شناور</div>
+            <div class="subtab-item" data-tab="daftar-shenavar" onclick="switchHesabdariTab('daftar-shenavar')">دفتر شناور</div>
+            <div class="subtab-item" data-tab="profit-loss" onclick="switchHesabdariTab('profit-loss')">عملکرد و سود و زیان</div>
+            <div class="subtab-item" data-tab="balance-sheet" onclick="switchHesabdariTab('balance-sheet')">ترازنامه</div>
+            <div class="subtab-item" data-tab="other-reports" onclick="switchHesabdariTab('other-reports')">سایر گزارشات</div>
+          </div>
+
+          <!-- Tab 1: تنظیمات اولیه حساب‌ها -->
+          <div id="tab-panel-settings" class="hesabdari-tab-panel">
+            <div class="card form-card" style="max-width:580px;margin:auto;">
+              <h4 style="margin-bottom:16px;">⚙️ تنظیمات اولیه کدینگ و سطوح حساب‌ها</h4>
               <div class="form-row">
-                <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newAccCode" class="form-input" /></div>
-                <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newAccName" class="form-input" /></div>
-                <div class="form-group"><label class="form-label">سطح:</label>
-                  <select id="newAccType" class="form-select"><option>معین</option><option>تفصیلی</option><option>کل</option><option>گروه</option></select>
+                <div class="form-group"><label class="form-label">تعداد سطوح:</label><input type="number" class="form-input" value="5" /></div>
+                <div class="form-group"><label class="form-label">طول کد گروه:</label><input type="number" class="form-input" value="2" /></div>
+                <div class="form-group"><label class="form-label">طول کد کل:</label><input type="number" class="form-input" value="4" /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">طول کد معین:</label><input type="number" class="form-input" value="6" /></div>
+                <div class="form-group"><label class="form-label">طول تفصیلی ۱:</label><input type="number" class="form-input" value="6" /></div>
+                <div class="form-group"><label class="form-label">طول تفصیلی ۲:</label><input type="number" class="form-input" value="2" /></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">نوع سرفصل مورد استفاده:</label>
+                <select class="form-select">
+                  <option>سرفصل‌های پیش‌فرض برنامه</option>
+                  <option>سرفصل سفارشی کاربر</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">کد اقتصادی:</label><input type="text" class="form-input" placeholder="کد اقتصادی..." /></div>
+                <div class="form-group"><label class="form-label">شناسه ملی:</label><input type="text" class="form-input" placeholder="شناسه ملی..." /></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('تنظیمات کدینگ حسابداری با موفقیت ذخیره شد.')">💾 ذخیره تنظیمات</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 2: سرفصل حساب‌ها -->
+          <div id="tab-panel-accounts" class="hesabdari-tab-panel active" style="display:block;">
+            <div class="card form-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div style="font-weight:700;font-size:0.95rem;">📑 نمایش درختی و ساختار سلسله‌مراتبی سرفصل‌های حساب</div>
+                <button class="btn btn-outline" onclick="openAddAccountRow()">+ حساب جدید</button>
+              </div>
+              <div class="table-wrapper">
+                <table><thead><tr><th>کد حساب</th><th>عنوان حساب</th><th>سطح</th><th>ماهیت</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+                <tbody id="accountsTableBody"></tbody></table>
+              </div>
+              <div id="addAccountRow" style="display:none;" class="inline-form">
+                <h4>افزودن حساب جدید</h4>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newAccCode" class="form-input" /></div>
+                  <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newAccName" class="form-input" /></div>
+                  <div class="form-group"><label class="form-label">سطح:</label>
+                    <select id="newAccType" class="form-select"><option>معین</option><option>تفصیلی</option><option>کل</option><option>گروه</option></select>
+                  </div>
+                  <div class="form-group"><label class="form-label">ماهیت:</label>
+                    <select id="newAccNature" class="form-select"><option>بدهکار</option><option>بستانکار</option><option>خنثی</option></select>
+                  </div>
+                  <div class="form-group" style="align-self:flex-end;">
+                    <button class="btn btn-primary" onclick="saveNewAccount()">ذخیره</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('addAccountRow').style.display='none'">لغو</button>
+                  </div>
                 </div>
-                <div class="form-group"><label class="form-label">ماهیت:</label>
-                  <select id="newAccNature" class="form-select"><option>بدهکار</option><option>بستانکار</option><option>خنثی</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: حساب‌های شناور -->
+          <div id="tab-panel-shenavar" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div style="font-weight:700;font-size:0.95rem;">🌊 نمایش درختی و ساختار سلسله‌مراتبی حساب‌های شناور</div>
+                <button class="btn btn-primary" onclick="addShenavaar()">+ شناور جدید</button>
+              </div>
+              <div class="table-wrapper">
+                <table><thead><tr><th>کد شناور</th><th>عنوان شناور</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+                <tbody id="shenavaarTableBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 4: ثبت سند حسابداری -->
+          <div id="tab-panel-sanad" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <div style="font-weight:700;font-size:0.95rem;">📝 ثبت و مدیریت اسناد حسابداری</div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-primary" onclick="showForm('form-sanad2')">+ ثبت سند جدید</button>
+                  <button class="btn btn-outline" onclick="showForm('form-sanad-merge')">🔗 ادغام اسناد</button>
+                  <button class="btn btn-outline" onclick="showForm('form-sanad-split')">✂️ تفکیک سند</button>
                 </div>
-                <div class="form-group" style="align-self:flex-end;">
-                  <button class="btn btn-primary" onclick="saveNewAccount()">ذخیره</button>
-                  <button class="btn btn-outline" onclick="document.getElementById('addAccountRow').style.display='none'">لغو</button>
+              </div>
+              <div class="table-wrapper">
+                <table><thead><tr><th>شماره سند</th><th>تاریخ</th><th>شرح سند</th><th>جمع بدهکار</th><th>جمع بستانکار</th><th>توازن</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+                <tbody id="sanadListTable"></tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 5: مغایرت بانکی -->
+          <div id="tab-panel-bank" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">انتخاب حساب بانک:</label>
+                  <select class="form-select"><option>بانک ملی شعبه مرکزی - ۱۰۰۲</option></select>
                 </div>
+                <div class="form-group"><label class="form-label">تاریخ صورتحساب بانک:</label><input type="text" class="form-input" value="1403/05/01" /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">مانده دفاتر نگار (ریال):</label><input type="text" class="form-input" value="3,450,000,000" readonly /></div>
+                <div class="form-group"><label class="form-label">مانده صورتحساب بانک (ریال):</label><input type="text" class="form-input" placeholder="مانده بانک را وارد کنید..." /></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش مغایرت‌گیری بانکی تولید شد.')">📊 مغایرت‌گیری</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 6: تراز آزمایشی -->
+          <div id="tab-panel-taraz" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">نوع تراز:</label>
+                  <select class="form-select"><option>تراز ۲ ستونی</option><option selected>تراز ۴ ستونی</option><option>تراز ۶ ستونی</option><option>تراز ۸ ستونی</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">سطح نمایش:</label>
+                  <select class="form-select"><option>گروه</option><option>کل</option><option>معین</option><option>تفصیلی</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
+                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش تراز آزمایشی ۴ ستونی با موفقیت محاسبه و صادر شد.')">⚖️ محاسبه و نمایش تراز</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 7: دفتر حساب -->
+          <div id="tab-panel-ledger" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">نوع دفتر:</label>
+                  <select class="form-select"><option>دفتر روزنامه</option><option selected>دفتر کل</option><option>دفتر معین</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
+                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش دفتر حسابداری استخراج شد.')">📊 نمایش دفتر</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 8: تراز شناور -->
+          <div id="tab-panel-taraz-shenavar" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">نوع تراز شناور:</label><select class="form-select"><option>تراز تفصیلی شناور (۴ ستونی)</option></select></div>
+                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
+                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('تراز شناور محاسبه شد.')">🌊 محاسبه تراز شناور</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 9: دفتر شناور -->
+          <div id="tab-panel-daftar-shenavar" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">انتخاب حساب شناور:</label><select class="form-select"><option>مهران رجبی (1001)</option><option>بخش البرز (1002)</option></select></div>
+                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
+                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('دفتر شناور استخراج شد.')">📖 نمایش دفتر شناور</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 10: عملکرد و سود و زیان -->
+          <div id="tab-panel-profit-loss" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">تنظیم بازه گزارش:</label><select class="form-select"><option>بر اساس تاریخ (از ابتداء تا انتهای دوره)</option></select></div>
+                <div class="form-group"><label class="form-label">تنظیمات مالیات:</label><select class="form-select"><option>ورود از سیستم حسابداری</option></select></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش صورت سود و زیان محاسبه شد.')">📈 محاسبه و نمایش سود و زیان</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 11: ترازنامه -->
+          <div id="tab-panel-balance-sheet" class="hesabdari-tab-panel">
+            <div class="card form-card">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">انتخاب سطح ترازنامه:</label><select class="form-select"><option>کل و معین</option><option>تفصیلی</option></select></div>
+                <div class="form-group"><label class="form-label">تنظیم بازه گزارش:</label><select class="form-select"><option>بر اساس شماره سند در سال جاری</option></select></div>
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" onclick="alert('ترازنامه مالی با موفقیت استخراج گردید.')">⚖️ محاسبه و نمایش ترازنامه</button></div>
+            </div>
+          </div>
+
+          <!-- Tab 12: سایر گزارشات -->
+          <div id="tab-panel-other-reports" class="hesabdari-tab-panel">
+            <div class="card form-card" style="text-align:center;padding:40px 20px;">
+              <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+              <h3 style="margin-bottom:8px;">سایر گزارشات و طراحی گزارشات سفارشی</h3>
+              <p style="color:var(--text-muted);margin-bottom:20px;">طراحی گزارشات دلخواه، گزارشات نموداری و گزارشات پیشرفته سیستم نگار</p>
+              <div style="display:flex;gap:12px;justify-content:center;">
+                <button class="btn btn-outline" onclick="alert('بخش طراحی گزارش دلخواه')">🎨 طراحی گزارش دلخواه</button>
+                <button class="btn btn-outline" onclick="alert('بخش گزارشات نموداری')">📈 گزارشات نموداری</button>
+                <button class="btn btn-primary" onclick="alert('این گزارش در دست تکمیل می‌باشد.')">🚀 گزارشات پیشرفته</button>
               </div>
             </div>
           </div>
-        </div>
 
-        <div id="form-shenavar" class="form-section">
-          <h2 class="form-heading">🌊 کدگذاری حساب‌های شناور (ShenavaarCodingForm)</h2>
-          <div class="card form-card">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
-              <button class="btn btn-primary" onclick="addShenavaar()">+ شناور جدید</button>
-            </div>
-            <div class="table-wrapper">
-              <table><thead><tr><th>کد شناور</th><th>عنوان شناور</th><th>حساب والد</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody id="shenavaarTableBody"></tbody></table>
-            </div>
-          </div>
-        </div>
-
-        <div id="form-sanad1" class="form-section">
-          <h2 class="form-heading">📝 لیست اسناد حسابداری (HesabdarySanad1Form)</h2>
-          <div class="card form-card">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
-              <button class="btn btn-primary" onclick="showForm('form-sanad2')">+ ثبت سند جدید</button>
-            </div>
-            <div class="table-wrapper">
-              <table><thead><tr><th>شماره سند</th><th>تاریخ</th><th>شرح سند</th><th>جمع بدهکار</th><th>جمع بستانکار</th><th>توازن</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody id="sanadListTable"></tbody></table>
-            </div>
-          </div>
-        </div>
-
-        <div id="form-sanad2" class="form-section">
-          <h2 class="form-heading">✏️ ثبت / ویرایش سند حسابداری (HesabdarySanad2Form)</h2>
-          <div class="card form-card">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">شماره سند:</label><input type="text" id="sanadNumberInput" class="form-input" value="103" /></div>
-              <div class="form-group"><label class="form-label">تاریخ سند:</label><input type="text" id="sanadDateInput" class="form-input" value="1403/05/10" /></div>
-              <div class="form-group"><label class="form-label">شرح کلی سند:</label><input type="text" id="sanadDescInput" class="form-input" placeholder="شرح سند..." /></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;">
-              <h4>ردیف‌های سند حسابداری</h4>
-              <button class="btn btn-outline" onclick="addSanadLine()">+ افزودن ردیف</button>
-            </div>
-            <div class="table-wrapper" style="max-height:260px;">
-              <table><thead><tr><th>#</th><th style="min-width:220px;">حساب معین/تفصیلی</th><th style="min-width:200px;">شرح ردیف</th><th>مبلغ بدهکار</th><th>مبلغ بستانکار</th><th>حذف</th></tr></thead>
-              <tbody id="sanadLinesEditorBody"></tbody></table>
-            </div>
-            <div class="sanad-totals-bar">
-              <div>جمع بدهکار: <b id="sanadTotalDebit">۰ ریال</b></div>
-              <div>جمع بستانکار: <b id="sanadTotalCredit">۰ ریال</b></div>
-              <div>توازن سند: <span id="sanadBalanceStatus" class="badge badge-warning">نامتوازن</span></div>
-            </div>
-            <div class="form-actions">
-              <button class="btn btn-outline" onclick="showForm('form-sanad1')">بازگشت به لیست اسناد</button>
-              <button class="btn btn-primary" onclick="saveSanadEntry()">✅ ثبت نهایی سند</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="form-sanad-merge" class="form-section">
-          <h2 class="form-heading">🔗 ادغام اسناد حسابداری (SanadMergeForm)</h2>
-          <div class="card form-card">
-            <div class="form-group"><label class="form-label">اسناد برای ادغام (جداسازی با کاما):</label><input type="text" class="form-input" placeholder="مثال: 101, 102, 103" /></div>
-            <div class="form-group"><label class="form-label">شرح سند ادغامی:</label><input type="text" class="form-input" placeholder="شرح سند جدید ادغامی..." /></div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('ادغام اسناد با موفقیت انجام شد.')">🔗 ادغام اسناد</button></div>
-          </div>
-        </div>
-
-        <div id="form-sanad-split" class="form-section">
-          <h2 class="form-heading">✂️ تفکیک سند حسابداری (SanadSplitForm)</h2>
-          <div class="card form-card">
-            <div class="form-group"><label class="form-label">شماره سند برای تفکیک:</label><input type="text" class="form-input" placeholder="شماره سند..." /></div>
-            <div class="form-group"><label class="form-label">تعداد ردیف‌های هر سند جدید:</label><input type="number" class="form-input" value="5" /></div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('تفکیک سند با موفقیت انجام شد.')">✂️ تفکیک سند</button></div>
-          </div>
-        </div>
-
-        <div id="form-bank-reconcile" class="form-section">
-          <h2 class="form-heading">💳 مغایرت‌گیری بانکی (BankReconcileForm)</h2>
-          <div class="card form-card">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">انتخاب حساب بانک:</label>
-                <select class="form-select"><option>بانک ملی شعبه مرکزی - ۱۰۰۲</option></select>
-              </div>
-              <div class="form-group"><label class="form-label">تاریخ صورتحساب بانک:</label><input type="text" class="form-input" value="1403/05/01" /></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">مانده دفاتر نگار (ریال):</label><input type="text" class="form-input" value="3,450,000,000" readonly /></div>
-              <div class="form-group"><label class="form-label">مانده صورتحساب بانک (ریال):</label><input type="text" class="form-input" placeholder="مانده بانک را وارد کنید..." /></div>
-            </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش مغایرت‌گیری بانکی تولید شد.')">📊 مغایرت‌گیری</button></div>
-          </div>
-        </div>
-
-        <div id="form-ledger" class="form-section">
-          <h2 class="form-heading">📖 دفاتر حسابداری (LedgerForm)</h2>
-          <div class="card form-card">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">نوع دفتر:</label>
-                <select class="form-select"><option>دفتر روزنامه</option><option>دفتر کل</option><option>دفتر معین</option></select>
-              </div>
-              <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
-              <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
-            </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش دفاتر حسابداری تولید شد.')">📊 نمایش دفتر</button></div>
-          </div>
-        </div>
-
-        <div id="form-trial-balance" class="form-section">
-          <h2 class="form-heading">⚖️ تراز آزمایشی (TrialBalanceForm)</h2>
-          <div class="card form-card">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">نوع تراز:</label>
-                <select class="form-select"><option>تراز ۲ ستونی</option><option>تراز ۴ ستونی</option><option>تراز ۶ ستونی</option><option>تراز ۸ ستونی</option></select>
-              </div>
-              <div class="form-group"><label class="form-label">سطح نمایش:</label>
-                <select class="form-select"><option>گروه</option><option>کل</option><option>معین</option><option>تفصیلی</option></select>
-              </div>
-            </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش تراز آزمایشی تولید شد.')">⚖️ نمایش تراز</button></div>
-          </div>
-        </div>
-
-        <div id="form-financial-statements" class="form-section">
-          <h2 class="form-heading">📊 صورت‌های مالی (FinancialStatementsForm)</h2>
-          <div class="card form-card">
-            <div class="form-group"><label class="form-label">نوع گزارش مالی:</label>
-              <select class="form-select"><option>ترازنامه (Balance Sheet)</option><option>صورت سود و زیان (P&L)</option><option>صورت جریان وجوه نقد</option></select>
-            </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('صورت مالی تولید شد.')">📊 نمایش صورت مالی</button></div>
-          </div>
         </div>
 
         <!-- ---- INVENTORY FORMS ---- -->

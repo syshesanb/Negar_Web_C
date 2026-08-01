@@ -305,6 +305,52 @@ function showForm(formId) {
   if (formId === 'form-fiscal-years') renderFiscalYearsTable();
   if (formId === 'form-switch-company') renderSwitchCompanyForm();
   if (formId === 'form-switch-year') renderSwitchYearOnlyForm();
+  if (formId === 'form-hesabdari-main') {
+    const activeSub = document.querySelector('.hesabdari-subtabs-bar .subtab-item.active');
+    const tabId = activeSub ? activeSub.getAttribute('data-tab') : 'accounts';
+    switchHesabdariTab(tabId);
+  }
+}
+
+// ============================
+// HESABDARI MAIN MODULE & SUB-TABS
+// ============================
+function openHesabdariMain(mode) {
+  showForm('form-hesabdari-main');
+  if (mode === 'reports') {
+    switchHesabdariTab('taraz');
+  } else {
+    switchHesabdariTab('accounts');
+  }
+}
+
+function switchHesabdariTab(tabId) {
+  // 1. Update sub-tab navigation items
+  const items = document.querySelectorAll('.hesabdari-subtabs-bar .subtab-item');
+  items.forEach(item => {
+    if (item.getAttribute('data-tab') === tabId) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+
+  // 2. Update sub-tab panels
+  const panels = document.querySelectorAll('.hesabdari-tab-panel');
+  panels.forEach(panel => {
+    if (panel.id === 'tab-panel-' + tabId) {
+      panel.classList.add('active');
+      panel.style.display = 'block';
+    } else {
+      panel.classList.remove('active');
+      panel.style.display = 'none';
+    }
+  });
+
+  // 3. Render dynamic content for specific tab
+  if (tabId === 'accounts') renderAccountsTable();
+  if (tabId === 'shenavar') renderShenavaarTable();
+  if (tabId === 'sanad') renderSanadListTable();
 }
 
 // ============================
