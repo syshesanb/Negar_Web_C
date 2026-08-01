@@ -236,7 +236,13 @@ const PersianCal = (() => {
     prevMonth() { if (--state.month < 1)  { state.month = 12; state.year--; } render(); },
     nextMonth() { if (++state.month > 12) { state.month = 1;  state.year++; } render(); },
     prevYear()  { state.year--;  render(); },
-    nextYear()  { state.year++;  render(); }
+    nextYear()  { state.year++;  render(); },
+    getTodayString() {
+      const [y, m, d] = todayJalali();
+      const sm = String(m).padStart(2, '0');
+      const sd = String(d).padStart(2, '0');
+      return `${y}/${sm}/${sd}`;
+    }
   };
 })();
 

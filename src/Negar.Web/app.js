@@ -56,8 +56,6 @@ function doLogin() {
       // Update header info
       const headerUser = document.getElementById('headerUsername');
       if (headerUser) headerUser.textContent = found.fullName + ' (' + found.username + ')';
-      const statusUser = document.getElementById('statusBarUser');
-      if (statusUser) statusUser.innerHTML = `کاربر: <b>${found.fullName}</b>`;
 
       // Animate out login, animate in app
       const overlay  = document.getElementById('loginOverlay');
@@ -1055,35 +1053,28 @@ function updateHeaderBar() {
   const headerYear = document.getElementById('headerYear');
   if (headerComp && company) headerComp.textContent = company.name;
   if (headerYear && year)    headerYear.textContent  = 'سال مالی: ' + year;
+}
 
-  // Status bar (footer)
-  const sbCompany = document.getElementById('statusBarCompany');
-  const sbYear    = document.getElementById('statusBarYear');
-  const sbUser    = document.getElementById('statusBarUser');
-  if (sbCompany && company)     sbCompany.textContent = company.name;
-  if (sbYear    && year)        sbYear.textContent    = year;
-  if (sbUser    && currentUser) sbUser.textContent    = currentUser.fullName;
+function updateSystemClock() {
+  const timeEl = document.getElementById('headerTime');
+  const dateEl = document.getElementById('headerDate');
+  const now = new Date();
+  if (timeEl) timeEl.textContent = now.toLocaleTimeString('fa-IR');
+  if (dateEl && typeof PersianCal !== 'undefined') {
+    dateEl.textContent = PersianCal.getTodayString();
+  }
 }
 
 // ============================
 // Init on page load
-
-// ============================
-// Init on page load
-
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
   // On startup: show login page, focus username field
   const usernameInput = document.getElementById('loginUsername');
   if (usernameInput) setTimeout(() => usernameInput.focus(), 200);
 
-  // System clock - runs always (shown in status bar after login)
-  setInterval(() => {
-    const el = document.getElementById('statusBarTime');
-    if (el) {
-      const now = new Date();
-      el.innerHTML = `ساعت سیستم: <b>${now.toLocaleTimeString('fa-IR')}</b>`;
-    }
-  }, 1000);
+  // Update clock & date immediately and then every second
+  updateSystemClock();
+  setInterval(updateSystemClock, 1000);
 });
 
