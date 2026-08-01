@@ -225,14 +225,18 @@
       <!-- ACCOUNTING TILES -->
       <div id="tiles-accounting" class="tiles-container">
         <div class="page-title">📊 ماژول حسابداری نگار (HesabdariForms)</div>
-        <div class="tiles-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); max-width: 720px; margin: 40px auto 0;">
-          <div class="tile-card" onclick="openHesabdariMain('coding')" style="padding: 36px 24px; text-align: center; cursor: pointer;">
-            <div class="tile-icon-box tile-green" style="font-size: 3.2rem; margin: 0 auto 16px; width: 84px; height: 84px;">🧮</div>
-            <div class="tile-title" style="font-size: 1.2rem; font-weight: 800;">کدینگ، ثبت اسناد و دفاتر</div>
+        <div class="tiles-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); max-width: 960px; margin: 40px auto 0;">
+          <div class="tile-card" onclick="openHesabdariMain('coding')" style="padding: 32px 20px; text-align: center; cursor: pointer;">
+            <div class="tile-icon-box tile-green" style="font-size: 3rem; margin: 0 auto 16px; width: 80px; height: 80px;">🧮</div>
+            <div class="tile-title" style="font-size: 1.15rem; font-weight: 800;">کدینگ، ثبت اسناد و دفاتر</div>
           </div>
-          <div class="tile-card" onclick="openHesabdariMain('reports')" style="padding: 36px 24px; text-align: center; cursor: pointer;">
-            <div class="tile-icon-box tile-blue" style="font-size: 3.2rem; margin: 0 auto 16px; width: 84px; height: 84px;">📊</div>
-            <div class="tile-title" style="font-size: 1.2rem; font-weight: 800;">گزارشات و ترازهای حسابداری</div>
+          <div class="tile-card" onclick="openHesabdariMain('reports')" style="padding: 32px 20px; text-align: center; cursor: pointer;">
+            <div class="tile-icon-box tile-blue" style="font-size: 3rem; margin: 0 auto 16px; width: 80px; height: 80px;">📊</div>
+            <div class="tile-title" style="font-size: 1.15rem; font-weight: 800;">گزارشات و ترازهای حسابداری</div>
+          </div>
+          <div class="tile-card" onclick="showForm('form-account-levels')" style="padding: 32px 20px; text-align: center; cursor: pointer;">
+            <div class="tile-icon-box tile-orange" style="font-size: 3rem; margin: 0 auto 16px; width: 80px; height: 80px;">⚙️</div>
+            <div class="tile-title" style="font-size: 1.15rem; font-weight: 800;">تنظیمات اولیه حساب‌ها</div>
           </div>
         </div>
       </div>
@@ -878,13 +882,30 @@
         </div>
 
         <div id="form-account-levels" class="form-section">
-          <h2 class="form-heading">⚙️ تنظیمات طول و سطوح حساب‌ها</h2>
-          <div class="card form-card" style="max-width:400px;margin:auto;">
-            <div class="form-group"><label class="form-label">طول کد گروه:</label><input type="number" class="form-input" value="1" /></div>
-            <div class="form-group"><label class="form-label">طول کد کل:</label><input type="number" class="form-input" value="2" /></div>
-            <div class="form-group"><label class="form-label">طول کد معین:</label><input type="number" class="form-input" value="4" /></div>
-            <div class="form-group"><label class="form-label">طول کد تفصیلی:</label><input type="number" class="form-input" value="6" /></div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('تنظیمات سطوح حساب ذخیره شد.')">💾 ذخیره تنظیمات</button></div>
+          <h2 class="form-heading">⚙️ تنظیمات اولیه کدینگ و سطوح حساب‌ها (HesabdaryInitialSettingsForm)</h2>
+          <div class="card form-card" style="max-width:580px;margin:auto;">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">تعداد سطوح:</label><input type="number" class="form-input" value="5" /></div>
+              <div class="form-group"><label class="form-label">طول کد گروه:</label><input type="number" class="form-input" value="2" /></div>
+              <div class="form-group"><label class="form-label">طول کد کل:</label><input type="number" class="form-input" value="4" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">طول کد معین:</label><input type="number" class="form-input" value="6" /></div>
+              <div class="form-group"><label class="form-label">طول تفصیلی ۱:</label><input type="number" class="form-input" value="6" /></div>
+              <div class="form-group"><label class="form-label">طول تفصیلی ۲:</label><input type="number" class="form-input" value="2" /></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">نوع سرفصل مورد استفاده:</label>
+              <select class="form-select">
+                <option>سرفصل‌های پیش‌فرض برنامه</option>
+                <option>سرفصل سفارشی کاربر</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">کد اقتصادی:</label><input type="text" class="form-input" placeholder="کد اقتصادی..." /></div>
+              <div class="form-group"><label class="form-label">شناسه ملی:</label><input type="text" class="form-input" placeholder="شناسه ملی..." /></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="alert('تنظیمات کدینگ حسابداری با موفقیت ذخیره شد.')">💾 ذخیره تنظیمات</button></div>
           </div>
         </div>
 
@@ -894,7 +915,6 @@
 
           <!-- Sub-tabs Navigation Bar -->
           <div class="hesabdari-subtabs-bar">
-            <div class="subtab-item" data-tab="settings" onclick="switchHesabdariTab('settings')">تنظیمات اولیه حساب‌ها</div>
             <div class="subtab-item active" data-tab="accounts" onclick="switchHesabdariTab('accounts')">سرفصل حساب‌ها</div>
             <div class="subtab-item" data-tab="shenavar" onclick="switchHesabdariTab('shenavar')">حساب‌های شناور</div>
             <div class="subtab-item" data-tab="sanad" onclick="switchHesabdariTab('sanad')">ثبت سند حسابداری</div>
@@ -908,34 +928,7 @@
             <div class="subtab-item" data-tab="other-reports" onclick="switchHesabdariTab('other-reports')">سایر گزارشات</div>
           </div>
 
-          <!-- Tab 1: تنظیمات اولیه حساب‌ها -->
-          <div id="tab-panel-settings" class="hesabdari-tab-panel">
-            <div class="card form-card" style="max-width:580px;margin:auto;">
-              <h4 style="margin-bottom:16px;">⚙️ تنظیمات اولیه کدینگ و سطوح حساب‌ها</h4>
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">تعداد سطوح:</label><input type="number" class="form-input" value="5" /></div>
-                <div class="form-group"><label class="form-label">طول کد گروه:</label><input type="number" class="form-input" value="2" /></div>
-                <div class="form-group"><label class="form-label">طول کد کل:</label><input type="number" class="form-input" value="4" /></div>
-              </div>
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">طول کد معین:</label><input type="number" class="form-input" value="6" /></div>
-                <div class="form-group"><label class="form-label">طول تفصیلی ۱:</label><input type="number" class="form-input" value="6" /></div>
-                <div class="form-group"><label class="form-label">طول تفصیلی ۲:</label><input type="number" class="form-input" value="2" /></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">نوع سرفصل مورد استفاده:</label>
-                <select class="form-select">
-                  <option>سرفصل‌های پیش‌فرض برنامه</option>
-                  <option>سرفصل سفارشی کاربر</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">کد اقتصادی:</label><input type="text" class="form-input" placeholder="کد اقتصادی..." /></div>
-                <div class="form-group"><label class="form-label">شناسه ملی:</label><input type="text" class="form-input" placeholder="شناسه ملی..." /></div>
-              </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('تنظیمات کدینگ حسابداری با موفقیت ذخیره شد.')">💾 ذخیره تنظیمات</button></div>
-            </div>
-          </div>
+
 
           <!-- Tab 2: سرفصل حساب‌ها -->
           <div id="tab-panel-accounts" class="hesabdari-tab-panel active" style="display:block;">
