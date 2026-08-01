@@ -1081,18 +1081,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================
 // Global Keyboard Shortcuts
 // ============================
-document.addEventListener('keydown', (e) => {
-  // Alt + A (or Alt + ش in Persian layout): Open Switch Company / Fiscal Year form
-  if (e.altKey && (e.key === 'a' || e.key === 'A' || e.code === 'KeyA' || e.key === 'ش')) {
+window.addEventListener('keydown', (e) => {
+  // Physical key 'A' (e.code === 'KeyA') or character 'a'/'A'/'ش'
+  const isAKey = e.code === 'KeyA' || e.key === 'a' || e.key === 'A' || e.key === 'ش';
+  if (e.altKey && isAKey) {
     e.preventDefault();
+    e.stopPropagation();
+
     const loginOverlay = document.getElementById('loginOverlay');
     if (loginOverlay && loginOverlay.style.display !== 'none') {
-      return; // Do not open if at login screen
+      return; // Do not open if still at login screen
     }
+
     const systemTab = document.querySelector('.ribbon-tab[onclick*="system"]');
     if (systemTab) switchRibbon('system', systemTab);
     showForm('form-switch-company');
   }
-});
+}, true);
+
 
 
