@@ -1003,6 +1003,16 @@ function editSanad(id) {
   }
   showForm('form-sanad2');
   document.getElementById('sanadNumberInput').value = id;
+  document.getElementById('sanadNumberInput').readOnly = true; // Protect voucher number during edit
+  document.getElementById('sanadDateInput').value = s.date;
+  document.getElementById('sanadDescInput').value = s.desc;
+
+  // Render lines with the voucher's values
+  AppState.sanadLines = [
+    { account: '011001', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
+    { account: '022001', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
+  ];
+  renderSanadEditorLines();
 }
 
 function printVouchers() {
@@ -1243,17 +1253,74 @@ function updateSanadTotals() {
   }
 }
 
+function openNewSanadForm() {
+  const nextNo = AppState.sanads.length > 0 ? Math.max(...AppState.sanads.map(s => Number(s.id))) + 1 : 101;
+  showForm('form-sanad2');
+  
+  const numInput = document.getElementById('sanadNumberInput');
+  if (numInput) {
+    numInput.value = nextNo;
+    numInput.readOnly = false; // Allow editing number for new vouchers
+  }
+  
+  const todayStr = (PersianCal && typeof PersianCal.getTodayString === 'function') 
+    ? PersianCal.getTodayString() 
+    : '1403/05/11';
+  document.getElementById('sanadDateInput').value = todayStr;
+  document.getElementById('sanadDescInput').value = '';
+  
+  AppState.sanadLines = [
+    { account: '011001', desc: 'توضیحات ردیف ۱', debit: 0, credit: 0 },
+    { account: '011002', desc: 'توضیحات ردیف ۲', debit: 0, credit: 0 }
+  ];
+  renderSanadEditorLines();
+}
+
+function closeSanadEditor() {
+  showForm('form-hesabdari-main');
+  switchHesabdariTab('sanad');
+}
+
 function saveSanadEntry() {
   const td = AppState.sanadLines.reduce((s, l) => s + Number(l.debit || 0), 0);
   const tc = AppState.sanadLines.reduce((s, l) => s + Number(l.credit || 0), 0);
   if (td !== tc) { alert('امکان ثبت سند نامتوازن وجود ندارد.'); return; }
-  const no = document.getElementById('sanadNumberInput')?.value;
+  const no = Number(document.getElementById('sanadNumberInput')?.value);
   const date = document.getElementById('sanadDateInput')?.value;
   const desc = document.getElementById('sanadDescInput')?.value || 'سند حسابداری';
-  AppState.sanads.push({ id: Number(no), date, desc, debit: td, credit: tc, status: 'موقت', bakhshId: getCurrentBakhshId() });
-  AppState.sanadLines = [{ account: '1001', desc: '', debit: 0, credit: 0 }, { account: '1101', desc: '', debit: 0, credit: 0 }];
-  alert(`سند شماره ${no} با موفقیت ثبت شد.`);
-  showForm('form-sanad1');
+
+  if (isNaN(no) || no <= 0) { alert('شماره سند نامعتبر است.'); return; }
+
+  const existingIdx = AppState.sanads.findIndex(x => x.id === no);
+  if (existingIdx !== -1) {
+    const s = AppState.sanads[existingIdx];
+    if (s.bakhshId && s.bakhshId !== getCurrentBakhshId()) {
+      alert('شما مجاز به ویرایش این سند نیستید.');
+      return;
+    }
+    AppState.sanads[existingIdx] = {
+      ...s,
+      date,
+      desc,
+      debit: td,
+      credit: tc
+    };
+    alert(`سند شماره ${no} با موفقیت ویرایش شد.`);
+  } else {
+    AppState.sanads.push({ 
+      id: no, 
+      date, 
+      desc, 
+      debit: td, 
+      credit: tc, 
+      status: 'موقت', 
+      bakhshId: getCurrentBakhshId() 
+    });
+    alert(`سند شماره ${no} با موفقیت ثبت شد.`);
+  }
+
+  AppState.sanadLines = [{ account: '011001', desc: '', debit: 0, credit: 0 }, { account: '011002', desc: '', debit: 0, credit: 0 }];
+  closeSanadEditor();
 }
 
 // ============================

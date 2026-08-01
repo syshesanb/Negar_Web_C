@@ -998,7 +998,7 @@
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div style="font-weight:700;font-size:0.95rem;">📝 ثبت و مدیریت اسناد حسابداری</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                  <button class="btn btn-primary" onclick="showForm('form-sanad2')">+ ثبت سند جدید</button>
+                  <button class="btn btn-primary" onclick="openNewSanadForm()">+ ثبت سند جدید</button>
                   <button class="btn btn-outline" onclick="printVouchers()">🖨️ چاپ اسناد</button>
                   <button class="btn btn-outline" onclick="printJournalLedger()">📖 چاپ دفتر روزنامه</button>
                   <button class="btn btn-outline" onclick="copyActiveVoucher()">📋 کپی سند</button>
@@ -1121,6 +1121,63 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- ---- SANAD EDITOR FORM ---- -->
+        <div id="form-sanad2" class="form-section">
+          <h2 class="form-heading">📝 ثبت و ویرایش سند حسابداری (JournalVoucherForm)</h2>
+          <div class="card form-card">
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">شماره سند:</label>
+                <input type="number" id="sanadNumberInput" class="form-input" />
+              </div>
+              <div class="form-group" style="flex:1.5;">
+                <label class="form-label">تاریخ سند:</label>
+                <input type="text" id="sanadDateInput" class="form-input" placeholder="1403/05/11" />
+              </div>
+              <div class="form-group" style="flex:3;">
+                <label class="form-label">شرح کلی سند:</label>
+                <input type="text" id="sanadDescInput" class="form-input" placeholder="شرح سند را وارد کنید..." />
+              </div>
+            </div>
+            
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;margin-bottom:10px;">
+              <div style="font-weight:700;">آرتیکل‌های سند حسابداری:</div>
+              <button class="btn btn-outline" onclick="addSanadLine()">➕ افزودن ردیف</button>
+            </div>
+            
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:50px;">ردیف</th>
+                    <th>حساب معین/تفصیلی</th>
+                    <th>شرح ردیف</th>
+                    <th style="width:160px;">بدهکار (ریال)</th>
+                    <th style="width:160px;">بستانکار (ریال)</th>
+                    <th style="width:60px;">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="sanadLinesEditorBody">
+                  <!-- Dynamic rows will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="kpi-cards-row" style="margin-top:20px; margin-bottom:20px; background:var(--bg-secondary); padding:15px; border-radius:8px;">
+              <div style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:15px;">
+                <div>جمع بدهکار: <span id="sanadTotalDebit" style="color:var(--accent-color); font-weight:bold;">0 ریال</span></div>
+                <div>جمع بستانکار: <span id="sanadTotalCredit" style="color:var(--accent-color); font-weight:bold;">0 ریال</span></div>
+                <div>وضعیت توازن: <span id="sanadBalanceStatus" class="badge badge-warning">نامتوازن</span></div>
+              </div>
+            </div>
+            
+            <div class="form-actions" style="display:flex; gap:10px;">
+              <button class="btn btn-primary" onclick="saveSanadEntry()">💾 ثبت نهایی سند</button>
+              <button class="btn btn-outline" onclick="closeSanadEditor()">🔙 انصراف و بازگشت</button>
+            </div>
+          </div>
         </div>
 
         <!-- ---- INVENTORY FORMS ---- -->
