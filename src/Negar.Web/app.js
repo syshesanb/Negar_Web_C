@@ -201,9 +201,18 @@ const AppState = {
     { id: 3, code: 'SH-101-01', name: 'فاز ۱ سازه بتنی', parentId: 1, status: 'فعال' },
     { id: 4, code: 'SH-101-02', name: 'فاز ۲ محوطه‌سازی', parentId: 1, status: 'فعال' }
   ],
+  bakhsh: [
+    { id: 1, code: 1, name: 'حسابداری' },
+    { id: 2, code: 2, name: 'خرید و فروش' },
+    { id: 3, code: 3, name: 'انبارداری' },
+    { id: 4, code: 4, name: 'حقوق و دستمزد' },
+    { id: 5, code: 5, name: 'خزانه‌داری' },
+    { id: 6, code: 6, name: 'بودجه و هزینه' },
+    { id: 7, code: 7, name: 'اموال' }
+  ],
   sanads: [
-    { id: 101, date: '1403/01/05', desc: 'سند افتتاحیه سال مالی', debit: 5000000000, credit: 5000000000, status: 'دائم' },
-    { id: 102, date: '1403/05/10', desc: 'فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 125000000, status: 'تایید شده' }
+    { id: 101, date: '1403/01/05', desc: 'سند افتتاحیه سال مالی', debit: 5000000000, credit: 5000000000, status: 'دائم', bakhshId: 1 },
+    { id: 102, date: '1403/05/10', desc: 'فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 125000000, status: 'تایید شده', bakhshId: 2 }
   ],
   sanadLines: [
     { account: '1001', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
@@ -924,6 +933,18 @@ function deleteShenavar(id) {
 // Sanad 1 (list)
 let selectedSanadId = null;
 
+function getCurrentBakhshId() {
+  const mapping = {
+    'accounting': 1,
+    'purchase-sales': 2,
+    'inventory': 3,
+    'payroll': 4,
+    'treasury': 5,
+    'budget': 6
+  };
+  return mapping[AppState.currentModule] || 1;
+}
+
 function selectSanadRow(id) {
   selectedSanadId = id;
   renderSanadListTable();
@@ -935,6 +956,8 @@ function renderSanadListTable() {
   tbody.innerHTML = AppState.sanads.map(s => {
     const isSelected = (s.id === selectedSanadId);
     const selectedClass = isSelected ? 'selected-parent-row' : '';
+    const bakhshObj = AppState.bakhsh.find(b => b.id === s.bakhshId);
+    const bakhshName = bakhshObj ? bakhshObj.name : 'حسابداری';
 
     return `
       <tr class="${selectedClass}" onclick="selectSanadRow(${s.id})" style="cursor:pointer;">
@@ -944,6 +967,7 @@ function renderSanadListTable() {
         <td>${s.debit.toLocaleString()}</td>
         <td>${s.credit.toLocaleString()}</td>
         <td><span class="badge badge-success">متوازن ✅</span></td>
+        <td><span class="badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);font-weight:bold;">${bakhshName}</span></td>
         <td><span class="badge badge-primary">${s.status}</span></td>
         <td>
           <button class="btn btn-outline" style="padding:3px 8px;" onclick="event.stopPropagation(); editSanad(${s.id})">✏️ ویرایش</button>
@@ -955,6 +979,13 @@ function renderSanadListTable() {
 }
 
 function deleteSanad(id) {
+  const s = AppState.sanads.find(x => x.id === id);
+  if (s && s.bakhshId && s.bakhshId !== getCurrentBakhshId()) {
+    const creatorBakhsh = AppState.bakhsh.find(b => b.id === s.bakhshId);
+    const bName = creatorBakhsh ? creatorBakhsh.name : 'بخش دیگر';
+    alert(`این سند به‌طور خودکار توسط بخش «${bName}» صادر شده است و ویرایش یا حذف آن فقط از طریق همان بخش مجاز می‌باشد تا در زنجیره اطلاعات خطایی پیش نیاد.`);
+    return;
+  }
   if (confirm(`حذف سند #${id}؟`)) {
     AppState.sanads = AppState.sanads.filter(s => s.id !== id);
     if (selectedSanadId === id) selectedSanadId = null;
@@ -963,6 +994,13 @@ function deleteSanad(id) {
 }
 
 function editSanad(id) {
+  const s = AppState.sanads.find(x => x.id === id);
+  if (s && s.bakhshId && s.bakhshId !== getCurrentBakhshId()) {
+    const creatorBakhsh = AppState.bakhsh.find(b => b.id === s.bakhshId);
+    const bName = creatorBakhsh ? creatorBakhsh.name : 'بخش دیگر';
+    alert(`این سند به‌طور خودکار توسط بخش «${bName}» صادر شده است و ویرایش یا حذف آن فقط از طریق همان بخش مجاز می‌باشد تا در زنجیره اطلاعات خطایی پیش نیاد.`);
+    return;
+  }
   showForm('form-sanad2');
   document.getElementById('sanadNumberInput').value = id;
 }
@@ -1212,7 +1250,7 @@ function saveSanadEntry() {
   const no = document.getElementById('sanadNumberInput')?.value;
   const date = document.getElementById('sanadDateInput')?.value;
   const desc = document.getElementById('sanadDescInput')?.value || 'سند حسابداری';
-  AppState.sanads.push({ id: no, date, desc, debit: td, credit: tc, status: 'موقت' });
+  AppState.sanads.push({ id: Number(no), date, desc, debit: td, credit: tc, status: 'موقت', bakhshId: getCurrentBakhshId() });
   AppState.sanadLines = [{ account: '1001', desc: '', debit: 0, credit: 0 }, { account: '1101', desc: '', debit: 0, credit: 0 }];
   alert(`سند شماره ${no} با موفقیت ثبت شد.`);
   showForm('form-sanad1');

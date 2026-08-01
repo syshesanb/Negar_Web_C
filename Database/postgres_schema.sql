@@ -252,6 +252,12 @@ CREATE TABLE IF NOT EXISTS "SarfaslShenavar" (
     "IsActive" BOOLEAN DEFAULT TRUE
 );
 
+CREATE TABLE IF NOT EXISTS "Bakhsh" (
+    "BakhshID" SERIAL PRIMARY KEY,
+    "BakhshCode" INT NOT NULL UNIQUE,
+    "BakhshName" VARCHAR(100) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS "Sanad1" (
     "EntryID" SERIAL PRIMARY KEY,
     "CompanyID" INT NOT NULL REFERENCES "Companies"("CompanyID") ON DELETE CASCADE,
@@ -265,7 +271,8 @@ CREATE TABLE IF NOT EXISTS "Sanad1" (
     "TaeazSanad" VARCHAR(50) DEFAULT 'متوازن',
     "SharhSanad" TEXT,
     "VazeiatSanad" VARCHAR(50) DEFAULT 'یادداشت', -- یادداشت, موقت, دائم
-    "AdamVirayesh" BOOLEAN DEFAULT FALSE
+    "AdamVirayesh" BOOLEAN DEFAULT FALSE,
+    "BakhshID" INT NULL REFERENCES "Bakhsh"("BakhshID") ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS "Sanad2" (
@@ -371,6 +378,16 @@ INSERT INTO "SarfaslShenavar" ("CompanyID", "AccountCode", "AccountName", "Paren
 (1, 'SH-101-01', 'فاز ۱ سازه بتنی', (SELECT "ShenavarID" FROM "SarfaslShenavar" WHERE "CompanyID" = 1 AND "AccountCode" = 'SH-101')),
 (1, 'SH-101-02', 'فاز ۲ محوطه‌سازی', (SELECT "ShenavarID" FROM "SarfaslShenavar" WHERE "CompanyID" = 1 AND "AccountCode" = 'SH-101'))
 ON CONFLICT DO NOTHING;
+
+INSERT INTO "Bakhsh" ("BakhshCode", "BakhshName") VALUES
+(1, 'حسابداری'),
+(2, 'خرید و فروش'),
+(3, 'انبارداری'),
+(4, 'حقوق و دستمزد'),
+(5, 'خزانه‌داری'),
+(6, 'بودجه و هزینه'),
+(7, 'اموال')
+ON CONFLICT ("BakhshCode") DO NOTHING;
 
 INSERT INTO "AppSettings" ("SettingKey", "SettingValue", "SettingCategory") VALUES
 ('CurrentTheme', 'Blue', 'UI'),
