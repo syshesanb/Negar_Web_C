@@ -181,18 +181,18 @@ const AppState = {
     { id: 3, username: 'storekeeper', fullName: 'رضا حسینی (انباردار)', userType: 'User', isActive: true, ip: '192.168.1.15' }
   ],
   accounts: [
-    { id: 1, code: '1', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 1, code: '01', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parentId: null },
     { id: 2, code: '10', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
     { id: 3, code: '1001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
     { id: 4, code: '1002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
     { id: 5, code: '11', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
     { id: 6, code: '1101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parentId: 5 },
-    { id: 7, code: '2', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 7, code: '02', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
     { id: 8, code: '20', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parentId: 7 },
     { id: 9, code: '2001', name: 'تامین‌کنندگان', type: 'معین', nature: 'بستانکار', parentId: 8 },
-    { id: 10, code: '4', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 10, code: '04', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
     { id: 11, code: '40', name: 'فروش کالا', type: 'کل', nature: 'بستانکار', parentId: 10 },
-    { id: 12, code: '5', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 12, code: '05', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parentId: null },
     { id: 13, code: '50', name: 'هزینه اداری', type: 'کل', nature: 'بدهکار', parentId: 12 },
   ],
   shenavars: [
