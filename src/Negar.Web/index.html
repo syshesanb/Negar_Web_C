@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl" data-theme="blue">
 <head>
   <meta charset="UTF-8" />
@@ -8,12 +8,87 @@
 </head>
 <body>
 
-  <!-- Top Header Bar -->
+  <!-- ================================================================
+       LOGIN OVERLAY - shown before main app
+       ================================================================ -->
+  <div id="loginOverlay">
+    <div class="login-bg-shapes">
+      <div class="login-shape s1"></div>
+      <div class="login-shape s2"></div>
+      <div class="login-shape s3"></div>
+    </div>
+
+    <div class="login-box">
+      <!-- Logo / Brand -->
+      <div class="login-brand">
+        <div class="login-logo">📊</div>
+        <h1 class="login-title">نگار تحت وب</h1>
+        <p class="login-subtitle">سیستم یکپارچه مالی، حسابداری، انبارداری</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="login-form-area">
+        <div id="loginError" class="login-error" style="display:none;">
+          ❌ نام کاربری یا رمز عبور اشتباه است. لطفاً دوباره تلاش کنید.
+        </div>
+
+        <div class="login-field">
+          <label class="login-label">نام کاربری</label>
+          <div class="login-input-wrap">
+            <span class="login-input-icon">👤</span>
+            <input
+              type="text"
+              id="loginUsername"
+              class="login-input"
+              placeholder="نام کاربری خود را وارد کنید"
+              autocomplete="username"
+              onkeydown="if(event.key==='Enter') document.getElementById('loginPassword').focus()"
+            />
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label class="login-label">رمز عبور</label>
+          <div class="login-input-wrap">
+            <span class="login-input-icon">🔒</span>
+            <input
+              type="password"
+              id="loginPassword"
+              class="login-input"
+              placeholder="رمز عبور خود را وارد کنید"
+              autocomplete="current-password"
+              onkeydown="if(event.key==='Enter') doLogin()"
+            />
+            <button class="login-eye-btn" onclick="togglePasswordVisibility()" type="button" title="نمایش/پنهان رمز">👁</button>
+          </div>
+        </div>
+
+        <button class="login-btn" onclick="doLogin()" id="loginBtn">
+          <span id="loginBtnText">ورود به سیستم</span>
+          <span id="loginBtnSpinner" style="display:none;">⏳ در حال بررسی...</span>
+        </button>
+
+        <div class="login-hint">
+          <span>نام کاربری پیش‌فرض: <b>admin</b> | رمز عبور: <b>admin123</b></span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        سیستم نگار - نسخه وبی ۱.۰ &nbsp;|&nbsp; © ۱۴۰۳
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP (hidden until login) -->
+  <div id="mainApp" style="display:none;">
+
+
   <header class="desktop-header">
     <div class="title-bar">
       <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</div>
       <div style="display:flex;gap:16px;align-items:center;">
-        <span>کاربر: <b>ابر مدیر (admin)</b></span>
+        <span>کاربر: <b id="headerUsername">---</b></span>
         <span>شرکت: <b>شرکت نمونه نگار</b></span>
         <span>سال مالی: <b>۱۴۰۳</b></span>
       </div>
@@ -516,7 +591,7 @@
             <p style="margin-bottom:20px;">آیا از خروج از سیستم نگار اطمینان دارید؟</p>
             <div style="display:flex;gap:12px;justify-content:center;">
               <button class="btn btn-outline" onclick="goBack()">انصراف</button>
-              <button class="btn btn-danger" onclick="alert('از سیستم خارج شدید.')">بله، خروج</button>
+              <button class="btn btn-danger" onclick="logout()">🚪 بله، خروج از سیستم</button>
             </div>
           </div>
         </div>
@@ -1409,5 +1484,6 @@
   </footer>
 
   <script src="app.js"></script>
+  </div><!-- end mainApp -->
 </body>
 </html>

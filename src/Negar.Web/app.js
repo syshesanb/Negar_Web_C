@@ -3,7 +3,142 @@
 // Architecture: Each tile button shows its own form; Back button returns to tiles
 // =============================================================================
 
+// ============================
+// AUTHENTICATION - Credentials
+// ============================
+const CREDENTIALS = [
+  { username: 'admin',        password: 'admin123',    fullName: 'ابر مدیر سیستم',         role: 'SuperAdmin' },
+  { username: 'accountant1',  password: 'acc2024',     fullName: 'علی رضایی (حسابدار)',     role: 'User' },
+  { username: 'storekeeper',  password: 'store2024',   fullName: 'رضا حسینی (انباردار)',    role: 'User' }
+];
+
+let currentUser = null;  // will be set after successful login
+
+function doLogin() {
+  const usernameEl = document.getElementById('loginUsername');
+  const passwordEl = document.getElementById('loginPassword');
+  const errorEl   = document.getElementById('loginError');
+  const btnText   = document.getElementById('loginBtnText');
+  const btnSpinner= document.getElementById('loginBtnSpinner');
+  const loginBtn  = document.getElementById('loginBtn');
+
+  const username = usernameEl?.value?.trim();
+  const password = passwordEl?.value;
+
+  // Basic empty check
+  if (!username) {
+    usernameEl?.focus();
+    showLoginError('لطفاً نام کاربری را وارد کنید.');
+    return;
+  }
+  if (!password) {
+    passwordEl?.focus();
+    showLoginError('لطفاً رمز عبور را وارد کنید.');
+    return;
+  }
+
+  // Show loading state
+  if (btnText)   btnText.style.display = 'none';
+  if (btnSpinner) btnSpinner.style.display = 'inline';
+  if (loginBtn)  loginBtn.disabled = true;
+
+  // Simulate a short delay (like a real server call)
+  setTimeout(() => {
+    const found = CREDENTIALS.find(
+      c => c.username === username && c.password === password
+    );
+
+    if (found) {
+      // ✅ Success
+      currentUser = found;
+      if (errorEl) errorEl.style.display = 'none';
+
+      // Update header info
+      const headerUser = document.getElementById('headerUsername');
+      if (headerUser) headerUser.textContent = found.fullName + ' (' + found.username + ')';
+      const statusUser = document.getElementById('statusBarUser');
+      if (statusUser) statusUser.innerHTML = `کاربر: <b>${found.fullName}</b>`;
+
+      // Animate out login, animate in app
+      const overlay  = document.getElementById('loginOverlay');
+      const mainApp  = document.getElementById('mainApp');
+
+      overlay.classList.add('login-fade-out');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        mainApp.style.display = 'block';
+        mainApp.classList.add('app-fade-in');
+        // Initialize app
+        showTiles('system');
+      }, 400);
+
+    } else {
+      // ❌ Wrong credentials
+      showLoginError('نام کاربری یا رمز عبور اشتباه است. لطفاً دوباره تلاش کنید.');
+      if (passwordEl) { passwordEl.value = ''; passwordEl.focus(); }
+      // Reset button
+      if (btnText)    btnText.style.display = 'inline';
+      if (btnSpinner) btnSpinner.style.display = 'none';
+      if (loginBtn)   loginBtn.disabled = false;
+    }
+  }, 700);
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  if (!el) return;
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+  // Re-trigger shake animation
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = 'shake 0.4s ease';
+}
+
+function togglePasswordVisibility() {
+  const input = document.getElementById('loginPassword');
+  const btn   = document.querySelector('.login-eye-btn');
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (btn) btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    if (btn) btn.textContent = '👁';
+  }
+}
+
+function logout() {
+  currentUser = null;
+  // Clear fields
+  const u = document.getElementById('loginUsername');
+  const p = document.getElementById('loginPassword');
+  if (u) u.value = '';
+  if (p) { p.value = ''; p.type = 'password'; }
+  const btn = document.querySelector('.login-eye-btn');
+  if (btn) btn.textContent = '👁';
+  // Hide error
+  const err = document.getElementById('loginError');
+  if (err) err.style.display = 'none';
+  // Reset button state
+  const btnText    = document.getElementById('loginBtnText');
+  const btnSpinner = document.getElementById('loginBtnSpinner');
+  const loginBtn   = document.getElementById('loginBtn');
+  if (btnText)    { btnText.style.display = 'inline'; }
+  if (btnSpinner) { btnSpinner.style.display = 'none'; }
+  if (loginBtn)   { loginBtn.disabled = false; }
+
+  // Show login, hide app
+  const overlay = document.getElementById('loginOverlay');
+  const mainApp = document.getElementById('mainApp');
+  if (mainApp)  { mainApp.style.display = 'none'; mainApp.classList.remove('app-fade-in'); }
+  if (overlay)  { overlay.style.display = 'flex'; overlay.classList.remove('login-fade-out'); }
+  // Focus username field
+  setTimeout(() => { if (u) u.focus(); }, 100);
+}
+
 // ---- App State ----
+
 const AppState = {
   currentModule: 'system',   // active ribbon tab
   currentForm: null,          // null = tiles view, otherwise form id
@@ -831,10 +966,14 @@ function deleteFiscalYear(fyId) {
 // Init on page load
 
 // ============================
+// Init on page load
+// ============================
 document.addEventListener('DOMContentLoaded', () => {
-  // Show system tiles by default
-  showTiles('system');
-  // Update system clock every second
+  // On startup: show login page, focus username field
+  const usernameInput = document.getElementById('loginUsername');
+  if (usernameInput) setTimeout(() => usernameInput.focus(), 200);
+
+  // System clock - runs always (shown in status bar after login)
   setInterval(() => {
     const el = document.getElementById('statusBarTime');
     if (el) {
@@ -843,3 +982,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 1000);
 });
+
