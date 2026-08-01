@@ -856,3 +856,54 @@ tr:hover td { background: var(--accent-light); }
   display: block;
 }
 
+/* ── Treeview Datagrid Simulation ── */
+.tree-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--accent-color);
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.tree-toggle-btn:hover {
+  background: var(--accent-color);
+  color: #0f172a;
+  border-color: var(--accent-color);
+  transform: scale(1.1);
+}
+.tree-toggle-btn.expanded {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+.tree-toggle-btn.expanded:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+/* Level Colors (lighter tones for child rows) */
+tr.tree-level-0 {
+  background: rgba(15, 23, 42, 0.6) !important;
+  font-weight: 700;
+}
+tr.tree-level-1 {
+  background: rgba(30, 41, 59, 0.45) !important;
+}
+tr.tree-level-2 {
+  background: rgba(51, 65, 85, 0.35) !important;
+}
+tr.tree-level-3 {
+  background: rgba(71, 85, 105, 0.25) !important;
+}
+
+

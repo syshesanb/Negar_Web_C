@@ -433,23 +433,89 @@ function renderPermissionsMatrix() {
 // ============================
 // ACCOUNTING MODULE
 // ============================
+// Set of expanded account codes for treeview datagrid
+const expandedAccountCodes = new Set();
+
+function toggleAccountExpand(code) {
+  if (expandedAccountCodes.has(code)) {
+    expandedAccountCodes.delete(code);
+  } else {
+    expandedAccountCodes.add(code);
+  }
+  renderAccountsTable();
+}
+
+function getAccountParentCode(a) {
+  if (!a.parent || a.parent === '-' || a.parent.trim() === '') return null;
+  const parts = a.parent.split('-');
+  return parts[0].trim();
+}
+
+function getAccountLevel(a) {
+  let level = 0;
+  let curr = a;
+  let visited = new Set();
+  while (curr && !visited.has(curr.code)) {
+    visited.add(curr.code);
+    const parentCode = getAccountParentCode(curr);
+    if (!parentCode) break;
+    curr = AppState.accounts.find(x => x.code === parentCode);
+    if (curr) level++;
+    else break;
+  }
+  return level;
+}
+
+function isAccountVisible(a) {
+  let curr = a;
+  let visited = new Set();
+  while (curr && !visited.has(curr.code)) {
+    visited.add(curr.code);
+    const parentCode = getAccountParentCode(curr);
+    if (!parentCode) return true; // Root level accounts are always visible
+    if (!expandedAccountCodes.has(parentCode)) return false; // Parent not expanded
+    curr = AppState.accounts.find(x => x.code === parentCode);
+  }
+  return true;
+}
+
 function renderAccountsTable() {
   const tbody = document.getElementById('accountsTableBody');
   if (!tbody) return;
-  tbody.innerHTML = AppState.accounts.map(a => `
-    <tr>
-      <td><b>${a.code}</b></td>
-      <td>${a.name}</td>
-      <td><span class="badge badge-primary">${a.type}</span></td>
-      <td>${a.nature}</td>
-      <td style="color:var(--text-muted);font-size:0.82rem;">${a.parent}</td>
-      <td><span class="badge badge-success">فعال</span></td>
-      <td>
-        <button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button>
-        <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteAccount(${a.id})">🗑️ حذف</button>
-      </td>
-    </tr>
-  `).join('');
+
+  // Filter accounts by visibility in tree
+  const visibleAccounts = AppState.accounts.filter(isAccountVisible);
+
+  tbody.innerHTML = visibleAccounts.map(a => {
+    const level = getAccountLevel(a);
+    const hasChildren = AppState.accounts.some(child => getAccountParentCode(child) === a.code);
+    const isExpanded = expandedAccountCodes.has(a.code);
+
+    const toggleBtnHtml = hasChildren
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="toggleAccountExpand('${a.code}')">${isExpanded ? '-' : '+'}</button>`
+      : '';
+
+    const indentPx = level * 22;
+
+    return `
+      <tr class="tree-level-${Math.min(level, 3)}">
+        <td style="text-align:center;vertical-align:middle;">${toggleBtnHtml}</td>
+        <td><b>${a.code}</b></td>
+        <td style="padding-right:${indentPx + 10}px;">
+          ${level > 0 ? '<span style="color:var(--accent-color);margin-left:6px;">└─</span>' : ''}
+          <b>${a.name}</b>
+        </td>
+        <td><span class="badge badge-primary">${a.type}</span></td>
+        <td>${a.nature}</td>
+        <td style="color:var(--text-muted);font-size:0.82rem;">${a.parent}</td>
+        <td><span class="badge badge-success">فعال</span></td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button>
+          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteAccount(${a.id})">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function openAddAccountRow() {
