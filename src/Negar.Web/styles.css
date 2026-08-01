@@ -68,6 +68,23 @@ body {
   font-weight: 600;
 }
 
+#headerTime {
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  direction: ltr;
+}
+
+#headerDate {
+  display: inline-block;
+  min-width: 88px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
 .main-modules-ribbon {
   display: flex;
   align-items: center;
