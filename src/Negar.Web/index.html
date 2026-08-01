@@ -89,8 +89,8 @@
       <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</div>
       <div style="display:flex;gap:16px;align-items:center;">
         <span>کاربر: <b id="headerUsername">---</b></span>
-        <span>شرکت: <b>شرکت نمونه نگار</b></span>
-        <span>سال مالی: <b>۱۴۰۳</b></span>
+        <span>شرکت: <b id="headerCompany">شرکت نمونه نگار</b></span>
+        <span id="headerYear">سال مالی: 1403</span>
       </div>
     </div>
     <nav class="main-modules-ribbon" id="ribbonNav">
@@ -787,14 +787,7 @@
                   <label class="form-label">وبسایت:</label>
                   <input type="text" id="compWebsite" class="form-input" placeholder="www.company.ir" />
                 </div>
-                <div class="form-group">
-                  <label class="form-label">سال مالی فعال:</label>
-                  <select id="compActiveYear" class="form-select">
-                    <option value="1403">۱۴۰۳</option>
-                    <option value="1402">۱۴۰۲</option>
-                    <option value="1404">۱۴۰۴</option>
-                  </select>
-                </div>
+
               </div>
               <div class="form-group">
                 <label class="form-label">آدرس کامل شرکت:</label>
@@ -879,14 +872,22 @@
 
         <div id="form-switch-company" class="form-section">
           <h2 class="form-heading">🔄 تغییر شرکت / سال مالی فعال</h2>
-          <div class="card form-card" style="max-width:400px;margin:auto;">
-            <div class="form-group"><label class="form-label">انتخاب شرکت:</label>
-              <select class="form-select"><option>شرکت نمونه نگار (۱۰۰۱)</option></select>
+          <div class="card form-card" style="max-width:460px;margin:auto;">
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">
+              شرکت و سال مالی جاری سیستم را انتخاب کنید — تمام گزارشات و اسناد در دوره انتخابی تهیه خواهد شد.
+            </p>
+            <div class="form-group">
+              <label class="form-label">انتخاب شرکت:</label>
+              <select id="switchCompany" class="form-select" onchange="refreshSwitchYearList()">
+              </select>
             </div>
-            <div class="form-group"><label class="form-label">انتخاب سال مالی:</label>
-              <select class="form-select"><option selected>۱۴۰۳</option><option>۱۴۰۲</option></select>
+            <div class="form-group">
+              <label class="form-label">انتخاب سال مالی:</label>
+              <select id="switchYear" class="form-select"></select>
             </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('شرکت و سال مالی تغییر یافت.')">✅ اعمال تغییر</button></div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="applyCompanySwitch()">✅ اعمال تغییر</button>
+            </div>
           </div>
         </div>
 
@@ -1485,8 +1486,8 @@
 
   <!-- Status Bar Footer -->
   <footer class="status-bar">
-    <div>کاربر: <b>ابر مدیر (admin)</b> | شرکت: <b>شرکت نمونه نگار</b> | سال مالی: <b>۱۴۰۳</b></div>
-    <div id="statusBarTime">تاریخ سیستم: <b>۱۴۰۵/۰۵/۱۰ - ۱۸:۵۰</b></div>
+    <div id="statusBarInfo">کاربر: <b id="statusBarUser">—</b> | شرکت: <b id="statusBarCompany">شرکت نمونه نگار</b> | سال مالی: <b id="statusBarYear">1403</b></div>
+    <div id="statusBarTime">ساعت سیستم: <b>--:--:--</b></div>
   </footer>
 
 

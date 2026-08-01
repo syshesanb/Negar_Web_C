@@ -68,7 +68,21 @@ function doLogin() {
         overlay.style.display = 'none';
         mainApp.style.display = 'block';
         mainApp.classList.add('app-fade-in');
-        // Initialize app
+
+        // Initialize session: default to first company and its active (or latest) fiscal year
+        if (AppState.companies.length > 0) {
+          SessionState.company = AppState.companies[0];
+          const activeYears = AppState.fiscalYears
+            .filter(fy => fy.company === SessionState.company.code)
+            .sort((a, b) => Number(b.year) - Number(a.year));
+          const activeOne = activeYears.find(fy => fy.status === 'فعال') || activeYears[0];
+          if (activeOne) SessionState.year = activeOne.year;
+        }
+
+        // Update header and status bar with user + company + year
+        updateHeaderBar();
+
+        // Show main tiles
         showTiles('system');
       }, 400);
 
@@ -291,6 +305,7 @@ function showForm(formId) {
   if (formId === 'form-permissions-matrix') renderPermissionsMatrix();
   if (formId === 'form-companies-list') renderCompaniesTable();
   if (formId === 'form-fiscal-years') renderFiscalYearsTable();
+  if (formId === 'form-switch-company') renderSwitchCompanyForm();
 }
 
 // ============================
@@ -963,10 +978,99 @@ function deleteFiscalYear(fyId) {
 }
 
 // ============================
+// SWITCH COMPANY / FISCAL YEAR
+// ============================
+
+// Current session state
+const SessionState = {
+  company: null,   // currently active company object
+  year:    null    // currently active year string
+};
+
+function renderSwitchCompanyForm() {
+  const compSel = document.getElementById('switchCompany');
+  if (!compSel) return;
+
+  // Build company dropdown
+  compSel.innerHTML = AppState.companies.map(c =>
+    `<option value="${c.code}" ${SessionState.company && SessionState.company.code === c.code ? 'selected' : ''}>${c.name} (${c.code})</option>`
+  ).join('');
+
+  refreshSwitchYearList();
+}
+
+function refreshSwitchYearList() {
+  const compSel = document.getElementById('switchCompany');
+  const yearSel = document.getElementById('switchYear');
+  if (!compSel || !yearSel) return;
+
+  const selectedCode = compSel.value;
+  const years = AppState.fiscalYears
+    .filter(fy => fy.company === selectedCode)
+    .sort((a, b) => Number(b.year) - Number(a.year));
+
+  if (years.length === 0) {
+    yearSel.innerHTML = '<option value="">-- سال مالی تعریف نشده --</option>';
+  } else {
+    yearSel.innerHTML = years.map(fy =>
+      `<option value="${fy.year}" ${SessionState.year === fy.year ? 'selected' : ''}>${fy.year} (${fy.status})</option>`
+    ).join('');
+  }
+}
+
+function applyCompanySwitch() {
+  const compSel = document.getElementById('switchCompany');
+  const yearSel = document.getElementById('switchYear');
+  if (!compSel || !yearSel) return;
+
+  const selectedCode = compSel.value;
+  const selectedYear = yearSel.value;
+
+  if (!selectedCode) { alert('لطفاً یک شرکت انتخاب کنید.'); return; }
+  if (!selectedYear) { alert('برای این شرکت هیچ سال مالی تعریف نشده است. ابتدا سال مالی اضافه کنید.'); return; }
+
+  const company = AppState.companies.find(c => c.code === selectedCode);
+  if (!company) return;
+
+  // Update session
+  SessionState.company = company;
+  SessionState.year    = selectedYear;
+
+  // Update header
+  updateHeaderBar();
+
+  // Feedback
+  alert(`✅ تغییر با موفقیت اعمال شد.\n\nشرکت فعال: ${company.name}\nسال مالی فعال: ${selectedYear}`);
+
+  // Go back to tiles
+  goBack();
+}
+
+function updateHeaderBar() {
+  const company = SessionState.company;
+  const year    = SessionState.year;
+
+  // Header title bar
+  const headerComp = document.getElementById('headerCompany');
+  const headerYear = document.getElementById('headerYear');
+  if (headerComp && company) headerComp.textContent = company.name;
+  if (headerYear && year)    headerYear.textContent  = 'سال مالی: ' + year;
+
+  // Status bar (footer)
+  const sbCompany = document.getElementById('statusBarCompany');
+  const sbYear    = document.getElementById('statusBarYear');
+  const sbUser    = document.getElementById('statusBarUser');
+  if (sbCompany && company)     sbCompany.textContent = company.name;
+  if (sbYear    && year)        sbYear.textContent    = year;
+  if (sbUser    && currentUser) sbUser.textContent    = currentUser.fullName;
+}
+
+// ============================
 // Init on page load
 
 // ============================
 // Init on page load
+
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
   // On startup: show login page, focus username field
