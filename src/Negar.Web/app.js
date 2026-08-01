@@ -435,6 +435,25 @@ function renderPermissionsMatrix() {
 // ============================
 // ACCOUNTING MODULE
 // ============================
+function sortTreePreOrder(list) {
+  const result = [];
+  
+  function traverse(parentId) {
+    const children = list.filter(item => item.parentId === parentId);
+    
+    // Sort children alphabetically/numerically by code
+    children.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: 'base' }));
+    
+    for (const child of children) {
+      result.push(child);
+      traverse(child.id);
+    }
+  }
+  
+  traverse(null);
+  return result;
+}
+
 // Set of expanded account IDs for treeview datagrid
 const expandedAccountIds = new Set();
 let currentParentIdForNewAccount = null;
@@ -509,7 +528,8 @@ function renderAccountsTable() {
   const tbody = document.getElementById('accountsTableBody');
   if (!tbody) return;
 
-  const visibleAccounts = AppState.accounts.filter(isAccountVisible);
+  const sortedAccounts = sortTreePreOrder(AppState.accounts);
+  const visibleAccounts = sortedAccounts.filter(isAccountVisible);
 
   tbody.innerHTML = visibleAccounts.map(a => {
     const level = getAccountLevel(a);
@@ -742,7 +762,8 @@ function renderShenavaarTable() {
   const tbody = document.getElementById('shenavaarTableBody');
   if (!tbody) return;
 
-  const visibleShenavars = AppState.shenavars.filter(isShenavarVisible);
+  const sortedShenavars = sortTreePreOrder(AppState.shenavars);
+  const visibleShenavars = sortedShenavars.filter(isShenavarVisible);
 
   tbody.innerHTML = visibleShenavars.map(s => {
     const level = getShenavarLevel(s);
