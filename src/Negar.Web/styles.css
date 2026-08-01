@@ -62,7 +62,7 @@ body {
 
 /* Sidebar Styling */
 .sidebar {
-  width: 280px;
+  width: 300px;
   background-color: var(--bg-secondary);
   border-left: 1px solid var(--border-color);
   display: flex;
@@ -76,7 +76,7 @@ body {
 }
 
 .brand-header {
-  padding: 24px 20px;
+  padding: 20px 18px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -99,7 +99,7 @@ body {
 
 .brand-title {
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   letter-spacing: -0.5px;
 }
 
@@ -109,23 +109,34 @@ body {
 }
 
 .nav-menu {
-  padding: 16px 12px;
+  padding: 12px 10px;
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+}
+
+.nav-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  margin-top: 14px;
+  margin-bottom: 4px;
+  padding: 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 10px 14px;
   border-radius: var(--radius);
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -138,25 +149,25 @@ body {
 }
 
 .nav-item svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Main Content Area */
 .main-wrapper {
-  margin-right: 280px;
+  margin-right: 300px;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: calc(100% - 280px);
+  width: calc(100% - 300px);
 }
 
 .top-navbar {
-  height: 70px;
+  height: 65px;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  padding: 0 28px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -168,9 +179,9 @@ body {
 .company-selector {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   background: var(--bg-primary);
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 20px;
   border: 1px solid var(--border-color);
 }
@@ -180,7 +191,7 @@ body {
   border: none;
   color: var(--text-main);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
   outline: none;
 }
@@ -188,26 +199,25 @@ body {
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .theme-toggle-btn {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-main);
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: background 0.2s;
 }
 
 .avatar-badge {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   background-color: var(--accent-color);
   color: white;
   border-radius: 50%;
@@ -218,7 +228,7 @@ body {
 }
 
 .content-body {
-  padding: 28px;
+  padding: 24px;
   flex: 1;
 }
 
@@ -239,16 +249,16 @@ body {
 /* Cards & Grid */
 .grid-4 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
 }
 
 .card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 20px;
   box-shadow: var(--shadow);
 }
 
@@ -259,15 +269,15 @@ body {
 }
 
 .stat-number {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--accent-color);
 }
 
 .stat-label {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 /* Data Table Styling */
@@ -276,7 +286,7 @@ body {
   border-radius: var(--radius);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 table {
@@ -289,15 +299,15 @@ th {
   background-color: var(--bg-primary);
   color: var(--text-muted);
   font-weight: 600;
-  padding: 14px 18px;
-  font-size: 0.88rem;
+  padding: 12px 16px;
+  font-size: 0.85rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 td {
-  padding: 14px 18px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-color);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 tr:hover {
@@ -305,16 +315,16 @@ tr:hover {
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .btn-primary {
@@ -324,7 +334,6 @@ tr:hover {
 
 .btn-primary:hover {
   background-color: var(--accent-hover);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
 .btn-outline {
@@ -333,19 +342,10 @@ tr:hover {
   color: var(--text-main);
 }
 
-.btn-outline:hover {
-  background: var(--bg-primary);
-}
-
-.btn-danger {
-  background-color: var(--danger-color);
-  color: white;
-}
-
 .badge {
-  padding: 4px 10px;
+  padding: 4px 8px;
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
@@ -381,46 +381,27 @@ tr:hover {
   max-width: 650px;
   max-height: 90vh;
   overflow-y: auto;
-  padding: 28px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  padding: 24px;
 }
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .form-label {
   display: block;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 6px;
 }
 
-.form-input, .form-select, .form-textarea {
+.form-input, .form-select {
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background: var(--bg-primary);
   color: var(--text-main);
   outline: none;
-  font-size: 0.95rem;
-}
-
-.form-input:focus, .form-select:focus {
-  border-color: var(--accent-color);
-}
-
-/* Responsive Mobile Navigation */
-@media (max-width: 992px) {
-  .sidebar {
-    transform: translateX(100%);
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  .main-wrapper {
-    margin-right: 0;
-    width: 100%;
-  }
+  font-size: 0.9rem;
 }
