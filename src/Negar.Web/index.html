@@ -1686,6 +1686,111 @@
     </div>
   </div>
 
+  <!-- Modal Popup for Sarafsol Accounts Selector (Desktop Style) -->
+  <div id="sfPopupModal" style="display:none; position:fixed; z-index:2000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); align-items:center; justify-content:center; direction:rtl; font-family:var(--font-family);">
+    <div style="background:var(--bg-secondary); border:2px solid var(--accent-color); border-radius:6px; width:820px; box-shadow:0 10px 25px rgba(0,0,0,0.5); overflow:hidden;">
+      
+      <!-- Modal Header -->
+      <div style="background:linear-gradient(90deg, #0284c7, #0369a1); color:#fff; padding:10px 15px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:bold; font-size:0.9rem; display:flex; align-items:center; gap:8px;">📁 سرفصل حساب‌ها</span>
+        <button onclick="closeSfPopup()" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer; line-height:1;">&times;</button>
+      </div>
+      
+      <!-- Top Action Panel -->
+      <div style="background:var(--bg-secondary); padding:10px 15px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn btn-primary" onclick="openAddAccountInPopup()" style="padding:4px 15px; font-size:0.8rem; font-weight:bold;">➕ جدید</button>
+        <span style="font-weight:700; font-size:0.85rem; color:var(--text-muted);">نمایش درختی و ساختار سلسله‌مراتبی سرفصل‌های حساب</span>
+      </div>
+
+      <!-- Content Container -->
+      <div style="padding:15px;">
+        <!-- Hierarchy Path box (Green indicator) -->
+        <div style="border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.04); padding: 8px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 0.8rem; color: #166534; font-weight: bold;" id="popupSelectedAccPath">
+          سطح سرفصل جاری: گروه / زنجیره: -
+        </div>
+
+        <!-- Search bar -->
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <input type="text" id="popupSearchCode" placeholder="جستجوی کد..." class="form-input" style="flex:1; height:28px; font-size:0.8rem; background:var(--bg-primary);" oninput="filterPopupAccounts()" />
+          <input type="text" id="popupSearchName" placeholder="جستجوی نام..." class="form-input" style="flex:2; height:28px; font-size:0.8rem; background:var(--bg-primary);" oninput="filterPopupAccounts()" />
+        </div>
+
+        <!-- Accounts Grid -->
+        <div style="max-height:280px; overflow-y:auto; border:1px solid var(--border-color); border-radius:4px; margin-bottom:15px; background:var(--bg-primary);">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="position:sticky; top:0; background:var(--bg-secondary); z-index:10; border-bottom:1px solid var(--border-color);">
+                <th style="width:30px; text-align:center;">+</th>
+                <th style="width:70px; text-align:center;">انتخاب</th>
+                <th style="width:70px; text-align:center;">ویرایش</th>
+                <th style="width:70px; text-align:center;">حذف</th>
+                <th style="width:110px;">کد حساب</th>
+                <th>نام حساب</th>
+                <th style="width:60px; text-align:center;">فعال</th>
+              </tr>
+            </thead>
+            <tbody id="popupAccountsTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Inline CRUD Form in Popup (hidden by default) -->
+        <div id="popupAccCrudForm" style="display:none; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:4px; padding:12px; margin-bottom:12px;">
+          <h4 id="popupAccCrudTitle" style="margin-top:0; margin-bottom:10px; font-size:0.8rem; color:var(--accent-color);">افزودن حساب جدید</h4>
+          <input type="hidden" id="popupAccCrudParentId" />
+          <input type="hidden" id="popupAccCrudEditId" />
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:0.75rem; font-weight:bold; color:var(--text-muted);">کد:</span>
+              <input type="text" id="popupAccCrudCode" class="form-input" style="width:100px; height:24px; font-size:0.75rem; background:var(--bg-primary);" />
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-grow:1;">
+              <span style="font-size:0.75rem; font-weight:bold; color:var(--text-muted);">عنوان:</span>
+              <input type="text" id="popupAccCrudName" class="form-input" style="width:100%; height:24px; font-size:0.75rem; background:var(--bg-primary);" />
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:0.75rem; font-weight:bold; color:var(--text-muted);">ماهیت:</span>
+              <select id="popupAccCrudNature" class="form-select" style="height:24px; font-size:0.75rem; padding:2px; background:var(--bg-primary);">
+                <option value="بدهکار">بدهکار</option>
+                <option value="بستانکار">بستانکار</option>
+                <option value="خنثی">خنثی</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:0.75rem; font-weight:bold; color:var(--text-muted);">سطح:</span>
+              <select id="popupAccCrudType" class="form-select" style="height:24px; font-size:0.75rem; padding:2px; background:var(--bg-primary);">
+                <option value="معین">معین</option>
+                <option value="کل">کل</option>
+                <option value="گروه">گروه</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-primary" onclick="saveAccountInPopup()" style="padding:2px 10px; font-size:0.75rem;">ذخیره</button>
+              <button class="btn btn-outline" onclick="cancelAccountInPopup()" style="padding:2px 10px; font-size:0.75rem;">لغو</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Desktop Style Footer Status Bar -->
+      <div style="background:#0369a1; color:#fff; padding:6px 12px; font-size:0.7rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); direction:ltr;">
+        <div style="display:flex; gap:15px;">
+          <span id="popupStatusUser">ابر مدیر</span>
+          <span id="popupStatusCompany">حسابداری 15000</span>
+          <span id="popupStatusYear">سال مالی: 1399</span>
+        </div>
+        <div style="display:flex; gap:15px; direction:rtl;">
+          <span>Alt+S : تغییر سریع سال مالی</span>
+          <span id="popupStatusBarDate">1403/05/11</span>
+          <span id="popupStatusBarTime">05:28:15</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script src="persian-calendar.js"></script>
   <script src="app.js"></script>
   </div><!-- end mainApp -->

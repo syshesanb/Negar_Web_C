@@ -1351,7 +1351,7 @@ function renderSanadEditorLines() {
         <td style="text-align:center; font-weight:bold;">${i + 1}</td>
         
         <!-- SF button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('سرفصل حساب: ' + '${line.account}')">...</button></td>
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openSfPopup(${i})">...</button></td>
 
         <!-- Account Code TextBox -->
         <td>
@@ -1548,6 +1548,227 @@ function alignFooterTotals() {
     statusContainer.style.width = `${creditLeft - 12}px`;
     statusContainer.style.top = '12px';
     statusContainer.style.height = '50px';
+  }
+}
+
+// ==========================================
+// Accounts Popup Dialog (Sarafsol Selection)
+// ==========================================
+let activePopupRowIndex = null;
+
+function openSfPopup(rowIndex) {
+  activePopupRowIndex = rowIndex;
+  
+  // Clear search inputs
+  const sc = document.getElementById('popupSearchCode');
+  const sn = document.getElementById('popupSearchName');
+  if (sc) sc.value = '';
+  if (sn) sn.value = '';
+  
+  // Close any open CRUD form in popup
+  cancelAccountInPopup();
+  
+  // Render
+  renderPopupAccounts();
+  
+  // Show modal
+  const modal = document.getElementById('sfPopupModal');
+  if (modal) modal.style.display = 'flex';
+  
+  // Set date/time in status bar
+  const dateEl = document.getElementById('popupStatusBarDate');
+  const timeEl = document.getElementById('popupStatusBarTime');
+  const userEl = document.getElementById('popupStatusUser');
+  const compEl = document.getElementById('popupStatusCompany');
+  const yearEl = document.getElementById('popupStatusYear');
+  
+  if (dateEl && PersianCal && typeof PersianCal.getTodayString === 'function') {
+    dateEl.textContent = PersianCal.getTodayString();
+  }
+  if (timeEl) {
+    const now = new Date();
+    timeEl.textContent = now.toTimeString().split(' ')[0];
+  }
+  if (userEl && currentUser) userEl.textContent = currentUser.fullName;
+  if (compEl && SessionState.company) compEl.textContent = SessionState.company.name;
+  if (yearEl && SessionState.year) yearEl.textContent = `سال مالی: ${SessionState.year}`;
+}
+
+function closeSfPopup() {
+  const modal = document.getElementById('sfPopupModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renderPopupAccounts() {
+  const tbody = document.getElementById('popupAccountsTableBody');
+  if (!tbody) return;
+  
+  const searchCode = (document.getElementById('popupSearchCode')?.value || '').trim();
+  const searchName = (document.getElementById('popupSearchName')?.value || '').trim().toLowerCase();
+  
+  // Filter accounts list
+  let list = AppState.accounts;
+  if (searchCode) {
+    list = list.filter(a => a.code.includes(searchCode));
+  }
+  if (searchName) {
+    list = list.filter(a => a.name.toLowerCase().includes(searchName));
+  }
+  
+  tbody.innerHTML = list.map(account => {
+    return `
+      <tr onclick="updatePopupSelectedPath(${JSON.stringify(account).replace(/"/g, '&quot;')})" style="cursor:pointer; height:26px;">
+        <!-- Add Sub-Account Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem; border-color:#0284c7; color:#0284c7;" onclick="event.stopPropagation(); openAddAccountInPopup(${account.id})">+</button>
+        </td>
+        <!-- Select Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem; border-color:#10b981; color:#10b981; font-weight:bold;" onclick="event.stopPropagation(); selectAccountInPopup('${account.code}')">انتخاب</button>
+        </td>
+        <!-- Edit Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openEditAccountInPopup(${account.id})">ویرایش</button>
+        </td>
+        <!-- Delete Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem; color:red;" onclick="event.stopPropagation(); deleteAccountInPopup(${account.id})">حذف</button>
+        </td>
+        <!-- Code -->
+        <td style="padding:4px 8px; font-weight:bold; font-size:0.8rem;">${account.code}</td>
+        <!-- Name -->
+        <td style="padding:4px 8px; font-size:0.8rem;">${account.name}</td>
+        <!-- Active Checkbox -->
+        <td style="text-align:center;">
+          <input type="checkbox" checked disabled />
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterPopupAccounts() {
+  renderPopupAccounts();
+}
+
+function selectAccountInPopup(code) {
+  if (activePopupRowIndex !== null && AppState.sanadLines[activePopupRowIndex]) {
+    AppState.sanadLines[activePopupRowIndex].account = code;
+    
+    // Rerender row template to show the new value in text box
+    renderSanadEditorLines();
+    
+    // Also, trigger manual path update for header
+    updateFocusedPaths(activePopupRowIndex);
+  }
+  closeSfPopup();
+}
+
+function updatePopupSelectedPath(account) {
+  let curr = account;
+  const pathParts = [];
+  while (curr) {
+    pathParts.unshift(`${curr.code} : ${curr.name}`);
+    curr = curr.parentId ? AppState.accounts.find(x => x.id === curr.parentId) : null;
+  }
+  const pathStr = `سطح سرفصل جاری: ${account.type} / زنجیره: ${pathParts.join(' / ')}`;
+  const el = document.getElementById('popupSelectedAccPath');
+  if (el) el.innerHTML = pathStr;
+}
+
+function openAddAccountInPopup(parentId = null) {
+  const form = document.getElementById('popupAccCrudForm');
+  if (!form) return;
+  
+  form.style.display = 'block';
+  document.getElementById('popupAccCrudTitle').textContent = parentId ? 'افزودن زیرمجموعه سرفصل' : 'افزودن سرفصل جدید';
+  document.getElementById('popupAccCrudParentId').value = parentId || '';
+  document.getElementById('popupAccCrudEditId').value = '';
+  document.getElementById('popupAccCrudCode').value = '';
+  document.getElementById('popupAccCrudName').value = '';
+  document.getElementById('popupAccCrudNature').value = 'بدهکار';
+  document.getElementById('popupAccCrudType').value = parentId ? 'معین' : 'کل';
+}
+
+function openEditAccountInPopup(id) {
+  const acc = AppState.accounts.find(x => x.id === id);
+  if (!acc) return;
+  
+  const form = document.getElementById('popupAccCrudForm');
+  if (!form) return;
+  
+  form.style.display = 'block';
+  document.getElementById('popupAccCrudTitle').textContent = 'ویرایش سرفصل حساب';
+  document.getElementById('popupAccCrudParentId').value = acc.parentId || '';
+  document.getElementById('popupAccCrudEditId').value = acc.id;
+  document.getElementById('popupAccCrudCode').value = acc.code;
+  document.getElementById('popupAccCrudName').value = acc.name;
+  document.getElementById('popupAccCrudNature').value = acc.nature;
+  document.getElementById('popupAccCrudType').value = acc.type;
+}
+
+function cancelAccountInPopup() {
+  const form = document.getElementById('popupAccCrudForm');
+  if (form) form.style.display = 'none';
+}
+
+function saveAccountInPopup() {
+  const parentIdStr = document.getElementById('popupAccCrudParentId').value;
+  const editIdStr = document.getElementById('popupAccCrudEditId').value;
+  const code = document.getElementById('popupAccCrudCode').value.trim();
+  const name = document.getElementById('popupAccCrudName').value.trim();
+  const nature = document.getElementById('popupAccCrudNature').value;
+  const type = document.getElementById('popupAccCrudType').value;
+  
+  if (!code || !name) {
+    alert('لطفاً کد و نام سرفصل را وارد کنید.');
+    return;
+  }
+  
+  if (editIdStr) {
+    // Edit existing account
+    const id = Number(editIdStr);
+    const acc = AppState.accounts.find(x => x.id === id);
+    if (acc) {
+      acc.code = code;
+      acc.name = name;
+      acc.nature = nature;
+      acc.type = type;
+    }
+  } else {
+    // Add new account
+    const newId = AppState.accounts.length > 0 ? Math.max(...AppState.accounts.map(x => x.id)) + 1 : 1;
+    const parentId = parentIdStr ? Number(parentIdStr) : null;
+    AppState.accounts.push({
+      id: newId,
+      code: code,
+      name: name,
+      type: type,
+      nature: nature,
+      parentId: parentId
+    });
+  }
+  
+  // Refresh accounts table inside both popup and coding tab
+  renderPopupAccounts();
+  if (typeof renderAccountsTable === 'function') {
+    renderAccountsTable();
+  }
+  
+  // Hide Form
+  cancelAccountInPopup();
+}
+
+function deleteAccountInPopup(id) {
+  if (confirm('آیا مایل به حذف این سرفصل هستید؟')) {
+    const idx = AppState.accounts.findIndex(x => x.id === id);
+    if (idx !== -1) {
+      AppState.accounts.splice(idx, 1);
+      renderPopupAccounts();
+      if (typeof renderAccountsTable === 'function') {
+        renderAccountsTable();
+      }
+    }
   }
 }
 
