@@ -1359,7 +1359,7 @@ function renderSanadEditorLines() {
         </td>
         
         <!-- SH button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert( line.shenavarCode ? 'شناور: ' + line.shenavarCode : 'حساب بدون شناور است' )">...</button></td>
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openShPopup(${i})">...</button></td>
 
         <!-- Floating Account Code TextBox -->
         <td>
@@ -1698,7 +1698,10 @@ function selectAccountInPopup(code) {
   closeSfPopup();
 }
 
+let lastSelectedPopupAccId = null;
+
 function updatePopupSelectedPath(account) {
+  lastSelectedPopupAccId = account.id;
   let curr = account;
   const pathParts = [];
   while (curr) {
@@ -1714,14 +1717,23 @@ function openAddAccountInPopup(parentId = null) {
   const form = document.getElementById('popupAccCrudForm');
   if (!form) return;
   
+  let targetParentId = parentId;
+  let parentName = '';
+  
+  if (targetParentId === null && lastSelectedPopupAccId !== null) {
+    targetParentId = lastSelectedPopupAccId;
+    const parentAcc = AppState.accounts.find(x => x.id === targetParentId);
+    if (parentAcc) parentName = ` (زیرمجموعه ${parentAcc.name})`;
+  }
+  
   form.style.display = 'block';
-  document.getElementById('popupAccCrudTitle').textContent = parentId ? 'افزودن زیرمجموعه سرفصل' : 'افزودن سرفصل جدید';
-  document.getElementById('popupAccCrudParentId').value = parentId || '';
+  document.getElementById('popupAccCrudTitle').textContent = targetParentId ? `افزودن زیرمجموعه سرفصل${parentName}` : 'افزودن سرفصل جدید';
+  document.getElementById('popupAccCrudParentId').value = targetParentId || '';
   document.getElementById('popupAccCrudEditId').value = '';
   document.getElementById('popupAccCrudCode').value = '';
   document.getElementById('popupAccCrudName').value = '';
   document.getElementById('popupAccCrudNature').value = 'بدهکار';
-  document.getElementById('popupAccCrudType').value = parentId ? 'معین' : 'کل';
+  document.getElementById('popupAccCrudType').value = targetParentId ? 'معین' : 'کل';
 }
 
 function openEditAccountInPopup(id) {
@@ -1801,6 +1813,266 @@ function deleteAccountInPopup(id) {
       renderPopupAccounts();
       if (typeof renderAccountsTable === 'function') {
         renderAccountsTable();
+      }
+    }
+  }
+}
+
+// ==========================================
+// Shenavars Popup Dialog (Floating Accounts Selection)
+// ==========================================
+let activeShPopupRowIndex = null;
+let lastSelectedPopupShenavarId = null;
+
+function openShPopup(rowIndex) {
+  activeShPopupRowIndex = rowIndex;
+  
+  // Clear search inputs
+  const sc = document.getElementById('popupSearchShCode');
+  const sn = document.getElementById('popupSearchShName');
+  if (sc) sc.value = '';
+  if (sn) sn.value = '';
+  
+  // Close any open CRUD form in popup
+  cancelShenavarInPopup();
+  
+  // Render
+  renderPopupShenavars();
+  
+  // Show modal
+  const modal = document.getElementById('shPopupModal');
+  if (modal) modal.style.display = 'flex';
+  
+  // Set date/time in status bar
+  const dateEl = document.getElementById('popupShStatusBarDate');
+  const timeEl = document.getElementById('popupShStatusBarTime');
+  const userEl = document.getElementById('popupShStatusUser');
+  const compEl = document.getElementById('popupShStatusCompany');
+  const yearEl = document.getElementById('popupShStatusYear');
+  
+  if (dateEl && PersianCal && typeof PersianCal.getTodayString === 'function') {
+    dateEl.textContent = PersianCal.getTodayString();
+  }
+  if (timeEl) {
+    const now = new Date();
+    timeEl.textContent = now.toTimeString().split(' ')[0];
+  }
+  if (userEl && currentUser) userEl.textContent = currentUser.fullName;
+  if (compEl && SessionState.company) compEl.textContent = SessionState.company.name;
+  if (yearEl && SessionState.year) yearEl.textContent = `سال مالی: ${SessionState.year}`;
+}
+
+function closeShPopup() {
+  const modal = document.getElementById('shPopupModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renderPopupShenavars() {
+  const tbody = document.getElementById('popupShenavarsTableBody');
+  if (!tbody) return;
+  
+  const searchCode = (document.getElementById('popupSearchShCode')?.value || '').trim();
+  const searchName = (document.getElementById('popupSearchShName')?.value || '').trim().toLowerCase();
+  
+  const sortedShenavars = sortTreePreOrder(AppState.shenavars);
+  let list;
+  
+  const isSearching = (searchCode || searchName);
+  
+  if (isSearching) {
+    list = sortedShenavars.filter(s => {
+      const matchCode = searchCode ? s.code.includes(searchCode) : true;
+      const matchName = searchName ? s.name.toLowerCase().includes(searchName) : true;
+      return matchCode && matchName;
+    });
+  } else {
+    list = sortedShenavars.filter(isShenavarVisible);
+  }
+  
+  tbody.innerHTML = list.map(s => {
+    const level = getShenavarLevel(s);
+    const hasChildren = AppState.shenavars.some(child => child.parentId === s.id);
+    const isExpanded = expandedShenavarIds.has(s.id);
+    
+    // Toggle button in popup
+    const toggleBtnHtml = hasChildren
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); togglePopupShenavarExpand(${s.id})">${isExpanded ? '-' : '+'}</button>`
+      : `<button class="tree-toggle-btn" style="visibility:hidden; width:16px;">+</button>`;
+      
+    const indentPx = level * 18;
+    const isSelected = (s.code === AppState.sanadLines[activeShPopupRowIndex]?.shenavarCode);
+    
+    return `
+      <tr onclick="updatePopupSelectedShPath(${JSON.stringify(s).replace(/"/g, '&quot;')})" style="cursor:pointer; height:26px; ${isSelected ? 'background-color:rgba(2,132,199,0.18) !important;' : ''}">
+        <!-- Expand/Collapse Button -->
+        <td style="text-align:center; vertical-align:middle;">
+          ${toggleBtnHtml}
+        </td>
+        <!-- Select Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem; border-color:#10b981; color:#10b981; font-weight:bold;" onclick="event.stopPropagation(); selectShenavarInPopup('${s.code}')">انتخاب</button>
+        </td>
+        <!-- Edit Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openEditShenavarInPopup(${s.id})">ویرایش</button>
+        </td>
+        <!-- Delete Button -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem; color:red;" onclick="event.stopPropagation(); deleteShenavarInPopup(${s.id})">حذف</button>
+        </td>
+        <!-- Code -->
+        <td style="padding:4px 8px; font-weight:bold; font-size:0.8rem;">${s.code}</td>
+        <!-- Name (with tree indentation) -->
+        <td style="padding:4px 8px; padding-right:${indentPx + 10}px; font-size:0.8rem; text-align:right;">
+          ${level > 0 ? '<span style="color:var(--accent-color);margin-left:6px;">└─</span>' : ''}
+          <b>${s.name}</b>
+        </td>
+        <!-- Active Checkbox -->
+        <td style="text-align:center;">
+          <input type="checkbox" checked disabled />
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function togglePopupShenavarExpand(shenId) {
+  if (expandedShenavarIds.has(shenId)) {
+    expandedShenavarIds.delete(shenId);
+  } else {
+    expandedShenavarIds.add(shenId);
+  }
+  renderPopupShenavars();
+  if (typeof renderShenavaarTable === 'function') {
+    renderShenavaarTable();
+  }
+}
+
+function filterPopupShenavars() {
+  renderPopupShenavars();
+}
+
+function selectShenavarInPopup(code) {
+  if (activeShPopupRowIndex !== null && AppState.sanadLines[activeShPopupRowIndex]) {
+    AppState.sanadLines[activeShPopupRowIndex].shenavarCode = code;
+    
+    // Rerender row template to show the new value in text box
+    renderSanadEditorLines();
+    
+    // Also, trigger manual path update for header
+    updateFocusedPaths(activeShPopupRowIndex);
+  }
+  closeShPopup();
+}
+
+function updatePopupSelectedShPath(s) {
+  lastSelectedPopupShenavarId = s.id;
+  let curr = s;
+  const pathParts = [];
+  while (curr) {
+    pathParts.unshift(`${curr.code} : ${curr.name}`);
+    curr = curr.parentId ? AppState.shenavars.find(x => x.id === curr.parentId) : null;
+  }
+  const levelText = getShenavarLevel(s) === 0 ? 'گروه اصلی' : 'زیرمجموعه';
+  const pathStr = `سطح شناور جاری: ${levelText} / زنجیره: ${pathParts.join(' / ')}`;
+  const el = document.getElementById('popupSelectedShPath');
+  if (el) el.innerHTML = pathStr;
+}
+
+function openAddShenavarInPopup(parentId = null) {
+  const form = document.getElementById('popupShCrudForm');
+  if (!form) return;
+  
+  let targetParentId = parentId;
+  let parentName = '';
+  
+  if (targetParentId === null && lastSelectedPopupShenavarId !== null) {
+    targetParentId = lastSelectedPopupShenavarId;
+    const parentAcc = AppState.shenavars.find(x => x.id === targetParentId);
+    if (parentAcc) parentName = ` (زیرمجموعه ${parentAcc.name})`;
+  }
+  
+  form.style.display = 'block';
+  document.getElementById('popupShCrudTitle').textContent = targetParentId ? `افزودن زیرمجموعه شناور${parentName}` : 'افزودن حساب شناور جدید';
+  document.getElementById('popupShCrudParentId').value = targetParentId || '';
+  document.getElementById('popupShCrudEditId').value = '';
+  document.getElementById('popupShCrudCode').value = '';
+  document.getElementById('popupShCrudName').value = '';
+  document.getElementById('popupShCrudStatus').value = 'فعال';
+}
+
+function openEditShenavarInPopup(id) {
+  const s = AppState.shenavars.find(x => x.id === id);
+  if (!s) return;
+  
+  const form = document.getElementById('popupShCrudForm');
+  if (!form) return;
+  
+  form.style.display = 'block';
+  document.getElementById('popupShCrudTitle').textContent = 'ویرایش حساب شناور';
+  document.getElementById('popupShCrudParentId').value = s.parentId || '';
+  document.getElementById('popupShCrudEditId').value = s.id;
+  document.getElementById('popupShCrudCode').value = s.code;
+  document.getElementById('popupShCrudName').value = s.name;
+  document.getElementById('popupShCrudStatus').value = s.status || 'فعال';
+}
+
+function cancelShenavarInPopup() {
+  const form = document.getElementById('popupShCrudForm');
+  if (form) form.style.display = 'none';
+}
+
+function saveShenavarInPopup() {
+  const parentIdStr = document.getElementById('popupShCrudParentId').value;
+  const editIdStr = document.getElementById('popupShCrudEditId').value;
+  const code = document.getElementById('popupShCrudCode').value.trim();
+  const name = document.getElementById('popupShCrudName').value.trim();
+  const status = document.getElementById('popupShCrudStatus').value;
+  
+  if (!code || !name) {
+    alert('لطفاً کد و عنوان شناور را وارد کنید.');
+    return;
+  }
+  
+  if (editIdStr) {
+    // Edit existing
+    const id = Number(editIdStr);
+    const s = AppState.shenavars.find(x => x.id === id);
+    if (s) {
+      s.code = code;
+      s.name = name;
+      s.status = status;
+    }
+  } else {
+    // Add new
+    const newId = AppState.shenavars.length > 0 ? Math.max(...AppState.shenavars.map(x => x.id)) + 1 : 1;
+    const parentId = parentIdStr ? Number(parentIdStr) : null;
+    AppState.shenavars.push({
+      id: newId,
+      code: code,
+      name: name,
+      parentId: parentId,
+      status: status
+    });
+  }
+  
+  // Refresh lists
+  renderPopupShenavars();
+  if (typeof renderShenavaarTable === 'function') {
+    renderShenavaarTable();
+  }
+  
+  cancelShenavarInPopup();
+}
+
+function deleteShenavarInPopup(id) {
+  if (confirm('آیا مایل به حذف این حساب شناور هستید؟')) {
+    const idx = AppState.shenavars.findIndex(x => x.id === id);
+    if (idx !== -1) {
+      AppState.shenavars.splice(idx, 1);
+      renderPopupShenavars();
+      if (typeof renderShenavaarTable === 'function') {
+        renderShenavaarTable();
       }
     }
   }
