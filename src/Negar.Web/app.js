@@ -1350,6 +1350,9 @@ function renderSanadEditorLines() {
         <!-- Row No -->
         <td style="text-align:center; font-weight:bold;">${i + 1}</td>
         
+        <!-- SF button helper -->
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('سرفصل حساب: ' + '${line.account}')">...</button></td>
+
         <!-- Account Code Dropdown -->
         <td>
           <select class="form-select" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'account', this.value)">
@@ -1359,9 +1362,9 @@ function renderSanadEditorLines() {
           </select>
         </td>
         
-        <!-- SF button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('سرفصل حساب: ' + '${line.account}')">...</button></td>
-        
+        <!-- SH button helper -->
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert( '${line.shenavarCode}' ? 'شناور: ' + '${line.shenavarCode}' : 'حساب بدون شناور است' )">...</button></td>
+
         <!-- Floating Account Dropdown -->
         <td>
           <select class="form-select" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'shenavarCode', this.value)">
@@ -1371,9 +1374,6 @@ function renderSanadEditorLines() {
             ).join('')}
           </select>
         </td>
-        
-        <!-- SH button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert( '${line.shenavarCode}' ? 'شناور: ' + '${line.shenavarCode}' : 'حساب بدون شناور است' )">...</button></td>
         
         <!-- Description -->
         <td>
