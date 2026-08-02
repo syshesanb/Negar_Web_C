@@ -152,6 +152,7 @@ function logout() {
 // ---- App State ----
 
 const AppState = {
+  isTabMode: false,          // opened via direct tab routing (hides top nav bar)
   currentModule: 'system',   // active ribbon tab
   currentForm: null,          // null = tiles view, otherwise form id
   companies: [
@@ -270,6 +271,14 @@ function showTiles(moduleId) {
 // Show Form (called when a tile is clicked)
 // ============================
 function showForm(formId) {
+  // If we are in the main dashboard tab (not inside a sub-tab)
+  if (!AppState.isTabMode) {
+    // Open in a new tab!
+    const url = `index.html?form=${formId}`;
+    window.open(url, '_blank');
+    return;
+  }
+
   AppState.currentForm = formId;
 
   // Hide all tile containers
@@ -337,6 +346,10 @@ function showForm(formId) {
 // HESABDARI MAIN MODULE & SUB-TABS
 // ============================
 function openHesabdariMain(mode) {
+  if (!AppState.isTabMode) {
+    window.open(`index.html?form=form-hesabdari-main&mode=${mode}`, '_blank');
+    return;
+  }
   showForm('form-hesabdari-main');
   if (mode === 'reports') {
     switchHesabdariTab('taraz');
@@ -378,6 +391,10 @@ function switchHesabdariTab(tabId) {
 // Back Button
 // ============================
 function goBack() {
+  if (AppState.isTabMode) {
+    window.close();
+    return;
+  }
   AppState.currentForm = null;
   showTiles(AppState.currentModule);
 }
@@ -2053,9 +2070,61 @@ function updateSystemClock() {
 // Init on page load
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
-  // On startup: show login page, focus username field
-  const usernameInput = document.getElementById('loginUsername');
-  if (usernameInput) setTimeout(() => usernameInput.focus(), 200);
+  // Check if form parameter is present in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const formParam = urlParams.get('form');
+  const modeParam = urlParams.get('mode');
+
+  if (formParam) {
+    // 1. Mark as tab mode
+    AppState.isTabMode = true;
+
+    // 2. Bypass login overlay
+    const overlay = document.getElementById('loginOverlay');
+    const mainApp = document.getElementById('mainApp');
+    if (overlay) overlay.style.display = 'none';
+    if (mainApp) {
+      mainApp.style.display = 'block';
+      mainApp.classList.add('app-fade-in');
+    }
+
+    // 3. Hide the desktop header (tabs like سیستم، کاربران، شرکتها و سالها...)
+    const desktopHeader = document.querySelector('.desktop-header');
+    if (desktopHeader) {
+      desktopHeader.style.display = 'none';
+    }
+
+    // 4. Set current user to admin (session bypass)
+    currentUser = CREDENTIALS[0]; // admin
+    const headerUser = document.getElementById('headerUsername');
+    if (headerUser) headerUser.textContent = currentUser.fullName + ' (' + currentUser.username + ')';
+
+    if (AppState.companies.length > 0) {
+      SessionState.company = AppState.companies[0];
+      const activeYears = AppState.fiscalYears
+        .filter(fy => fy.company === SessionState.company.code)
+        .sort((a, b) => Number(b.year) - Number(a.year));
+      const activeOne = activeYears.find(fy => fy.status === 'فعال') || activeYears[0];
+      if (activeOne) SessionState.year = activeOne.year;
+    }
+    updateHeaderBar();
+
+    // 5. Show the requested form
+    showForm(formParam);
+
+    // 6. Handle special mode for accounting main module
+    if (formParam === 'form-hesabdari-main' && modeParam) {
+      if (modeParam === 'reports') {
+        switchHesabdariTab('taraz');
+      } else {
+        switchHesabdariTab('accounts');
+      }
+    }
+  } else {
+    // Standard dashboard mode: focus username field
+    const usernameInput = document.getElementById('loginUsername');
+    if (usernameInput) setTimeout(() => usernameInput.focus(), 200);
+  }
 
   // Update clock & date immediately and then every second
   updateSystemClock();
