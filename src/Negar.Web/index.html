@@ -1164,21 +1164,8 @@
             <div class="table-wrapper" style="max-height:360px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-color); border-radius:4px; margin-bottom:12px;">
               <table style="width:100%; border-collapse:collapse; min-width:1200px;">
                 <thead>
-                  <tr style="position:sticky; top:0; background:var(--bg-secondary); z-index:10;">
-                    <th style="width:50px; text-align:center;">ردیف</th>
-                    <th style="width:40px; text-align:center;">SF</th>
-                    <th style="width:120px;">کد سرفصل</th>
-                    <th style="width:40px; text-align:center;">SH</th>
-                    <th style="width:120px;">کد شناور</th>
-                    <th>شرح ردیف</th>
-                    <th style="width:150px;">بدهکار</th>
-                    <th style="width:150px;">بستانکار</th>
-                    <th style="width:130px;">شماره تراکنش</th>
-                    <th style="width:40px; text-align:center;">TT</th>
-                    <th style="width:110px;">تاریخ تراکنش</th>
-                    <th style="width:50px; text-align:center;">عملیات</th>
-                  </tr>
-                  <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                  <!-- Row of Search Inputs (placed above titles) -->
+                  <tr style="position:sticky; top:0; background:var(--bg-secondary); z-index:10; border-bottom:1px solid var(--border-color);">
                     <th></th>
                     <th></th>
                     <th><input type="text" id="searchColAccount" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('account', this.value)" /></th>
@@ -1191,6 +1178,21 @@
                     <th></th>
                     <th><input type="text" id="searchColTxDate" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('txDate', this.value)" /></th>
                     <th></th>
+                  </tr>
+                  <!-- Column Titles -->
+                  <tr style="position:sticky; top:30px; background:var(--bg-secondary); z-index:10; border-bottom:1px solid var(--border-color);">
+                    <th style="width:50px; text-align:center;">ردیف</th>
+                    <th style="width:40px; text-align:center;">SF</th>
+                    <th style="width:120px;">کد سرفصل</th>
+                    <th style="width:40px; text-align:center;">SH</th>
+                    <th style="width:120px;">کد شناور</th>
+                    <th>شرح ردیف</th>
+                    <th style="width:150px;">بدهکار</th>
+                    <th style="width:150px;">بستانکار</th>
+                    <th style="width:130px;">شماره تراکنش</th>
+                    <th style="width:40px; text-align:center;">TT</th>
+                    <th style="width:110px;">تاریخ تراکنش</th>
+                    <th style="width:50px; text-align:center;">عملیات</th>
                   </tr>
                 </thead>
                 <tbody id="sanadLinesEditorBody">
