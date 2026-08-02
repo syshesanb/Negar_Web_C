@@ -1128,29 +1128,6 @@
           <h2 class="form-heading" style="display:none;">📝 ثبت و ویرایش سند حسابداری (JournalVoucherForm)</h2>
           
           <div class="card form-card" style="padding: 15px; border-radius: 6px;">
-            <!-- Consolidated Top Ribbon Bar (Tabs and Action Buttons) -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:12px; direction:rtl;">
-              <!-- Right Side: Tabs + Action Buttons in one line -->
-              <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
-                <!-- Tabs -->
-                <button class="btn btn-outline active" style="padding:4px 10px; font-size:0.75rem; background:rgba(56,189,248,0.1); border-color:var(--accent-color);">سطرهای سند</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش ضمائم سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">ضمائم</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش یادداشت برای سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">یادداشت</button>
-                
-                <!-- Separator -->
-                <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 4px;"></div>
-                
-                <!-- Compact Action Buttons -->
-                <button class="btn btn-primary" style="padding:4px 12px; font-size:0.75rem;" onclick="saveSanadEntry()">💾 ثبت و خروج</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="printVouchers()">🖨️ چاپ سند (Ctrl+P)</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; border-color:#10b981; color:#10b981;" onclick="addSanadLine()">➕ افزودن سطر</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('below')">📋 کپی در زیر</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('above')">📋 کپی در بالا</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('کپی در محل دلخواه فعال شد.')">📋 کپی در محل دلخواه</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('جستجوها پاک شدند.')">🧹 پاک کردن جستجوها</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="closeSanadEditor()">🔙 خروج</button>
-              </div>
-            </div>
 
             <!-- Acoustical Group Box (Voucher Header & Current Line Paths) -->
             <div style="border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.04); padding: 12px 18px; border-radius: 6px; margin-bottom: 15px; direction: rtl;">
@@ -1240,6 +1217,30 @@
                   <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.85rem; padding:5px 12px; font-weight:bold;">تراز</span>
                   <span style="font-size:0.85rem; font-weight:bold; color:var(--text-muted);">است</span>
                 </div>
+              </div>
+            </div>
+
+            <!-- Consolidated Bottom Action Bar (Tabs and Action Buttons) -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:15px; border-top:1px solid var(--border-color); padding-top:12px; direction:rtl;">
+              <!-- Right Side: Tabs + Action Buttons in one line -->
+              <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+                <!-- Tabs -->
+                <button class="btn btn-outline active" style="padding:4px 10px; font-size:0.75rem; background:rgba(56,189,248,0.1); border-color:var(--accent-color);">سطرهای سند</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش ضمائم سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">ضمائم</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش یادداشت برای سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">یادداشت</button>
+                
+                <!-- Separator -->
+                <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 4px;"></div>
+                
+                <!-- Compact Action Buttons -->
+                <button class="btn btn-primary" style="padding:4px 12px; font-size:0.75rem;" onclick="saveSanadEntry()">💾 ثبت و خروج</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="printVouchers()">🖨️ چاپ سند (Ctrl+P)</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; border-color:#10b981; color:#10b981;" onclick="addSanadLine()">➕ افزودن سطر</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('below')">📋 کپی در زیر</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('above')">📋 کپی در بالا</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('کپی در محل دلخواه فعال شد.')">📋 کپی در محل دلخواه</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('جستجوها پاک شدند.')">🧹 پاک کردن جستجوها</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="closeSanadEditor()">🔙 خروج</button>
               </div>
             </div>
 
