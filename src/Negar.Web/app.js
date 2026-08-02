@@ -2990,7 +2990,6 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 }, true);
-}, true);
 
 // ==========================================
 // ── Bank Reconciliation Module (مغایرات بانکی) ──
