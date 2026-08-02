@@ -1558,6 +1558,7 @@ let activePopupRowIndex = null;
 
 function openSfPopup(rowIndex) {
   activePopupRowIndex = rowIndex;
+  lastSelectedPopupAccId = null;
   
   // Clear search inputs
   const sc = document.getElementById('popupSearchCode');
@@ -1718,22 +1719,51 @@ function openAddAccountInPopup(parentId = null) {
   if (!form) return;
   
   let targetParentId = parentId;
-  let parentName = '';
   
   if (targetParentId === null && lastSelectedPopupAccId !== null) {
     targetParentId = lastSelectedPopupAccId;
-    const parentAcc = AppState.accounts.find(x => x.id === targetParentId);
-    if (parentAcc) parentName = ` (زیرمجموعه ${parentAcc.name})`;
   }
   
-  form.style.display = 'block';
-  document.getElementById('popupAccCrudTitle').textContent = targetParentId ? `افزودن زیرمجموعه سرفصل${parentName}` : 'افزودن سرفصل جدید';
+  let targetType = 'گروه';
+  let parentAcc = null;
+  
+  if (targetParentId !== null) {
+    parentAcc = AppState.accounts.find(a => a.id === targetParentId);
+    if (parentAcc) {
+      const nextLevelMap = {
+        'گروه': 'کل',
+        'کل': 'معین',
+        'معین': 'تفصیلی',
+        'تفصیلی': 'تفصیلی'
+      };
+      targetType = nextLevelMap[parentAcc.type] || 'تفصیلی';
+    }
+  }
+  
+  const titleEl = document.getElementById('popupAccCrudTitle');
+  if (titleEl) {
+    if (targetParentId !== null && parentAcc) {
+      titleEl.innerHTML = `افزودن حساب جدید <span style="font-size:0.75rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(به عنوان فرزندِ "${parentAcc.name}")</span> 
+        <button class="btn btn-outline" style="padding:1px 6px;font-size:0.7rem;margin-right:12px;" onclick="resetPopupParentSelection(event)">🔄 ایجاد به عنوان حساب اصلی (گروه)</button>`;
+    } else {
+      titleEl.innerHTML = `افزودن حساب جدید <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;margin-right:6px;">(به عنوان حساب اصلی / گروه)</span>`;
+    }
+  }
+  
   document.getElementById('popupAccCrudParentId').value = targetParentId || '';
   document.getElementById('popupAccCrudEditId').value = '';
-  document.getElementById('popupAccCrudCode').value = '';
+  document.getElementById('popupAccCrudType').value = targetType;
+  document.getElementById('popupAccCrudCode').value = suggestNextAccountCode(targetType, targetParentId);
   document.getElementById('popupAccCrudName').value = '';
-  document.getElementById('popupAccCrudNature').value = 'بدهکار';
-  document.getElementById('popupAccCrudType').value = targetParentId ? 'معین' : 'کل';
+  document.getElementById('popupAccCrudNature').value = parentAcc ? parentAcc.nature : 'بدهکار';
+  
+  form.style.display = 'block';
+}
+
+function resetPopupParentSelection(e) {
+  if (e) e.preventDefault();
+  lastSelectedPopupAccId = null;
+  openAddAccountInPopup();
 }
 
 function openEditAccountInPopup(id) {
@@ -1826,6 +1856,7 @@ let lastSelectedPopupShenavarId = null;
 
 function openShPopup(rowIndex) {
   activeShPopupRowIndex = rowIndex;
+  lastSelectedPopupShenavarId = null;
   
   // Clear search inputs
   const sc = document.getElementById('popupSearchShCode');
@@ -1984,21 +2015,39 @@ function openAddShenavarInPopup(parentId = null) {
   if (!form) return;
   
   let targetParentId = parentId;
-  let parentName = '';
   
   if (targetParentId === null && lastSelectedPopupShenavarId !== null) {
     targetParentId = lastSelectedPopupShenavarId;
-    const parentAcc = AppState.shenavars.find(x => x.id === targetParentId);
-    if (parentAcc) parentName = ` (زیرمجموعه ${parentAcc.name})`;
   }
   
-  form.style.display = 'block';
-  document.getElementById('popupShCrudTitle').textContent = targetParentId ? `افزودن زیرمجموعه شناور${parentName}` : 'افزودن حساب شناور جدید';
+  let parentShen = null;
+  if (targetParentId !== null) {
+    parentShen = AppState.shenavars.find(s => s.id === targetParentId);
+  }
+  
+  const titleEl = document.getElementById('popupShCrudTitle');
+  if (titleEl) {
+    if (targetParentId !== null && parentShen) {
+      titleEl.innerHTML = `افزودن حساب شناور جدید <span style="font-size:0.75rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(به عنوان فرزندِ "${parentShen.name}")</span> 
+        <button class="btn btn-outline" style="padding:1px 6px;font-size:0.7rem;margin-right:12px;" onclick="resetPopupShenavarParentSelection(event)">🔄 ایجاد به عنوان شناور اصلی</button>`;
+    } else {
+      titleEl.innerHTML = `افزودن حساب شناور جدید <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;margin-right:6px;">(به عنوان شناور اصلی)</span>`;
+    }
+  }
+  
   document.getElementById('popupShCrudParentId').value = targetParentId || '';
   document.getElementById('popupShCrudEditId').value = '';
-  document.getElementById('popupShCrudCode').value = '';
+  document.getElementById('popupShCrudCode').value = suggestNextShenavarCode(targetParentId);
   document.getElementById('popupShCrudName').value = '';
   document.getElementById('popupShCrudStatus').value = 'فعال';
+  
+  form.style.display = 'block';
+}
+
+function resetPopupShenavarParentSelection(e) {
+  if (e) e.preventDefault();
+  lastSelectedPopupShenavarId = null;
+  openAddShenavarInPopup();
 }
 
 function openEditShenavarInPopup(id) {
