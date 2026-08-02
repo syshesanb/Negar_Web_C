@@ -1484,6 +1484,71 @@ function updateSanadTotals() {
       badgeEl.style.color = '#ef4444';
     }
   }
+
+  // Trigger dynamic pixel-perfect alignment
+  setTimeout(alignFooterTotals, 0);
+}
+
+function alignFooterTotals() {
+  const headers = document.querySelectorAll('#form-sanad2 table th');
+  if (headers.length < 8) return;
+  
+  let debitTh = null;
+  let creditTh = null;
+  headers.forEach(th => {
+    if (th.textContent.includes('بدهکار')) debitTh = th;
+    if (th.textContent.includes('بستانکار')) creditTh = th;
+  });
+  
+  if (!debitTh || !creditTh) return;
+  
+  const bottomPanel = document.getElementById('sanadBottomPanel');
+  if (!bottomPanel) return;
+  
+  const panelRect = bottomPanel.getBoundingClientRect();
+  const debitRect = debitTh.getBoundingClientRect();
+  const creditRect = creditTh.getBoundingClientRect();
+  
+  // Calculate LTR offset positions relative to the bottom panel
+  const debitLeft = debitRect.left - panelRect.left;
+  const creditLeft = creditRect.left - panelRect.left;
+  const debitWidth = debitRect.width;
+  const creditWidth = creditRect.width;
+  
+  // Apply position to inputs
+  const totalDebitInput = document.getElementById('footerTotalDebit');
+  const totalCreditInput = document.getElementById('footerTotalCredit');
+  const diffDebitInput = document.getElementById('footerDiffDebit');
+  const diffCreditInput = document.getElementById('footerDiffCredit');
+  
+  if (totalDebitInput) {
+    totalDebitInput.style.left = `${debitLeft}px`;
+    totalDebitInput.style.width = `${debitWidth}px`;
+  }
+  if (totalCreditInput) {
+    totalCreditInput.style.left = `${creditLeft}px`;
+    totalCreditInput.style.width = `${creditWidth}px`;
+  }
+  if (diffDebitInput) {
+    diffDebitInput.style.left = `${debitLeft}px`;
+    diffDebitInput.style.width = `${debitWidth}px`;
+  }
+  if (diffCreditInput) {
+    diffCreditInput.style.left = `${creditLeft}px`;
+    diffCreditInput.style.width = `${creditWidth}px`;
+  }
+  
+  // Position labels dynamically to the right of the Debit column
+  const labelLeft = (debitRect.right - panelRect.left) + 12;
+  const labelTotal = document.getElementById('footerLabelTotal');
+  const labelDiff = document.getElementById('footerLabelDiff');
+  
+  if (labelTotal) {
+    labelTotal.style.left = `${labelLeft}px`;
+  }
+  if (labelDiff) {
+    labelDiff.style.left = `${labelLeft}px`;
+  }
 }
 
 function openNewSanadForm() {
@@ -2170,6 +2235,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Update clock & date immediately and then every second
   updateSystemClock();
   setInterval(updateSystemClock, 1000);
+
+  // Resize and scroll listeners to dynamically align footer totals
+  window.addEventListener('resize', () => {
+    if (typeof alignFooterTotals === 'function') alignFooterTotals();
+  });
+  const sanadWrapper = document.querySelector('#form-sanad2 .table-wrapper');
+  if (sanadWrapper) {
+    sanadWrapper.addEventListener('scroll', () => {
+      if (typeof alignFooterTotals === 'function') alignFooterTotals();
+    });
+  }
 });
 
 // ============================
