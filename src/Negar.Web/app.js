@@ -320,6 +320,17 @@ function showForm(formId) {
     window.scrollTo(0, 0);
   }
 
+  // Toggle body scroll for form-sanad2
+  if (formId === 'form-sanad2') {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+  } else {
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.body.style.height = '';
+  }
+
   // Re-render dynamic tables when their form is shown
   if (formId === 'form-users-list') renderUsersTable();
   if (formId === 'form-accounts-chart') renderAccountsTable();
