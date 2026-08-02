@@ -1178,6 +1178,20 @@
                     <th style="width:110px;">تاریخ تراکنش</th>
                     <th style="width:50px; text-align:center;">عملیات</th>
                   </tr>
+                  <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                    <th></th>
+                    <th></th>
+                    <th><input type="text" id="searchColAccount" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('account', this.value)" /></th>
+                    <th></th>
+                    <th><input type="text" id="searchColShenavar" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('shenavarCode', this.value)" /></th>
+                    <th><input type="text" id="searchColDesc" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('desc', this.value)" /></th>
+                    <th><input type="text" id="searchColDebit" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('debit', this.value)" /></th>
+                    <th><input type="text" id="searchColCredit" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('credit', this.value)" /></th>
+                    <th><input type="text" id="searchColTxNo" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('txNo', this.value)" /></th>
+                    <th></th>
+                    <th><input type="text" id="searchColTxDate" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('txDate', this.value)" /></th>
+                    <th></th>
+                  </tr>
                 </thead>
                 <tbody id="sanadLinesEditorBody">
                   <!-- Rows generated dynamically -->
@@ -1231,7 +1245,7 @@
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('below')">📋 کپی در زیر</button>
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('above')">📋 کپی در بالا</button>
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('کپی در محل دلخواه فعال شد.')">📋 کپی در محل دلخواه</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('جستجوها پاک شدند.')">🧹 پاک کردن جستجوها</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="clearColumnSearches()">🧹 پاک کردن جستجوها</button>
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="closeSanadEditor()">🔙 خروج</button>
               </div>
             </div>

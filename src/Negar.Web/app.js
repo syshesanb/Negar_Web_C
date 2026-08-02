@@ -1331,6 +1331,36 @@ function handleAmountInput(input, index, field) {
   input.setSelectionRange(newCursor, newCursor);
 }
 
+const sanadSearchFilters = {
+  account: '',
+  shenavarCode: '',
+  desc: '',
+  debit: '',
+  credit: '',
+  txNo: '',
+  txDate: ''
+};
+
+function handleColumnSearch(field, value) {
+  sanadSearchFilters[field] = value;
+  renderSanadEditorLines();
+}
+
+function clearColumnSearches() {
+  for (let key in sanadSearchFilters) {
+    sanadSearchFilters[key] = '';
+  }
+  const inputs = [
+    'searchColAccount', 'searchColShenavar', 'searchColDesc',
+    'searchColDebit', 'searchColCredit', 'searchColTxNo', 'searchColTxDate'
+  ];
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderSanadEditorLines();
+}
+
 function renderSanadEditorLines() {
   const tbody = document.getElementById('sanadLinesEditorBody');
   if (!tbody) return;
@@ -1340,6 +1370,23 @@ function renderSanadEditorLines() {
     if (!line.account) line.account = '011001';
     if (!line.shenavarCode) line.shenavarCode = '';
     if (!line.txNo) line.txNo = '';
+    if (!line.txDate) line.txDate = '';
+
+    // Apply search filters
+    if (sanadSearchFilters.account && !line.account.includes(sanadSearchFilters.account)) return '';
+    if (sanadSearchFilters.shenavarCode && !line.shenavarCode.includes(sanadSearchFilters.shenavarCode)) return '';
+    if (sanadSearchFilters.desc && !line.desc.toLowerCase().includes(sanadSearchFilters.desc.toLowerCase())) return '';
+    if (sanadSearchFilters.txNo && !line.txNo.includes(sanadSearchFilters.txNo)) return '';
+    if (sanadSearchFilters.txDate && !line.txDate.includes(sanadSearchFilters.txDate)) return '';
+
+    if (sanadSearchFilters.debit) {
+      const cleanSearch = sanadSearchFilters.debit.replace(/\D/g, '');
+      if (cleanSearch && !String(line.debit).includes(cleanSearch)) return '';
+    }
+    if (sanadSearchFilters.credit) {
+      const cleanSearch = sanadSearchFilters.credit.replace(/\D/g, '');
+      if (cleanSearch && !String(line.credit).includes(cleanSearch)) return '';
+    }
     if (!line.txDate) line.txDate = '';
 
     const isSelected = (i === focusedLineIndex);
