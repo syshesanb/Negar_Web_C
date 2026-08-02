@@ -1232,6 +1232,17 @@ let focusedLineIndex = 0;
 
 function updateFocusedPaths(i) {
   focusedLineIndex = i;
+  
+  // Dynamic visual row selection highlight
+  const rows = document.querySelectorAll('#sanadLinesEditorBody tr');
+  rows.forEach((row, idx) => {
+    if (idx === i) {
+      row.classList.add('focused-row');
+    } else {
+      row.classList.remove('focused-row');
+    }
+  });
+
   const line = AppState.sanadLines[i];
   if (!line) return;
   
@@ -1290,6 +1301,36 @@ function updateSanadLineField(i, field, value) {
   }
 }
 
+function formatAmount(val) {
+  if (val === undefined || val === null || val === '') return '0';
+  const clean = val.toString().replace(/,/g, '');
+  const num = Number(clean);
+  if (isNaN(num)) return '0';
+  return num === 0 ? '0' : num.toLocaleString('en-US');
+}
+
+function handleAmountInput(input, index, field) {
+  let selectionStart = input.selectionStart;
+  let originalLen = input.value.length;
+  
+  // Strip all non-digit characters
+  let clean = input.value.replace(/[^0-9]/g, '');
+  const num = clean === '' ? 0 : Number(clean);
+  
+  AppState.sanadLines[index][field] = num;
+  updateSanadTotals();
+  
+  // Formatted value
+  const formatted = num === 0 ? '0' : num.toLocaleString('en-US');
+  input.value = formatted;
+  
+  // Restore cursor position
+  let newLen = formatted.length;
+  let diff = newLen - originalLen;
+  let newCursor = selectionStart + diff;
+  input.setSelectionRange(newCursor, newCursor);
+}
+
 function renderSanadEditorLines() {
   const tbody = document.getElementById('sanadLinesEditorBody');
   if (!tbody) return;
@@ -1302,10 +1343,10 @@ function renderSanadEditorLines() {
     if (!line.txDate) line.txDate = '';
 
     const isSelected = (i === focusedLineIndex);
-    const rowClass = isSelected ? 'selected-parent-row' : '';
+    const rowClass = isSelected ? 'focused-row' : '';
 
     return `
-      <tr class="${rowClass}" onclick="updateFocusedPaths(${i})" style="cursor:pointer;">
+      <tr class="${rowClass}" data-index="${i}" onclick="updateFocusedPaths(${i})" style="cursor:pointer;">
         <!-- Row No -->
         <td style="text-align:center; font-weight:bold;">${i + 1}</td>
         
@@ -1341,12 +1382,12 @@ function renderSanadEditorLines() {
         
         <!-- Debit -->
         <td>
-          <input type="number" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${line.debit || 0}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'debit', this.value)" />
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.debit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'debit')" />
         </td>
         
         <!-- Credit -->
         <td>
-          <input type="number" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${line.credit || 0}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'credit', this.value)" />
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.credit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'credit')" />
         </td>
         
         <!-- TT Transaction Type Helper -->

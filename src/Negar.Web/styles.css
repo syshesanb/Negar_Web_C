@@ -912,5 +912,49 @@ tr.selected-parent-row {
   background: rgba(56, 189, 248, 0.15) !important;
 }
 
+/* Compact Sanad Datagrid */
+#sanadLinesEditorBody tr td {
+  padding: 2px 4px !important;
+  height: 28px !important;
+}
+#sanadLinesEditorBody tr td select,
+#sanadLinesEditorBody tr td input {
+  height: 24px !important;
+  padding: 2px 4px !important;
+  font-size: 0.75rem !important;
+  border-radius: 3px !important;
+  border: 1px solid transparent !important;
+}
+#sanadLinesEditorBody tr td button {
+  height: 22px !important;
+  line-height: 1 !important;
+  padding: 0 6px !important;
+  font-size: 0.75rem !important;
+}
+
+/* Zebra Striping */
+#sanadLinesEditorBody tr:nth-child(odd) {
+  background-color: var(--bg-primary) !important;
+}
+#sanadLinesEditorBody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Active Row Highlight */
+#sanadLinesEditorBody tr.focused-row {
+  background-color: rgba(56, 189, 248, 0.08) !important;
+  outline: 2px solid var(--accent-color) !important;
+  outline-offset: -2px !important;
+}
+
+/* Active Cell (Focus Input) Highlight */
+#sanadLinesEditorBody tr td input:focus,
+#sanadLinesEditorBody tr td select:focus {
+  border: 1px solid var(--accent-color) !important;
+  background: rgba(56, 189, 248, 0.06) !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+  outline: none !important;
+}
+
 
 
