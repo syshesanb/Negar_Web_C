@@ -1381,17 +1381,19 @@ function renderSanadEditorLines() {
           <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:right; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.credit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'credit')" />
         </td>
         
-        <!-- TT Transaction Type Helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('نوع تراکنش پیش‌فرض')">...</button></td>
-        
         <!-- Transaction Number -->
         <td>
-          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.txNo}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'txNo', this.value)" />
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.txNo}" onfocus="updateFocusedPaths(${i})" oninput="updateSanadLineField(${i}, 'txNo', this.value)" />
+        </td>
+
+        <!-- TT Transaction Type Helper (Jalali Calendar Button) -->
+        <td style="text-align:center;">
+          <button class="btn btn-outline date-picker-btn" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); PersianCal.open('txDateInput_${i}', this)">...</button>
         </td>
         
         <!-- Transaction Date -->
         <td>
-          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.txDate}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'txDate', this.value)" />
+          <input type="text" id="txDateInput_${i}" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.txDate}" maxlength="10" onfocus="updateFocusedPaths(${i})" oninput="autoFormatDate(this); updateSanadLineField(${i}, 'txDate', this.value)" />
         </td>
         
         <!-- Action: Delete -->
