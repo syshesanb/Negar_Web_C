@@ -397,6 +397,10 @@ function switchHesabdariTab(tabId) {
   if (tabId === 'accounts') renderAccountsTable();
   if (tabId === 'shenavar') renderShenavaarTable();
   if (tabId === 'sanad') renderSanadListTable();
+  if (tabId === 'taraz') populateTarazFields();
+  if (tabId === 'ledger') populateLedgerCombos();
+  if (tabId === 'taraz-shenavar') calculateTarazShenavar();
+  if (tabId === 'daftar-shenavar') populateDaftarShenavarCombos();
 }
 
 // ============================
@@ -3635,5 +3639,787 @@ function printMoghStatementReport() {
 
 function transferMoghDescToLedger() {
   alert('انتقال شرح صورتحساب بانک به شرح ردیف دفاتر با موفقیت برای تمامی اقلام بسته شده انجام گرفت.');
+}
+
+
+// ==========================================
+// ACCOUNTING REPORTS IMPLEMENTATION
+// ==========================================
+
+// Ensure sanad lines are populated on initial mock data
+function ensureSanadMockLines() {
+  AppState.sanads.forEach(s => {
+    if (!s.lines) {
+      if (s.id === 101) {
+        s.lines = [
+          { account: '011001', shenavarCode: 'SH-101', desc: 'سند افتتاحیه صندوق مرکزی', debit: 5000000000, credit: 0, txNo: '101', txDate: '1403/01/05' },
+          { account: '022001', shenavarCode: '', desc: 'سند افتتاحیه تامین‌کنندگان', debit: 0, credit: 5000000000, txNo: '101', txDate: '1403/01/05' }
+        ];
+      } else if (s.id === 102) {
+        s.lines = [
+          { account: '011002', shenavarCode: 'SH-102', desc: 'دریافت بانک ملی بابت فروش', debit: 125000000, credit: 0, txNo: '102', txDate: '1403/05/10' },
+          { account: '0440', shenavarCode: '', desc: 'درآمد حاصل از فروش کالا', debit: 0, credit: 125000000, txNo: '102', txDate: '1403/05/10' }
+        ];
+      } else {
+        s.lines = [
+          { account: '011001', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0, txNo: s.id.toString(), txDate: s.date },
+          { account: '022001', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit, txNo: s.id.toString(), txDate: s.date }
+        ];
+      }
+    }
+  });
+}
+
+// 1. Trial Balance (تراز آزمایشی)
+function populateTarazFields() {
+  ensureSanadMockLines();
+  const fromEl = document.getElementById('tarazFromDate');
+  const toEl = document.getElementById('tarazToDate');
+  if (fromEl && !fromEl.value) fromEl.value = '1403/01/01';
+  if (toEl && !toEl.value) toEl.value = '1403/12/29';
+  calculateTrialBalance();
+}
+
+function calculateTrialBalance() {
+  ensureSanadMockLines();
+  const colCount = Number(document.getElementById('tarazColCount')?.value || 4);
+  const maxLevel = document.getElementById('tarazLevel')?.value || 'moein';
+  const fromDate = document.getElementById('tarazFromDate')?.value || '1403/01/01';
+  const toDate = document.getElementById('tarazToDate')?.value || '1403/12/29';
+  const onlyTurnover = document.getElementById('tarazOnlyTurnover')?.checked;
+
+  const headerRow = document.querySelector('#tblTrialBalance thead');
+  const bodyEl = document.getElementById('tblTrialBalanceBody');
+  const footerEl = document.getElementById('tblTrialBalanceFooter');
+  if (!bodyEl) return;
+
+  // Render headers
+  let headerHtml = '';
+  if (colCount === 2) {
+    headerHtml = `
+      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+        <th style="padding:6px; text-align:center; width:50px;">دفتر</th>
+        <th style="padding:6px; text-align:center; width:120px;">کد حساب</th>
+        <th style="padding:6px; text-align:right;">نام حساب</th>
+        <th style="padding:6px; text-align:left; width:180px;">مانده بدهکار (ریال)</th>
+        <th style="padding:6px; text-align:left; width:180px;">مانده بستانکار (ریال)</th>
+      </tr>
+    `;
+  } else if (colCount === 4) {
+    headerHtml = `
+      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+        <th style="padding:6px; text-align:center; width:50px;">دفتر</th>
+        <th style="padding:6px; text-align:center; width:120px;">کد حساب</th>
+        <th style="padding:6px; text-align:right;">نام حساب</th>
+        <th style="padding:6px; text-align:left; width:150px;">گردش بدهکار (ریال)</th>
+        <th style="padding:6px; text-align:left; width:150px;">گردش بستانکار (ریال)</th>
+        <th style="padding:6px; text-align:left; width:150px;">مانده بدهکار (ریال)</th>
+        <th style="padding:6px; text-align:left; width:150px;">مانده بستانکار (ریال)</th>
+      </tr>
+    `;
+  } else {
+    headerHtml = `
+      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+        <th style="padding:6px; text-align:center; width:50px;">دفتر</th>
+        <th style="padding:6px; text-align:center; width:100px;">کد حساب</th>
+        <th style="padding:6px; text-align:right;">نام حساب</th>
+        <th style="padding:6px; text-align:left; width:130px;">مانده قبل بدهکار</th>
+        <th style="padding:6px; text-align:left; width:130px;">مانده قبل بستانکار</th>
+        <th style="padding:6px; text-align:left; width:130px;">گردش طی بدهکار</th>
+        <th style="padding:6px; text-align:left; width:130px;">گردش طی بستانکار</th>
+        <th style="padding:6px; text-align:left; width:130px;">مانده نهایی بدهکار</th>
+        <th style="padding:6px; text-align:left; width:130px;">مانده نهایی بستانکار</th>
+      </tr>
+    `;
+  }
+  if (headerRow) headerRow.innerHTML = headerHtml;
+
+  // Process data
+  let rowData = [];
+  AppState.accounts.forEach(acc => {
+    // Determine level
+    let meetsLevel = false;
+    if (maxLevel === 'group' && acc.type === 'گروه') meetsLevel = true;
+    if (maxLevel === 'kol' && (acc.type === 'گروه' || acc.type === 'کل')) meetsLevel = true;
+    if (maxLevel === 'moein' && (acc.type === 'گروه' || acc.type === 'کل' || acc.type === 'معین')) meetsLevel = true;
+    if (maxLevel === 'tafsili') meetsLevel = true; // All
+
+    if (!meetsLevel) return;
+
+    // Calculate sums
+    let debitBefore = 0, creditBefore = 0;
+    let debitTurnover = 0, creditTurnover = 0;
+
+    AppState.sanads.forEach(s => {
+      if (!s.lines) return;
+      s.lines.forEach(line => {
+        if (line.account && line.account.startsWith(acc.code)) {
+          const date = line.txDate || s.date;
+          if (date < fromDate) {
+            debitBefore += Number(line.debit || 0);
+            creditBefore += Number(line.credit || 0);
+          } else if (date >= fromDate && date <= toDate) {
+            debitTurnover += Number(line.debit || 0);
+            creditTurnover += Number(line.credit || 0);
+          }
+        }
+      });
+    });
+
+    const beforeDiff = debitBefore - creditBefore;
+    const beforeDeb = beforeDiff > 0 ? beforeDiff : 0;
+    const beforeCred = beforeDiff < 0 ? -beforeDiff : 0;
+
+    const netDebit = debitBefore + debitTurnover;
+    const netCredit = creditBefore + creditTurnover;
+    const netDiff = netDebit - netCredit;
+    const endDeb = netDiff > 0 ? netDiff : 0;
+    const endCred = netDiff < 0 ? -netDiff : 0;
+
+    if (onlyTurnover && debitBefore === 0 && creditBefore === 0 && debitTurnover === 0 && creditTurnover === 0) {
+      return;
+    }
+
+    rowData.push({
+      acc,
+      beforeDeb,
+      beforeCred,
+      debitTurnover,
+      creditTurnover,
+      endDeb,
+      endCred
+    });
+  });
+
+  if (rowData.length === 0) {
+    bodyEl.innerHTML = `<tr><td colspan="${colCount === 2 ? 5 : (colCount === 4 ? 7 : 9)}" style="text-align:center; color:var(--text-muted); padding:30px;">داده‌ای یافت نشد.</td></tr>`;
+    if (footerEl) footerEl.innerHTML = '';
+    return;
+  }
+
+  // Render rows
+  bodyEl.innerHTML = rowData.map(row => {
+    let style = '';
+    let indent = 0;
+    if (row.acc.type === 'گروه') {
+      style = 'background:rgba(210, 228, 255, 0.7); font-weight:bold; color:#1e3a8a;';
+      indent = 0;
+    } else if (row.acc.type === 'کل') {
+      style = 'background:rgba(232, 243, 255, 0.5); font-weight:bold; color:#1e40af;';
+      indent = 15;
+    } else if (row.acc.type === 'معین') {
+      style = 'background:rgba(246, 251, 255, 0.4);';
+      indent = 30;
+    } else {
+      style = 'background:transparent;';
+      indent = 45;
+    }
+
+    const nameSpan = `<span style="padding-right:${indent}px;">${row.acc.name}</span>`;
+    const ledgerBtn = `<button class="btn btn-outline" style="padding:1px 5px; font-size:0.7rem; border-color:var(--accent-color); color:var(--accent-color);" onclick="navigateToLedger('${row.acc.code}')">دفتر</button>`;
+
+    if (colCount === 2) {
+      return `
+        <tr style="${style}">
+          <td style="text-align:center;">${ledgerBtn}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.acc.code}</td>
+          <td>${nameSpan}</td>
+          <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
+          <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+        </tr>
+      `;
+    } else if (colCount === 4) {
+      return `
+        <tr style="${style}">
+          <td style="text-align:center;">${ledgerBtn}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.acc.code}</td>
+          <td>${nameSpan}</td>
+          <td style="text-align:left;">${row.debitTurnover ? row.debitTurnover.toLocaleString() : '0'}</td>
+          <td style="text-align:left;">${row.creditTurnover ? row.creditTurnover.toLocaleString() : '0'}</td>
+          <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
+          <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+        </tr>
+      `;
+    } else {
+      return `
+        <tr style="${style}">
+          <td style="text-align:center;">${ledgerBtn}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.acc.code}</td>
+          <td>${nameSpan}</td>
+          <td style="text-align:left; color:#6b7280;">${row.beforeDeb ? row.beforeDeb.toLocaleString() : '0'}</td>
+          <td style="text-align:left; color:#6b7280;">${row.beforeCred ? row.beforeCred.toLocaleString() : '0'}</td>
+          <td style="text-align:left;">${row.debitTurnover ? row.debitTurnover.toLocaleString() : '0'}</td>
+          <td style="text-align:left;">${row.creditTurnover ? row.creditTurnover.toLocaleString() : '0'}</td>
+          <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
+          <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+        </tr>
+      `;
+    }
+  }).join('');
+
+  // Calculate totals
+  const totalBeforeDeb = rowData.filter(r => r.acc.type === 'معین').reduce((s, r) => s + r.beforeDeb, 0);
+  const totalBeforeCred = rowData.filter(r => r.acc.type === 'معین').reduce((s, r) => s + r.beforeCred, 0);
+  const totalTurnDeb = rowData.filter(r => r.acc.type === 'معین').reduce((s, r) => s + r.debitTurnover, 0);
+  const totalTurnCred = rowData.filter(r => r.acc.type === 'معین').reduce((s, r) => s + r.creditTurnover, 0);
+  const totalEndDeb = rowData.filter(r => r.acc.type === 'معین').reduce((s, r) => s + r.endDeb, 0);
+  const totalEndCred = rowData.filter(r => r.acc.type === 'معین').reduce((s, r) => s + r.endCred, 0);
+
+  let footerHtml = '';
+  if (colCount === 2) {
+    footerHtml = `
+      <tr>
+        <td colspan="3" style="text-align:left; padding:8px;">جمع کل (حساب‌های معین):</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalEndDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalEndCred.toLocaleString()}</td>
+      </tr>
+    `;
+  } else if (colCount === 4) {
+    footerHtml = `
+      <tr>
+        <td colspan="3" style="text-align:left; padding:8px;">جمع کل (حساب‌های معین):</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalTurnDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalTurnCred.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalEndDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalEndCred.toLocaleString()}</td>
+      </tr>
+    `;
+  } else {
+    footerHtml = `
+      <tr>
+        <td colspan="3" style="text-align:left; padding:8px;">جمع کل (حساب‌های معین):</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalBeforeDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalBeforeCred.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalTurnDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalTurnCred.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalEndDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af; font-size:0.85rem;">${totalEndCred.toLocaleString()}</td>
+      </tr>
+    `;
+  }
+  if (footerEl) footerEl.innerHTML = footerHtml;
+}
+
+function navigateToLedger(accountCode) {
+  switchHesabdariTab('ledger');
+  const selectEl = document.getElementById('ledgerAccountSelect');
+  if (selectEl) {
+    selectEl.value = accountCode;
+    calculateAccountLedger();
+  }
+}
+
+function printTrialBalance() {
+  window.print();
+}
+
+function exportTrialBalanceExcel() {
+  alert('گزارش تراز آزمایشی به فرمت اکسل (CSV) تولید و دانلود شد.');
+}
+
+
+// 2. Account Ledger (دفتر حساب)
+function populateLedgerCombos() {
+  ensureSanadMockLines();
+  const selectEl = document.getElementById('ledgerAccountSelect');
+  if (!selectEl) return;
+
+  const currentVal = selectEl.value;
+  selectEl.innerHTML = AppState.accounts.map(acc => `
+    <option value="${acc.code}">${acc.code} - ${acc.name} (${acc.type})</option>
+  `).join('');
+
+  if (currentVal && AppState.accounts.some(x => x.code === currentVal)) {
+    selectEl.value = currentVal;
+  } else {
+    // Default to first moein account
+    const firstMoein = AppState.accounts.find(x => x.type === 'معین');
+    if (firstMoein) selectEl.value = firstMoein.code;
+  }
+  
+  const fromEl = document.getElementById('ledgerFromDate');
+  const toEl = document.getElementById('ledgerToDate');
+  if (fromEl && !fromEl.value) fromEl.value = '1403/01/01';
+  if (toEl && !toEl.value) toEl.value = '1403/12/29';
+}
+
+function calculateAccountLedger() {
+  ensureSanadMockLines();
+  const accountCode = document.getElementById('ledgerAccountSelect')?.value;
+  const fromDate = document.getElementById('ledgerFromDate')?.value || '1403/01/01';
+  const toDate = document.getElementById('ledgerToDate')?.value || '1403/12/29';
+  const descType = document.getElementById('ledgerDescType')?.value || 'line';
+  const statusFilter = document.getElementById('ledgerStatusFilter')?.value || 'all';
+
+  const bodyEl = document.getElementById('tblAccountLedgerBody');
+  const titleEl = document.getElementById('lblLedgerAccountTitle');
+  if (!bodyEl) return;
+
+  const activeAcc = AppState.accounts.find(x => x.code === accountCode);
+  if (!activeAcc) {
+    bodyEl.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">سرفصل معتبری انتخاب نشده است.</td></tr>`;
+    return;
+  }
+
+  if (titleEl) titleEl.textContent = `دفتر حساب: ${activeAcc.code} - ${activeAcc.name}`;
+
+  // Compute previous balance
+  let prevDebit = 0, prevCredit = 0;
+  let ledgerLines = [];
+
+  AppState.sanads.forEach(s => {
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'moo' && s.status !== 'موقت') return;
+      if (statusFilter === 'dai' && s.status !== 'دائم') return;
+    }
+
+    if (!s.lines) return;
+    s.lines.forEach(line => {
+      if (line.account && line.account.startsWith(accountCode)) {
+        const date = line.txDate || s.date;
+        if (date < fromDate) {
+          prevDebit += Number(line.debit || 0);
+          prevCredit += Number(line.credit || 0);
+        } else if (date >= fromDate && date <= toDate) {
+          ledgerLines.push({
+            date: date,
+            sanadId: s.id,
+            desc: descType === 'both' ? `${s.desc} / ${line.desc || ''}` : (line.desc || s.desc),
+            debit: Number(line.debit || 0),
+            credit: Number(line.credit || 0)
+          });
+        }
+      }
+    });
+  });
+
+  // Sort lines by date, then by sanadId
+  ledgerLines.sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.sanadId - b.sanadId;
+  });
+
+  let html = '';
+
+  // Render "مانده از قبل" row
+  let runningBalance = prevDebit - prevCredit;
+  let runningInd = runningBalance > 0 ? 'بد' : (runningBalance < 0 ? 'بس' : 'بی');
+  
+  html += `
+    <tr style="background:rgba(220, 235, 255, 0.7); font-weight:bold;">
+      <td style="text-align:center;">-</td>
+      <td style="text-align:center; color:#475569;">-</td>
+      <td style="text-align:center; color:#475569;">-</td>
+      <td style="color:#1e3a8a;">مانده از قبل (سوابق قبلی)</td>
+      <td style="text-align:left;">${prevDebit.toLocaleString()}</td>
+      <td style="text-align:left;">${prevCredit.toLocaleString()}</td>
+      <td style="text-align:center; color:#1e40af;">${runningInd}</td>
+      <td style="text-align:left; color:#1e40af;">${Math.abs(runningBalance).toLocaleString()}</td>
+    </tr>
+  `;
+
+  // Render transaction lines
+  let totalDeb = prevDebit;
+  let totalCred = prevCredit;
+
+  ledgerLines.forEach((line, idx) => {
+    runningBalance += line.debit - line.credit;
+    runningInd = runningBalance > 0 ? 'بد' : (runningBalance < 0 ? 'بس' : 'بی');
+    totalDeb += line.debit;
+    totalCred += line.credit;
+
+    html += `
+      <tr>
+        <td style="text-align:center; color:var(--text-muted);">${idx + 1}</td>
+        <td style="text-align:center; font-family:monospace;">${line.date}</td>
+        <td style="text-align:center; font-weight:bold; color:var(--accent-color); cursor:pointer;" onclick="openEditSanad(${line.sanadId})">${line.sanadId}</td>
+        <td style="text-align:right;">${line.desc}</td>
+        <td style="text-align:left; color:#047857;">${line.debit ? line.debit.toLocaleString() : '0'}</td>
+        <td style="text-align:left; color:#b91c1c;">${line.credit ? line.credit.toLocaleString() : '0'}</td>
+        <td style="text-align:center; font-weight:bold;">${runningInd}</td>
+        <td style="text-align:left; font-weight:bold;">${Math.abs(runningBalance).toLocaleString()}</td>
+      </tr>
+    `;
+  });
+
+  // Render "جمع کل" footer row
+  const finalInd = runningBalance > 0 ? 'بد' : (runningBalance < 0 ? 'بس' : 'بی');
+  html += `
+    <tr style="background:rgba(255, 255, 200, 0.7); font-weight:bold; border-top:2px solid var(--border-color);">
+      <td colspan="4" style="text-align:left; padding:8px;">جمع نهایی دفتر با احتساب مانده قبلی:</td>
+      <td style="text-align:left; color:#047857;">${totalDeb.toLocaleString()}</td>
+      <td style="text-align:left; color:#b91c1c;">${totalCred.toLocaleString()}</td>
+      <td style="text-align:center; color:#1e40af;">${finalInd}</td>
+      <td style="text-align:left; color:#1e40af;">${Math.abs(runningBalance).toLocaleString()}</td>
+    </tr>
+  `;
+
+  bodyEl.innerHTML = html;
+}
+
+function printAccountLedger() {
+  window.print();
+}
+
+function exportAccountLedgerExcel() {
+  alert('گزارش دفتر حساب به فرمت اکسل (CSV) صادر گردید.');
+}
+
+
+// 3. Floating Account Balance (تراز شناور)
+function calculateTarazShenavar() {
+  ensureSanadMockLines();
+  const fromDate = document.getElementById('tarazShenavarFromDate')?.value || '1403/01/01';
+  const toDate = document.getElementById('tarazShenavarToDate')?.value || '1403/12/29';
+
+  const bodyEl = document.getElementById('tblTarazShenavarBody');
+  const footerEl = document.getElementById('tblTarazShenavarFooter');
+  if (!bodyEl) return;
+
+  let rowData = [];
+  AppState.shenavars.forEach(sh => {
+    let debitTurnover = 0, creditTurnover = 0;
+    
+    AppState.sanads.forEach(s => {
+      if (!s.lines) return;
+      s.lines.forEach(line => {
+        if (line.shenavarCode === sh.code) {
+          const date = line.txDate || s.date;
+          if (date >= fromDate && date <= toDate) {
+            debitTurnover += Number(line.debit || 0);
+            creditTurnover += Number(line.credit || 0);
+          }
+        }
+      });
+    });
+
+    const diff = debitTurnover - creditTurnover;
+    const endDeb = diff > 0 ? diff : 0;
+    const endCred = diff < 0 ? -diff : 0;
+
+    rowData.push({
+      sh,
+      debitTurnover,
+      creditTurnover,
+      endDeb,
+      endCred
+    });
+  });
+
+  bodyEl.innerHTML = rowData.map(row => {
+    const detailBtn = `<button class="btn btn-outline" style="padding:1px 5px; font-size:0.7rem; border-color:var(--accent-color); color:var(--accent-color);" onclick="navigateToDaftarShenavar('${row.sh.code}')">دفتر</button>`;
+    return `
+      <tr>
+        <td style="text-align:center;">${detailBtn}</td>
+        <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.sh.code}</td>
+        <td>${row.sh.name}</td>
+        <td style="text-align:left;">${row.debitTurnover ? row.debitTurnover.toLocaleString() : '0'}</td>
+        <td style="text-align:left;">${row.creditTurnover ? row.creditTurnover.toLocaleString() : '0'}</td>
+        <td style="text-align:left; font-weight:bold; color:#047857;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
+        <td style="text-align:left; font-weight:bold; color:#b91c1c;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Totals
+  const sumDebTurn = rowData.reduce((s, r) => s + r.debitTurnover, 0);
+  const sumCredTurn = rowData.reduce((s, r) => s + r.creditTurnover, 0);
+  const sumEndDeb = rowData.reduce((s, r) => s + r.endDeb, 0);
+  const sumEndCred = rowData.reduce((s, r) => s + r.endCred, 0);
+
+  if (footerEl) {
+    footerEl.innerHTML = `
+      <tr>
+        <td colspan="3" style="text-align:left; padding:8px;">جمع کل شناورها:</td>
+        <td style="text-align:left; color:#1e40af;">${sumDebTurn.toLocaleString()}</td>
+        <td style="text-align:left; color:#1e40af;">${sumCredTurn.toLocaleString()}</td>
+        <td style="text-align:left; color:#047857;">${sumEndDeb.toLocaleString()}</td>
+        <td style="text-align:left; color:#b91c1c;">${sumEndCred.toLocaleString()}</td>
+      </tr>
+    `;
+  }
+}
+
+function navigateToDaftarShenavar(shenavarCode) {
+  switchHesabdariTab('daftar-shenavar');
+  const selectEl = document.getElementById('daftarShenavarSelect');
+  if (selectEl) {
+    selectEl.value = shenavarCode;
+    calculateDaftarShenavar();
+  }
+}
+
+
+// 4. Floating Account Ledger (دفتر شناور)
+function populateDaftarShenavarCombos() {
+  ensureSanadMockLines();
+  const selectEl = document.getElementById('daftarShenavarSelect');
+  if (!selectEl) return;
+
+  const currentVal = selectEl.value;
+  selectEl.innerHTML = AppState.shenavars.map(sh => `
+    <option value="${sh.code}">${sh.code} - ${sh.name}</option>
+  `).join('');
+
+  if (currentVal && AppState.shenavars.some(x => x.code === currentVal)) {
+    selectEl.value = currentVal;
+  } else {
+    if (AppState.shenavars.length > 0) selectEl.value = AppState.shenavars[0].code;
+  }
+
+  const fromEl = document.getElementById('daftarShenavarFromDate');
+  const toEl = document.getElementById('daftarShenavarToDate');
+  if (fromEl && !fromEl.value) fromEl.value = '1403/01/01';
+  if (toEl && !toEl.value) toEl.value = '1403/12/29';
+}
+
+function calculateDaftarShenavar() {
+  ensureSanadMockLines();
+  const shenavarCode = document.getElementById('daftarShenavarSelect')?.value;
+  const fromDate = document.getElementById('daftarShenavarFromDate')?.value || '1403/01/01';
+  const toDate = document.getElementById('daftarShenavarToDate')?.value || '1403/12/29';
+
+  const bodyEl = document.getElementById('tblDaftarShenavarBody');
+  const titleEl = document.getElementById('lblDaftarShenavarTitle');
+  if (!bodyEl) return;
+
+  const sh = AppState.shenavars.find(x => x.code === shenavarCode);
+  if (!sh) {
+    bodyEl.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">حساب شناور معتبری انتخاب نشده است.</td></tr>`;
+    return;
+  }
+
+  if (titleEl) titleEl.textContent = `دفتر شناور: ${sh.code} - ${sh.name}`;
+
+  let prevDebit = 0, prevCredit = 0;
+  let ledgerLines = [];
+
+  AppState.sanads.forEach(s => {
+    if (!s.lines) return;
+    s.lines.forEach(line => {
+      if (line.shenavarCode === shenavarCode) {
+        const date = line.txDate || s.date;
+        if (date < fromDate) {
+          prevDebit += Number(line.debit || 0);
+          prevCredit += Number(line.credit || 0);
+        } else if (date >= fromDate && date <= toDate) {
+          ledgerLines.push({
+            date: date,
+            sanadId: s.id,
+            desc: line.desc || s.desc,
+            debit: Number(line.debit || 0),
+            credit: Number(line.credit || 0)
+          });
+        }
+      }
+    });
+  });
+
+  ledgerLines.sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.sanadId - b.sanadId;
+  });
+
+  let html = '';
+  let runningBalance = prevDebit - prevCredit;
+  let runningInd = runningBalance > 0 ? 'بد' : (runningBalance < 0 ? 'بس' : 'بی');
+
+  html += `
+    <tr style="background:rgba(220, 235, 255, 0.7); font-weight:bold;">
+      <td style="text-align:center;">-</td>
+      <td style="text-align:center; color:#475569;">-</td>
+      <td style="text-align:center; color:#475569;">-</td>
+      <td style="color:#1e3a8a;">مانده از قبل</td>
+      <td style="text-align:left;">${prevDebit.toLocaleString()}</td>
+      <td style="text-align:left;">${prevCredit.toLocaleString()}</td>
+      <td style="text-align:center; color:#1e40af;">${runningInd}</td>
+      <td style="text-align:left; color:#1e40af;">${Math.abs(runningBalance).toLocaleString()}</td>
+    </tr>
+  `;
+
+  let totalDeb = prevDebit;
+  let totalCred = prevCredit;
+
+  ledgerLines.forEach((line, idx) => {
+    runningBalance += line.debit - line.credit;
+    runningInd = runningBalance > 0 ? 'بد' : (runningBalance < 0 ? 'بس' : 'بی');
+    totalDeb += line.debit;
+    totalCred += line.credit;
+
+    html += `
+      <tr>
+        <td style="text-align:center; color:var(--text-muted);">${idx + 1}</td>
+        <td style="text-align:center; font-family:monospace;">${line.date}</td>
+        <td style="text-align:center; font-weight:bold; color:var(--accent-color); cursor:pointer;" onclick="openEditSanad(${line.sanadId})">${line.sanadId}</td>
+        <td style="text-align:right;">${line.desc}</td>
+        <td style="text-align:left; color:#047857;">${line.debit ? line.debit.toLocaleString() : '0'}</td>
+        <td style="text-align:left; color:#b91c1c;">${line.credit ? line.credit.toLocaleString() : '0'}</td>
+        <td style="text-align:center; font-weight:bold;">${runningInd}</td>
+        <td style="text-align:left; font-weight:bold;">${Math.abs(runningBalance).toLocaleString()}</td>
+      </tr>
+    `;
+  });
+
+  const finalInd = runningBalance > 0 ? 'بد' : (runningBalance < 0 ? 'بس' : 'بی');
+  html += `
+    <tr style="background:rgba(255, 255, 200, 0.7); font-weight:bold; border-top:2px solid var(--border-color);">
+      <td colspan="4" style="text-align:left; padding:8px;">جمع نهایی دفتر شناور:</td>
+      <td style="text-align:left; color:#047857;">${totalDeb.toLocaleString()}</td>
+      <td style="text-align:left; color:#b91c1c;">${totalCred.toLocaleString()}</td>
+      <td style="text-align:center; color:#1e40af;">${finalInd}</td>
+      <td style="text-align:left; color:#1e40af;">${Math.abs(runningBalance).toLocaleString()}</td>
+    </tr>
+  `;
+
+  bodyEl.innerHTML = html;
+}
+
+
+// 5. Profit & Loss (صورت عملکرد و سود و زیان)
+function calculateProfitLoss() {
+  ensureSanadMockLines();
+  const reportDiv = document.getElementById('divProfitLossReport');
+  if (!reportDiv) return;
+
+  let totalSales = 0;
+  let totalExpenses = 0;
+
+  AppState.sanads.forEach(s => {
+    if (!s.lines) return;
+    s.lines.forEach(line => {
+      if (line.account) {
+        if (line.account.startsWith('04')) {
+          totalSales += Number(line.credit || 0) - Number(line.debit || 0);
+        } else if (line.account.startsWith('05')) {
+          totalExpenses += Number(line.debit || 0) - Number(line.credit || 0);
+        }
+      }
+    });
+  });
+
+  const grossProfit = totalSales; // Simple mock calculation
+  const netProfit = grossProfit - totalExpenses;
+
+  reportDiv.innerHTML = `
+    <div style="max-width:600px; margin:0 auto; border:1px solid rgba(16,185,129,0.3); padding:20px; border-radius:8px; background:rgba(16,185,129,0.02);">
+      <h3 style="text-align:center; margin-bottom:4px; color:#166534;">صورت سود و زیان دوره مالی</h3>
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:20px;">سال مالی ۱۴۰۳ - شرکت نمونه نگار</div>
+      
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border-color); font-weight:bold;">
+        <span>📈 درآمدهای عملیاتی (فروش و خدمات):</span>
+        <span style="color:#047857;">${totalSales.toLocaleString()} ریال</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-color); font-size:0.75rem; padding-right:15px; color:var(--text-muted);">
+        <span>فروش کالا و محصولات (معین ۰۴۴۰)</span>
+        <span>${totalSales.toLocaleString()} ریال</span>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:2px solid var(--border-color); font-weight:bold; background:rgba(0,0,0,0.02);">
+        <span>💵 سود ناویژه (ناخالص):</span>
+        <span style="color:#047857;">${grossProfit.toLocaleString()} ریال</span>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border-color); font-weight:bold; margin-top:15px;">
+        <span>📉 هزینه‌های اداری و فروش:</span>
+        <span style="color:#b91c1c;">${totalExpenses.toLocaleString()} ریال</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-color); font-size:0.75rem; padding-right:15px; color:var(--text-muted);">
+        <span>هزینه‌های عمومی و اداری (معین ۰۵۵۰)</span>
+        <span>${totalExpenses.toLocaleString()} ریال</span>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; padding:12px 10px; border-radius:4px; font-weight:bold; background:rgba(16,185,129,0.1); margin-top:20px; font-size:0.95rem; border:1px solid rgba(16,185,129,0.3);">
+        <span style="color:#166534;">🏆 سود (زیان) خالص دوره:</span>
+        <span style="color:${netProfit >= 0 ? '#047857' : '#b91c1c'};">${netProfit.toLocaleString()} ریال</span>
+      </div>
+    </div>
+  `;
+}
+
+
+// 6. Balance Sheet (ترازنامه مالی)
+function calculateBalanceSheet() {
+  ensureSanadMockLines();
+  const reportDiv = document.getElementById('divBalanceSheetReport');
+  if (!reportDiv) return;
+
+  let totalAssets = 0;
+  let totalLiabilities = 0;
+
+  AppState.sanads.forEach(s => {
+    if (!s.lines) return;
+    s.lines.forEach(line => {
+      if (line.account) {
+        if (line.account.startsWith('01')) {
+          totalAssets += Number(line.debit || 0) - Number(line.credit || 0);
+        } else if (line.account.startsWith('02')) {
+          totalLiabilities += Number(line.credit || 0) - Number(line.debit || 0);
+        }
+      }
+    });
+  });
+
+  const equity = totalAssets - totalLiabilities;
+
+  reportDiv.innerHTML = `
+    <div style="max-width:900px; margin:0 auto; border:1px solid rgba(30,58,138,0.2); padding:20px; border-radius:8px; background:rgba(30,58,138,0.01);">
+      <h3 style="text-align:center; margin-bottom:4px; color:#1e3a8a;">ترازنامه مالی دوره جاری</h3>
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:25px;">منتهی به ۲۹ اسفند ۱۴۰۳ - شرکت نمونه نگار</div>
+      
+      <div style="display:flex; gap:25px;">
+        <!-- Right Column: Assets -->
+        <div style="flex:1; border-left:1px solid var(--border-color); padding-left:15px;">
+          <h4 style="border-bottom:2px solid #1e3a8a; padding-bottom:6px; color:#1e3a8a;">دارایی‌ها (Assets)</h4>
+          
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border-color); font-weight:bold;">
+            <span>دارایی‌های جاری:</span>
+            <span>${totalAssets.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:0.75rem; padding-right:15px; color:var(--text-muted);">
+            <span>موجودی نقد و بانک (صندوق/بانکها)</span>
+            <span>${totalAssets.toLocaleString()} ریال</span>
+          </div>
+          
+          <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #1e3a8a; font-weight:bold; margin-top:40px; background:rgba(30,58,138,0.03);">
+            <span>جمع کل دارایی‌ها:</span>
+            <span style="color:#1e3a8a;">${totalAssets.toLocaleString()} ریال</span>
+          </div>
+        </div>
+
+        <!-- Left Column: Liabilities & Equity -->
+        <div style="flex:1; padding-right:15px;">
+          <h4 style="border-bottom:2px solid #b91c1c; padding-bottom:6px; color:#b91c1c;">بدهی‌ها و سرمایه (Liabilities & Equity)</h4>
+          
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border-color); font-weight:bold;">
+            <span>بدهی‌های جاری:</span>
+            <span>${totalLiabilities.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:0.75rem; padding-right:15px; color:var(--text-muted);">
+            <span>حساب‌های پرداختنی (تامین‌کنندگان)</span>
+            <span>${totalLiabilities.toLocaleString()} ریال</span>
+          </div>
+          
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border-color); font-weight:bold; margin-top:15px;">
+            <span>حقوق صاحبان سهام و سرمایه:</span>
+            <span>${equity.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:0.75rem; padding-right:15px; color:var(--text-muted);">
+            <span>سود (زیان) انباشته دوره جاری</span>
+            <span>${equity.toLocaleString()} ریال</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #b91c1c; font-weight:bold; margin-top:10px; background:rgba(185,28,28,0.03);">
+            <span>جمع کل بدهی‌ها و سرمایه:</span>
+            <span style="color:#b91c1c;">${(totalLiabilities + equity).toLocaleString()} ریال</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Balance Check Indicator -->
+      <div style="text-align:center; margin-top:25px; font-weight:bold; color:${totalAssets === (totalLiabilities + equity) ? '#047857' : '#b91c1c'}; font-size:0.85rem; padding:6px; border-radius:4px; background:rgba(0,0,0,0.02);">
+        ${totalAssets === (totalLiabilities + equity) ? '✅ ترازنامه تراز می‌باشد (دارایی‌ها = بدهی‌ها + سرمایه)' : '❌ ترازنامه ناهمخوان می‌باشد!'}
+      </div>
+    </div>
+  `;
 }
 

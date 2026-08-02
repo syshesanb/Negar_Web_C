@@ -1292,78 +1292,288 @@
 
           <!-- Tab 6: تراز آزمایشی -->
           <div id="tab-panel-taraz" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">نوع تراز:</label>
-                  <select class="form-select"><option>تراز ۲ ستونی</option><option selected>تراز ۴ ستونی</option><option>تراز ۶ ستونی</option><option>تراز ۸ ستونی</option></select>
+            <div class="card form-card" style="padding:15px; margin-bottom:15px; direction:rtl;">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نوع تراز:</label>
+                  <select id="tarazColCount" class="form-select" style="height:28px; font-size:0.8rem; width:110px;">
+                    <option value="2">۲ ستونی</option>
+                    <option value="4" selected>۴ ستونی</option>
+                    <option value="6">۶ ستونی</option>
+                  </select>
                 </div>
-                <div class="form-group"><label class="form-label">سطح نمایش:</label>
-                  <select class="form-select"><option>گروه</option><option>کل</option><option>معین</option><option>تفصیلی</option></select>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نمایش سرفصل‌ها تا سطح:</label>
+                  <select id="tarazLevel" class="form-select" style="height:28px; font-size:0.8rem; width:150px;" onchange="calculateTrialBalance()">
+                    <option value="group">گروه (بستن همه)</option>
+                    <option value="kol">کل</option>
+                    <option value="moein" selected>معین</option>
+                    <option value="tafsili">تفصیلی</option>
+                  </select>
                 </div>
-                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
-                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">از تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="tarazFromDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/01/01" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('tarazFromDate', this)">...</button>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تا تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="tarazToDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/12/29" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('tarazToDate', this)">...</button>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">مبنای گزارش:</label>
+                  <select id="tarazBasis" class="form-select" style="height:28px; font-size:0.8rem; width:110px;">
+                    <option value="date" selected>بر اساس تاریخ</option>
+                    <option value="doc">بر اساس سند</option>
+                  </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:20px; cursor:pointer; font-size:0.8rem; user-select:none;">
+                  <input type="checkbox" id="tarazOnlyTurnover" checked onchange="calculateTrialBalance()" />
+                  <label for="tarazOnlyTurnover">فقط حساب‌های دارای گردش</label>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:20px; cursor:pointer; font-size:0.8rem; user-select:none;">
+                  <input type="checkbox" id="tarazStatusFilter" />
+                  <label for="tarazStatusFilter">فیلتر وضعیت سند</label>
+                </div>
+                
+                <div style="display:flex; gap:6px; margin-top:20px; margin-right:auto;">
+                  <button class="btn btn-primary" onclick="calculateTrialBalance()" style="font-size:0.8rem; height:28px; padding:2px 12px; font-weight:bold;">🔄 بازخوانی</button>
+                  <button class="btn btn-outline" onclick="printTrialBalance()" style="font-size:0.8rem; height:28px; padding:2px 10px;">🖨️ چاپ تراز</button>
+                  <button class="btn btn-outline" onclick="exportTrialBalanceExcel()" style="font-size:0.8rem; height:28px; padding:2px 10px; background:#047857; color:#fff; border-color:#047857;">📥 اکسل</button>
+                </div>
               </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش تراز آزمایشی ۴ ستونی با موفقیت محاسبه و صادر شد.')">⚖️ محاسبه و نمایش تراز</button></div>
+            </div>
+
+            <!-- Trial Grid -->
+            <div class="card form-card" style="padding:10px; direction:rtl; overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.8rem;" id="tblTrialBalance">
+                <thead>
+                  <!-- dynamically populated -->
+                </thead>
+                <tbody id="tblTrialBalanceBody">
+                  <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">جهت بارگذاری داده‌ها، روی دکمه «🔄 بازخوانی» کلیک کنید.</td></tr>
+                </tbody>
+                <tfoot id="tblTrialBalanceFooter" style="background:var(--bg-secondary); font-weight:bold;">
+                  <!-- dynamically populated -->
+                </tfoot>
+              </table>
             </div>
           </div>
 
           <!-- Tab 7: دفتر حساب -->
           <div id="tab-panel-ledger" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">نوع دفتر:</label>
-                  <select class="form-select"><option>دفتر روزنامه</option><option selected>دفتر کل</option><option>دفتر معین</option></select>
+            <div class="card form-card" style="padding:15px; margin-bottom:15px; direction:rtl;">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">انتخاب سرفصل:</label>
+                  <select id="ledgerAccountSelect" class="form-select" style="height:28px; font-size:0.8rem; width:220px;"></select>
                 </div>
-                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
-                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">از تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="ledgerFromDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/01/01" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('ledgerFromDate', this)">...</button>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تا تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="ledgerToDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/12/29" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('ledgerToDate', this)">...</button>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نوع شرح:</label>
+                  <select id="ledgerDescType" class="form-select" style="height:28px; font-size:0.8rem; width:150px;">
+                    <option value="line" selected>فقط شرح ردیف</option>
+                    <option value="both">شرح سند + شرح ردیف</option>
+                  </select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">فیلتر وضعیت سند:</label>
+                  <select id="ledgerStatusFilter" class="form-select" style="height:28px; font-size:0.8rem; width:110px;">
+                    <option value="all" selected>همه اسناد</option>
+                    <option value="moo">موقت</option>
+                    <option value="dai">دائم</option>
+                  </select>
+                </div>
+
+                <div style="display:flex; gap:6px; margin-top:20px; margin-right:auto;">
+                  <button class="btn btn-primary" onclick="calculateAccountLedger()" style="font-size:0.8rem; height:28px; padding:2px 12px; font-weight:bold;">🔄 نمایش دفتر</button>
+                  <button class="btn btn-outline" onclick="printAccountLedger()" style="font-size:0.8rem; height:28px; padding:2px 10px;">🖨️ چاپ دفتر</button>
+                  <button class="btn btn-outline" onclick="exportAccountLedgerExcel()" style="font-size:0.8rem; height:28px; padding:2px 10px; background:#047857; color:#fff; border-color:#047857;">📥 اکسل</button>
+                </div>
               </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش دفتر حسابداری استخراج شد.')">📊 نمایش دفتر</button></div>
+            </div>
+
+            <!-- Ledger Grid -->
+            <div class="card form-card" style="padding:10px; direction:rtl; overflow-x:auto;">
+              <h3 id="lblLedgerAccountTitle" style="font-size:0.85rem; font-weight:bold; margin-bottom:10px; color:var(--accent-color);">دفتر حساب: انتخاب نشده</h3>
+              <table style="width:100%; border-collapse:collapse; font-size:0.8rem;" id="tblAccountLedger">
+                <thead>
+                  <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                    <th style="padding:6px; text-align:center; width:50px;">ردیف</th>
+                    <th style="padding:6px; text-align:center; width:90px;">تاریخ</th>
+                    <th style="padding:6px; text-align:center; width:80px;">شماره سند</th>
+                    <th style="padding:6px; text-align:right;">شرح تراکنش</th>
+                    <th style="padding:6px; text-align:left; width:120px;">بدهکار (ریال)</th>
+                    <th style="padding:6px; text-align:left; width:120px;">بستانکار (ریال)</th>
+                    <th style="padding:6px; text-align:center; width:50px;">تشخیص</th>
+                    <th style="padding:6px; text-align:left; width:140px;">مانده (ریال)</th>
+                  </tr>
+                </thead>
+                <tbody id="tblAccountLedgerBody">
+                  <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">لطفاً پس از انتخاب سرفصل، دکمه «🔄 نمایش دفتر» را بفشارید.</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           <!-- Tab 8: تراز شناور -->
           <div id="tab-panel-taraz-shenavar" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">نوع تراز شناور:</label><select class="form-select"><option>تراز تفصیلی شناور (۴ ستونی)</option></select></div>
-                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
-                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+            <div class="card form-card" style="padding:15px; margin-bottom:15px; direction:rtl;">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نوع تراز شناور:</label>
+                  <select id="tarazShenavarColCount" class="form-select" style="height:28px; font-size:0.8rem;">
+                    <option value="4" selected>تراز تفصیلی شناور (۴ ستونی)</option>
+                  </select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">از تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="tarazShenavarFromDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/01/01" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('tarazShenavarFromDate', this)">...</button>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تا تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="tarazShenavarToDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/12/29" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('tarazShenavarToDate', this)">...</button>
+                  </div>
+                </div>
+                
+                <div style="display:flex; gap:6px; margin-top:20px; margin-right:auto;">
+                  <button class="btn btn-primary" onclick="calculateTarazShenavar()" style="font-size:0.8rem; height:28px; padding:2px 12px; font-weight:bold;">🌊 محاسبه تراز شناور</button>
+                </div>
               </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('تراز شناور محاسبه شد.')">🌊 محاسبه تراز شناور</button></div>
+            </div>
+
+            <!-- Shenavar Balance Grid -->
+            <div class="card form-card" style="padding:10px; direction:rtl; overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.8rem;" id="tblTarazShenavar">
+                <thead>
+                  <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                    <th style="padding:6px; text-align:center; width:60px;">دفتر شناور</th>
+                    <th style="padding:6px; text-align:center; width:120px;">کد شناور</th>
+                    <th style="padding:6px; text-align:right;">نام حساب شناور</th>
+                    <th style="padding:6px; text-align:left; width:140px;">گردش بدهکار (ریال)</th>
+                    <th style="padding:6px; text-align:left; width:140px;">گردش بستانکار (ریال)</th>
+                    <th style="padding:6px; text-align:left; width:140px;">مانده بدهکار (ریال)</th>
+                    <th style="padding:6px; text-align:left; width:140px;">مانده بستانکار (ریال)</th>
+                  </tr>
+                </thead>
+                <tbody id="tblTarazShenavarBody">
+                  <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">جهت بارگذاری داده‌ها، روی دکمه «🌊 محاسبه تراز شناور» کلیک کنید.</td></tr>
+                </tbody>
+                <tfoot id="tblTarazShenavarFooter" style="background:var(--bg-secondary); font-weight:bold;">
+                  <!-- dynamically populated -->
+                </tfoot>
+              </table>
             </div>
           </div>
 
           <!-- Tab 9: دفتر شناور -->
           <div id="tab-panel-daftar-shenavar" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">انتخاب حساب شناور:</label><select class="form-select"><option>مهران رجبی (1001)</option><option>بخش البرز (1002)</option></select></div>
-                <div class="form-group"><label class="form-label">از تاریخ:</label><input type="text" class="form-input" value="1403/01/01" /></div>
-                <div class="form-group"><label class="form-label">تا تاریخ:</label><input type="text" class="form-input" value="1403/05/31" /></div>
+            <div class="card form-card" style="padding:15px; margin-bottom:15px; direction:rtl;">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">انتخاب حساب شناور:</label>
+                  <select id="daftarShenavarSelect" class="form-select" style="height:28px; font-size:0.8rem; width:220px;"></select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">از تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="daftarShenavarFromDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/01/01" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('daftarShenavarFromDate', this)">...</button>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تا تاریخ:</label>
+                  <div style="display:flex; gap:4px; align-items:center;">
+                    <input type="text" id="daftarShenavarToDate" class="form-input" style="width:85px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" value="1403/12/29" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('daftarShenavarToDate', this)">...</button>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:6px; margin-top:20px; margin-right:auto;">
+                  <button class="btn btn-primary" onclick="calculateDaftarShenavar()" style="font-size:0.8rem; height:28px; padding:2px 12px; font-weight:bold;">📖 نمایش دفتر شناور</button>
+                </div>
               </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('دفتر شناور استخراج شد.')">📖 نمایش دفتر شناور</button></div>
+            </div>
+
+            <!-- Shenavar Ledger Grid -->
+            <div class="card form-card" style="padding:10px; direction:rtl; overflow-x:auto;">
+              <h3 id="lblDaftarShenavarTitle" style="font-size:0.85rem; font-weight:bold; margin-bottom:10px; color:var(--accent-color);">دفتر شناور: انتخاب نشده</h3>
+              <table style="width:100%; border-collapse:collapse; font-size:0.8rem;" id="tblDaftarShenavar">
+                <thead>
+                  <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                    <th style="padding:6px; text-align:center; width:50px;">ردیف</th>
+                    <th style="padding:6px; text-align:center; width:90px;">تاریخ</th>
+                    <th style="padding:6px; text-align:center; width:80px;">شماره سند</th>
+                    <th style="padding:6px; text-align:right;">شرح تراکنش</th>
+                    <th style="padding:6px; text-align:left; width:120px;">بدهکار (ریال)</th>
+                    <th style="padding:6px; text-align:left; width:120px;">بستانکار (ریال)</th>
+                    <th style="padding:6px; text-align:center; width:50px;">تشخیص</th>
+                    <th style="padding:6px; text-align:left; width:140px;">مانده (ریال)</th>
+                  </tr>
+                </thead>
+                <tbody id="tblDaftarShenavarBody">
+                  <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">لطفاً پس از انتخاب حساب شناور، دکمه «📖 نمایش دفتر شناور» را بفشارید.</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           <!-- Tab 10: عملکرد و سود و زیان -->
           <div id="tab-panel-profit-loss" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">تنظیم بازه گزارش:</label><select class="form-select"><option>بر اساس تاریخ (از ابتداء تا انتهای دوره)</option></select></div>
-                <div class="form-group"><label class="form-label">تنظیمات مالیات:</label><select class="form-select"><option>ورود از سیستم حسابداری</option></select></div>
+            <div class="card form-card" style="padding:15px; margin-bottom:15px; direction:rtl;">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:200px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تنظیم بازه گزارش:</label>
+                  <select class="form-select" style="height:28px; font-size:0.8rem;"><option>بر اساس تاریخ (از ابتداء تا انتهای دوره)</option></select>
+                </div>
+                <button class="btn btn-primary" onclick="calculateProfitLoss()" style="font-size:0.8rem; height:28px; padding:2px 15px; font-weight:bold; margin-top:20px; margin-right:auto;">📈 محاسبه و نمایش سود و زیان</button>
               </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش صورت سود و زیان محاسبه شد.')">📈 محاسبه و نمایش سود و زیان</button></div>
+            </div>
+
+            <!-- Profit & Loss Sheet Display -->
+            <div class="card form-card" style="padding:25px; direction:rtl;" id="divProfitLossReport">
+              <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:30px;">جهت استخراج گزارش صورت سود و زیان، دکمه بالا را کلیک کنید.</div>
             </div>
           </div>
 
           <!-- Tab 11: ترازنامه -->
           <div id="tab-panel-balance-sheet" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">انتخاب سطح ترازنامه:</label><select class="form-select"><option>کل و معین</option><option>تفصیلی</option></select></div>
-                <div class="form-group"><label class="form-label">تنظیم بازه گزارش:</label><select class="form-select"><option>بر اساس شماره سند در سال جاری</option></select></div>
+            <div class="card form-card" style="padding:15px; margin-bottom:15px; direction:rtl;">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:180px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">انتخاب سطح ترازنامه:</label>
+                  <select class="form-select" style="height:28px; font-size:0.8rem;"><option>کل و معین</option></select>
+                </div>
+                <button class="btn btn-primary" onclick="calculateBalanceSheet()" style="font-size:0.8rem; height:28px; padding:2px 15px; font-weight:bold; margin-top:20px; margin-right:auto;">⚖️ محاسبه و نمایش ترازنامه</button>
               </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('ترازنامه مالی با موفقیت استخراج گردید.')">⚖️ محاسبه و نمایش ترازنامه</button></div>
+            </div>
+
+            <!-- Balance Sheet Display -->
+            <div class="card form-card" style="padding:25px; direction:rtl;" id="divBalanceSheetReport">
+              <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:30px;">جهت استخراج گزارش ترازنامه دوره جاری، دکمه بالا را کلیک کنید.</div>
             </div>
           </div>
 
