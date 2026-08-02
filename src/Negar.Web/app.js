@@ -1382,12 +1382,12 @@ function renderSanadEditorLines() {
         
         <!-- Debit -->
         <td>
-          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.debit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'debit')" />
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:right; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.debit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'debit')" />
         </td>
         
         <!-- Credit -->
         <td>
-          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:left; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.credit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'credit')" />
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; text-align:right; font-weight:bold; font-size:0.8rem; background:transparent;" value="${formatAmount(line.credit)}" onfocus="updateFocusedPaths(${i})" oninput="handleAmountInput(this, ${i}, 'credit')" />
         </td>
         
         <!-- TT Transaction Type Helper -->
