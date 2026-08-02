@@ -1188,32 +1188,37 @@
               <!-- Right Side: Voucher Description (reduced width) -->
               <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
                 <span style="font-weight:bold; font-size:0.8rem; color:var(--text-muted); min-width:60px;">شرح سند:</span>
-                <textarea id="sanadDescInput" class="form-input" style="width:280px; height:45px; resize:none; font-size:0.8rem;" placeholder="به شرح سند صادره..."></textarea>
+                <textarea id="sanadDescInput" class="form-input" style="width:350px; height:45px; resize:none; font-size:0.8rem;" placeholder="به شرح سند صادره..."></textarea>
               </div>
 
-              <!-- Middle: Balance Status Badge -->
-              <div style="display:flex; align-items:center; gap:6px; flex-grow:1; justify-content:center; padding-right:15px; padding-left:15px;">
-                <span style="font-weight:bold; font-size:0.8rem; color:var(--text-muted);">تعادل سند:</span>
-                <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.8rem; padding:4px 10px; font-weight:bold;">تراز</span>
-                <span style="font-size:0.8rem; font-weight:bold; color:var(--text-muted);">است</span>
-              </div>
-
-              <!-- Left Side: Aligned totals and labels (LTR for pixel-perfect columns) -->
+              <!-- Left Side: Aligned totals, labels and status badge (LTR for pixel-perfect columns) -->
               <div style="display:flex; align-items:center; direction:ltr !important; flex-shrink:0;">
                 <!-- Stacked Rows -->
                 <div style="display:flex; flex-direction:column; gap:4px; width:750px; direction:ltr !important; flex-shrink:0;">
-                  <!-- Row 1: Totals -->
+                  <!-- Row 1: Totals & Status Badge -->
                   <div style="display:flex; align-items:center; width:100%; direction:ltr !important;">
-                    <div style="width:318px; flex-shrink:0;"></div>
+                    <!-- Spacer matches columns on left, and acts as container for Status Badge on far-left -->
+                    <div style="width:318px; flex-shrink:0; display:flex; align-items:center; justify-content:flex-start; direction:rtl;">
+                      <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-weight:bold; font-size:0.75rem; color:var(--text-muted);">تعادل سند:</span>
+                        <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.75rem; padding:4px 10px; font-weight:bold;">تراز</span>
+                        <span style="font-size:0.75rem; font-weight:bold; color:var(--text-muted);">است</span>
+                      </div>
+                    </div>
+                    <!-- Credit Total (150px) -->
                     <input type="text" id="footerTotalCredit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(56,189,248,0.1); color:var(--accent-color); font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
+                    <!-- Debit Total (150px) -->
                     <input type="text" id="footerTotalDebit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(56,189,248,0.1); color:var(--accent-color); font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
                     <span style="font-weight:bold; font-size:0.75rem; color:var(--text-muted); padding-left:12px; flex-grow:1; text-align:right; direction:rtl;">جمع:</span>
                   </div>
                   
                   <!-- Row 2: Differences -->
                   <div style="display:flex; align-items:center; width:100%; direction:ltr !important;">
+                    <!-- Empty Spacer matching top row -->
                     <div style="width:318px; flex-shrink:0;"></div>
+                    <!-- Credit Difference (150px) -->
                     <input type="text" id="footerDiffCredit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(239,68,68,0.15); color:#ef4444; font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
+                    <!-- Debit Difference (150px) -->
                     <input type="text" id="footerDiffDebit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(253,224,71,0.15); color:#eab308; font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
                     <span style="font-weight:bold; font-size:0.75rem; color:var(--text-muted); padding-left:12px; flex-grow:1; text-align:right; direction:rtl;">کسری تا تراز:</span>
                   </div>
