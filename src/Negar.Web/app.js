@@ -1260,7 +1260,7 @@ function updateFocusedPaths(i) {
   
   // Find selected account path
   const acc = AppState.accounts.find(a => a.code === line.account);
-  let accPath = 'کد و نام حساب سرفصل ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span>';
+  let accPath = '<span style="color:var(--text-muted); font-weight:normal;">-</span>';
   if (acc) {
     const pathParts = [];
     let curr = acc;
@@ -1268,12 +1268,12 @@ function updateFocusedPaths(i) {
       pathParts.unshift(`${curr.code} : ${curr.name}`);
       curr = curr.parentId ? AppState.accounts.find(x => x.id === curr.parentId) : null;
     }
-    accPath = `کد و نام حساب سرفصل ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${pathParts.join(' / ')}</span>`;
+    accPath = `<span style="color:var(--accent-color); font-weight:bold;">${pathParts.join(' / ')}</span>`;
   }
   
   // Find selected shenavar path
   const shen = AppState.shenavars.find(s => s.code === line.shenavarCode);
-  let shenPath = 'کد و نام حساب شناور ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">بدون شناور</span>';
+  let shenPath = '<span style="color:var(--text-muted); font-weight:normal;">بدون شناور</span>';
   if (shen) {
     const pathParts = [];
     let curr = shen;
@@ -1281,7 +1281,7 @@ function updateFocusedPaths(i) {
       pathParts.unshift(`${curr.code} : ${curr.name}`);
       curr = curr.parentId ? AppState.shenavars.find(x => x.id === curr.parentId) : null;
     }
-    shenPath = `کد و نام حساب شناور ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${pathParts.join(' / ')}</span>`;
+    shenPath = `<span style="color:var(--accent-color); font-weight:bold;">${pathParts.join(' / ')}</span>`;
   }
   
   const accEl = document.getElementById('focusedAccountPath');
@@ -1290,7 +1290,7 @@ function updateFocusedPaths(i) {
   if (accEl) accEl.innerHTML = accPath;
   if (shenEl) shenEl.innerHTML = shenPath;
   if (lineDescEl) {
-    lineDescEl.innerHTML = `متن کامل شرح ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${line.desc || '-'}</span>`;
+    lineDescEl.innerHTML = `<span style="color:var(--accent-color); font-weight:bold;">${line.desc || '-'}</span>`;
   }
 }
 
@@ -1308,7 +1308,7 @@ function updateSanadLineField(i, field, value) {
   if (field === 'desc') {
     const lineDescEl = document.getElementById('focusedLineDesc');
     if (lineDescEl) {
-      lineDescEl.innerHTML = `متن کامل شرح ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${value || '-'}</span>`;
+      lineDescEl.innerHTML = `<span style="color:var(--accent-color); font-weight:bold;">${value || '-'}</span>`;
     }
   }
 }
@@ -1438,7 +1438,7 @@ function renderSanadEditorLines() {
         <td style="text-align:center; font-weight:bold;">${i + 1}</td>
         
         <!-- SF button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openSfPopup(${i})">...</button></td>
+        <td style="text-align:center;"><button class="btn btn-outline date-picker-btn" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openSfPopup(${i})">...</button></td>
 
         <!-- Account Code TextBox -->
         <td>
@@ -1446,7 +1446,7 @@ function renderSanadEditorLines() {
         </td>
         
         <!-- SH button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openShPopup(${i})">...</button></td>
+        <td style="text-align:center;"><button class="btn btn-outline date-picker-btn" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); openShPopup(${i})">...</button></td>
 
         <!-- Floating Account Code TextBox -->
         <td>
