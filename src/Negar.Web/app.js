@@ -1353,26 +1353,17 @@ function renderSanadEditorLines() {
         <!-- SF button helper -->
         <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert('سرفصل حساب: ' + '${line.account}')">...</button></td>
 
-        <!-- Account Code Dropdown -->
+        <!-- Account Code TextBox -->
         <td>
-          <select class="form-select" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'account', this.value)">
-            ${AppState.accounts.map(a => 
-              `<option value="${a.code}" ${line.account === a.code ? 'selected' : ''}>${a.code} - ${a.name}</option>`
-            ).join('')}
-          </select>
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.account || ''}" onfocus="updateFocusedPaths(${i})" oninput="updateSanadLineField(${i}, 'account', this.value)" />
         </td>
         
         <!-- SH button helper -->
-        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert( '${line.shenavarCode}' ? 'شناور: ' + '${line.shenavarCode}' : 'حساب بدون شناور است' )">...</button></td>
+        <td style="text-align:center;"><button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="event.stopPropagation(); alert( line.shenavarCode ? 'شناور: ' + line.shenavarCode : 'حساب بدون شناور است' )">...</button></td>
 
-        <!-- Floating Account Dropdown -->
+        <!-- Floating Account Code TextBox -->
         <td>
-          <select class="form-select" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'shenavarCode', this.value)">
-            <option value="">بدون شناور</option>
-            ${AppState.shenavars.map(s => 
-              `<option value="${s.code}" ${line.shenavarCode === s.code ? 'selected' : ''}>${s.code} - ${s.name}</option>`
-            ).join('')}
-          </select>
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.shenavarCode || ''}" onfocus="updateFocusedPaths(${i})" oninput="updateSanadLineField(${i}, 'shenavarCode', this.value)" placeholder="بدون شناور" />
         </td>
         
         <!-- Description -->
