@@ -1179,46 +1179,54 @@
                 <tbody id="sanadLinesEditorBody">
                   <!-- Rows generated dynamically -->
                 </tbody>
-                <!-- Integrated Footer Totals Aligning Directly Under Debit/Credit Columns -->
-                <tfoot style="position:sticky; bottom:0; background:var(--bg-secondary); z-index:10; border-top:2px solid var(--border-color);">
-                  <tr style="background:var(--bg-secondary); border-top:2px solid var(--border-color); font-weight:bold;">
-                    <td colspan="6" style="text-align:left; padding:4px 12px; font-size:0.75rem; color:var(--text-muted);">جمع:</td>
-                    <td style="padding:2px 4px; width:150px;">
-                      <input type="text" id="footerTotalDebit" readonly class="form-input" style="width:100%; text-align:right; background:rgba(56,189,248,0.1); color:var(--accent-color); font-weight:bold; height:24px; font-size:0.75rem; border:none; padding:2px 4px;" value="0" />
-                    </td>
-                    <td style="padding:2px 4px; width:150px;">
-                      <input type="text" id="footerTotalCredit" readonly class="form-input" style="width:100%; text-align:right; background:rgba(56,189,248,0.1); color:var(--accent-color); font-weight:bold; height:24px; font-size:0.75rem; border:none; padding:2px 4px;" value="0" />
-                    </td>
-                    <td colspan="4"></td>
-                  </tr>
-                  <tr style="background:var(--bg-secondary); border-top:1px solid var(--border-color); font-weight:bold;">
-                    <td colspan="6" style="text-align:left; padding:4px 12px; font-size:0.75rem; color:var(--text-muted);">کسری تا تراز:</td>
-                    <td style="padding:2px 4px; width:150px;">
-                      <input type="text" id="footerDiffDebit" readonly class="form-input" style="width:100%; text-align:right; background:rgba(253,224,71,0.15); color:#eab308; font-weight:bold; height:24px; font-size:0.75rem; border:none; padding:2px 4px;" value="0" />
-                    </td>
-                    <td style="padding:2px 4px; width:150px;">
-                      <input type="text" id="footerDiffCredit" readonly class="form-input" style="width:100%; text-align:right; background:rgba(239,68,68,0.15); color:#ef4444; font-weight:bold; height:24px; font-size:0.75rem; border:none; padding:2px 4px;" value="0" />
-                    </td>
-                    <td colspan="4"></td>
-                  </tr>
-                </tfoot>
               </table>
             </div>
 
             <!-- Footer Balance Box and Voucher description -->
-            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-secondary); padding:12px; border-radius:4px; margin-bottom:15px; border:1px solid var(--border-color); flex-wrap:wrap; gap:15px; direction:rtl;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-secondary); padding:10px 12px; border-radius:4px; margin-bottom:15px; border:1px solid var(--border-color); direction:rtl; height:75px; box-sizing:border-box;">
               
-              <!-- Right Side: Voucher Description -->
+              <!-- Right Side: Voucher Description (reduced width) -->
               <div style="display:flex; align-items:center; gap:8px;">
                 <span style="font-weight:bold; font-size:0.8rem; color:var(--text-muted); min-width:60px;">شرح سند:</span>
-                <textarea id="sanadDescInput" class="form-input" style="width:500px; height:42px; resize:none; font-size:0.8rem;" placeholder="به شرح سند صادره..."></textarea>
+                <textarea id="sanadDescInput" class="form-input" style="width:300px; height:45px; resize:none; font-size:0.8rem;" placeholder="به شرح سند صادره..."></textarea>
               </div>
 
-              <!-- Status Badge (Left aligned in RTL) -->
-              <div style="display:flex; align-items:center; gap:6px; margin-left:15px; direction:rtl;">
-                <span style="font-weight:bold; font-size:0.85rem; color:var(--text-muted);">تعادل سند:</span>
-                <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.85rem; padding:5px 12px; font-weight:bold;">تراز</span>
-                <span style="font-size:0.85rem; font-weight:bold; color:var(--text-muted);">است</span>
+              <!-- Middle: Balance Status Badge -->
+              <div style="display:flex; align-items:center; gap:6px; flex-grow:1; justify-content:center; padding-right:15px;">
+                <span style="font-weight:bold; font-size:0.8rem; color:var(--text-muted); justify-content:center;">تعادل سند:</span>
+                <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.8rem; padding:4px 10px; font-weight:bold;">تراز</span>
+                <span style="font-size:0.8rem; font-weight:bold; color:var(--text-muted);">است</span>
+              </div>
+
+              <!-- Left Side: Labels + Balance inputs (LTR stacked for pixel-perfect table alignment) -->
+              <div style="display:flex; align-items:center; gap:10px;">
+                <!-- Vertically Stacked Labels -->
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:0.75rem; color:var(--text-muted); font-weight:bold; text-align:left; min-width:80px; direction:rtl;">
+                  <div>جمع:</div>
+                  <div>کسری تا تراز:</div>
+                </div>
+
+                <!-- LTR Container for column aligned inputs -->
+                <div style="display:flex; flex-direction:column; gap:4px; width:630px; direction:ltr; flex-shrink:0;">
+                  <!-- Row 1: Totals -->
+                  <div style="display:flex; align-items:center; width:100%;">
+                    <!-- Spacer matches: operations(50px) + transaction date(110px) + TT(40px) + transaction no(130px) - container padding offset -->
+                    <div style="width:318px; flex-shrink:0;"></div>
+                    <!-- Credit Total (150px) -->
+                    <input type="text" id="footerTotalCredit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(56,189,248,0.1); color:var(--accent-color); font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
+                    <!-- Debit Total (150px) -->
+                    <input type="text" id="footerTotalDebit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(56,189,248,0.1); color:var(--accent-color); font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
+                  </div>
+                  <!-- Row 2: Differences -->
+                  <div style="display:flex; align-items:center; width:100%;">
+                    <!-- Spacer -->
+                    <div style="width:318px; flex-shrink:0;"></div>
+                    <!-- Credit Difference (150px) -->
+                    <input type="text" id="footerDiffCredit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(239,68,68,0.15); color:#ef4444; font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
+                    <!-- Debit Difference (150px) -->
+                    <input type="text" id="footerDiffDebit" readonly class="form-input" style="width:150px; text-align:right; background:rgba(253,224,71,0.15); color:#eab308; font-weight:bold; height:24px; font-size:0.75rem; border:1px solid var(--border-color); flex-shrink:0; box-sizing:border-box;" value="0" />
+                  </div>
+                </div>
               </div>
             </div>
 
