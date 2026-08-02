@@ -1497,6 +1497,37 @@ function copyFocusedSanadLine(direction) {
   renderSanadEditorLines();
 }
 
+function copyFocusedSanadLineToCustom() {
+  if (focusedLineIndex === null || !AppState.sanadLines[focusedLineIndex]) {
+    alert('لطفاً ابتدا روی یکی از ردیف‌های سند کلیک کنید تا به عنوان سطر جاری انتخاب شود.');
+    return;
+  }
+  
+  const totalRows = AppState.sanadLines.length;
+  const input = prompt(
+    `شماره سطر مقصد را وارد کنید (1 تا ${totalRows + 1}):`,
+    (focusedLineIndex + 1).toString()
+  );
+  
+  if (input === null || input.trim() === '') {
+    return;
+  }
+  
+  const pos = parseInt(input.trim(), 10);
+  if (isNaN(pos) || pos < 1 || pos > totalRows + 1) {
+    alert('شماره سطر وارد شده معتبر نیست.');
+    return;
+  }
+  
+  const insertAt = pos - 1;
+  const sourceLine = { ...AppState.sanadLines[focusedLineIndex] };
+  
+  AppState.sanadLines.splice(insertAt, 0, sourceLine);
+  focusedLineIndex = insertAt;
+  
+  renderSanadEditorLines();
+}
+
 function deleteFocusedSanadLine() {
   if (focusedLineIndex === null || !AppState.sanadLines[focusedLineIndex]) {
     alert('لطفاً ابتدا روی یکی از ردیف‌های سند کلیک کنید.');
