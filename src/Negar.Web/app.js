@@ -1342,6 +1342,36 @@ function handleAmountInput(input, index, field) {
   input.setSelectionRange(newCursor, newCursor);
 }
 
+function matchAmount(val, filterText) {
+  filterText = filterText.replace(/,/g, '').trim();
+  if (filterText.length === 0) return true;
+  
+  const ch = filterText[0];
+  if (ch === '*') {
+    const searchStr = filterText.slice(1);
+    if (searchStr.length === 0) return true;
+    return String(Math.floor(val)).includes(searchStr);
+  } else if (ch === '<') {
+    const numStr = filterText.slice(1).trim();
+    if (numStr.length === 0) return true;
+    const threshold = parseFloat(numStr);
+    return isNaN(threshold) ? true : val < threshold;
+  } else if (ch === '>') {
+    const numStr = filterText.slice(1).trim();
+    if (numStr.length === 0) return true;
+    const threshold = parseFloat(numStr);
+    return isNaN(threshold) ? true : val > threshold;
+  } else if (ch === '=') {
+    const numStr = filterText.slice(1).trim();
+    if (numStr.length === 0) return true;
+    const target = parseFloat(numStr);
+    return isNaN(target) ? true : val === target;
+  } else {
+    const target = parseFloat(filterText);
+    return isNaN(target) ? true : val === target;
+  }
+}
+
 const sanadSearchFilters = {
   account: '',
   shenavarCode: '',
@@ -1391,12 +1421,10 @@ function renderSanadEditorLines() {
     if (sanadSearchFilters.txDate && !line.txDate.includes(sanadSearchFilters.txDate)) return '';
 
     if (sanadSearchFilters.debit) {
-      const cleanSearch = sanadSearchFilters.debit.replace(/\D/g, '');
-      if (cleanSearch && !String(line.debit).includes(cleanSearch)) return '';
+      if (!matchAmount(Number(line.debit || 0), sanadSearchFilters.debit)) return '';
     }
     if (sanadSearchFilters.credit) {
-      const cleanSearch = sanadSearchFilters.credit.replace(/\D/g, '');
-      if (cleanSearch && !String(line.credit).includes(cleanSearch)) return '';
+      if (!matchAmount(Number(line.credit || 0), sanadSearchFilters.credit)) return '';
     }
     if (!line.txDate) line.txDate = '';
 
