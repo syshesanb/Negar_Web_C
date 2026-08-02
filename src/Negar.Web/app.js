@@ -1606,21 +1606,40 @@ function renderPopupAccounts() {
   const searchCode = (document.getElementById('popupSearchCode')?.value || '').trim();
   const searchName = (document.getElementById('popupSearchName')?.value || '').trim().toLowerCase();
   
-  // Filter accounts list
-  let list = AppState.accounts;
-  if (searchCode) {
-    list = list.filter(a => a.code.includes(searchCode));
-  }
-  if (searchName) {
-    list = list.filter(a => a.name.toLowerCase().includes(searchName));
+  const sortedAccounts = sortTreePreOrder(AppState.accounts);
+  let list;
+  
+  const isSearching = (searchCode || searchName);
+  
+  if (isSearching) {
+    list = sortedAccounts.filter(a => {
+      const matchCode = searchCode ? a.code.includes(searchCode) : true;
+      const matchName = searchName ? a.name.toLowerCase().includes(searchName) : true;
+      return matchCode && matchName;
+    });
+  } else {
+    list = sortedAccounts.filter(isAccountVisible);
   }
   
   tbody.innerHTML = list.map(account => {
+    const level = getAccountLevel(account);
+    const hasChildren = AppState.accounts.some(child => child.parentId === account.id);
+    const isExpanded = expandedAccountIds.has(account.id);
+    
+    // Toggle button in popup
+    const toggleBtnHtml = hasChildren
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); togglePopupAccountExpand(${account.id})">${isExpanded ? '-' : '+'}</button>`
+      : `<button class="tree-toggle-btn" style="visibility:hidden; width:16px;">+</button>`;
+      
+    const indentPx = level * 18;
+    const isSelected = (account.code === AppState.sanadLines[activePopupRowIndex]?.account);
+    const selectedClass = isSelected ? 'focused-row' : '';
+    
     return `
-      <tr onclick="updatePopupSelectedPath(${JSON.stringify(account).replace(/"/g, '&quot;')})" style="cursor:pointer; height:26px;">
-        <!-- Add Sub-Account Button -->
-        <td style="text-align:center;">
-          <button class="btn btn-outline" style="padding:1px 6px; font-size:0.75rem; border-color:#0284c7; color:#0284c7;" onclick="event.stopPropagation(); openAddAccountInPopup(${account.id})">+</button>
+      <tr onclick="updatePopupSelectedPath(${JSON.stringify(account).replace(/"/g, '&quot;')})" style="cursor:pointer; height:26px; ${isSelected ? 'background-color:rgba(2,132,199,0.18) !important;' : ''}">
+        <!-- Expand/Collapse Button (instead of "+" for sub-account) -->
+        <td style="text-align:center; vertical-align:middle;">
+          ${toggleBtnHtml}
         </td>
         <!-- Select Button -->
         <td style="text-align:center;">
@@ -1636,8 +1655,11 @@ function renderPopupAccounts() {
         </td>
         <!-- Code -->
         <td style="padding:4px 8px; font-weight:bold; font-size:0.8rem;">${account.code}</td>
-        <!-- Name -->
-        <td style="padding:4px 8px; font-size:0.8rem;">${account.name}</td>
+        <!-- Name (with tree indentation) -->
+        <td style="padding:4px 8px; padding-right:${indentPx + 10}px; font-size:0.8rem; text-align:right;">
+          ${level > 0 ? '<span style="color:var(--accent-color);margin-left:6px;">└─</span>' : ''}
+          <b>${account.name}</b>
+        </td>
         <!-- Active Checkbox -->
         <td style="text-align:center;">
           <input type="checkbox" checked disabled />
@@ -1645,6 +1667,18 @@ function renderPopupAccounts() {
       </tr>
     `;
   }).join('');
+}
+
+function togglePopupAccountExpand(accId) {
+  if (expandedAccountIds.has(accId)) {
+    expandedAccountIds.delete(accId);
+  } else {
+    expandedAccountIds.add(accId);
+  }
+  renderPopupAccounts();
+  if (typeof renderAccountsTable === 'function') {
+    renderAccountsTable();
+  }
 }
 
 function filterPopupAccounts() {
