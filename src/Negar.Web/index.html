@@ -1792,12 +1792,32 @@
           <h2 class="form-heading">📥 فاکتورهای خرید (KharidForm)</h2>
           <div class="card form-card">
             <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
-              <button class="btn btn-primary">+ فاکتور خرید جدید</button>
+              <button class="btn btn-primary" onclick="openAddPurchaseInvoiceRow()">+ فاکتور خرید جدید</button>
             </div>
             <div class="table-wrapper">
-              <table><thead><tr><th>شماره فاکتور</th><th>تاریخ</th><th>تامین‌کننده</th><th>انبار</th><th>مبلغ کل</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <table><thead><tr><th>شماره فاکتور</th><th>تاریخ</th><th>تامین‌کننده</th><th>انبار</th><th>مبلغ کل (ریال)</th><th>وضعیت</th></tr></thead>
               <tbody id="purchaseInvoicesBody"></tbody></table>
             </div>
+
+            <!-- Add Purchase Invoice form -->
+            <div id="addPurchaseInvoiceRow" style="display:none; margin-top:20px; border-top:1px dashed var(--border-color); padding-top:15px;" class="inline-form">
+              <h4 style="margin-bottom:10px; color:var(--accent-color);">ثبت فاکتور خرید جدید</h4>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">شماره فاکتور:</label><input type="text" id="newPurchNo" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">تاریخ:</label><input type="text" id="newPurchDate" class="form-input" style="background:var(--bg-primary);" value="1403/05/11" /></div>
+                <div class="form-group"><label class="form-label">تامین‌کننده:</label><input type="text" id="newPurchVendor" class="form-input" style="background:var(--bg-primary);" value="بازرگانی واردات پارس" /></div>
+                <div class="form-group"><label class="form-label">انتخاب کالا:</label>
+                  <select id="newPurchProduct" class="form-select"></select>
+                </div>
+                <div class="form-group"><label class="form-label">تعداد:</label><input type="number" id="newPurchQty" class="form-input" style="background:var(--bg-primary);" value="1" /></div>
+                <div class="form-group"><label class="form-label">قیمت واحد:</label><input type="number" id="newPurchPrice" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group" style="align-self:flex-end; display:flex; gap:6px;">
+                  <button class="btn btn-primary" onclick="saveNewPurchaseInvoice()">ثبت فاکتور</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addPurchaseInvoiceRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1805,12 +1825,32 @@
           <h2 class="form-heading">📤 فاکتورهای فروش (ForooshForm)</h2>
           <div class="card form-card">
             <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
-              <button class="btn btn-primary">+ فاکتور فروش جدید</button>
+              <button class="btn btn-primary" onclick="openAddSalesInvoiceRow()">+ فاکتور فروش جدید</button>
             </div>
             <div class="table-wrapper">
-              <table><thead><tr><th>شماره فاکتور</th><th>تاریخ</th><th>مشتری</th><th>انبار</th><th>مبلغ کل</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+              <table><thead><tr><th>شماره فاکتور</th><th>تاریخ</th><th>مشتری</th><th>انبار</th><th>مبلغ کل (ریال)</th><th>وضعیت</th></tr></thead>
               <tbody id="salesInvoicesBody"></tbody></table>
             </div>
+
+            <!-- Add Sales Invoice form -->
+            <div id="addSalesInvoiceRow" style="display:none; margin-top:20px; border-top:1px dashed var(--border-color); padding-top:15px;" class="inline-form">
+              <h4 style="margin-bottom:10px; color:var(--accent-color);">ثبت فاکتور فروش جدید</h4>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">شماره فاکتور:</label><input type="text" id="newSalesNo" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">تاریخ:</label><input type="text" id="newSalesDate" class="form-input" style="background:var(--bg-primary);" value="1403/05/11" /></div>
+                <div class="form-group"><label class="form-label">مشتری:</label><input type="text" id="newSalesCustomer" class="form-input" style="background:var(--bg-primary);" value="شرکت فناوری آریا" /></div>
+                <div class="form-group"><label class="form-label">انتخاب کالا:</label>
+                  <select id="newSalesProduct" class="form-select"></select>
+                </div>
+                <div class="form-group"><label class="form-label">تعداد:</label><input type="number" id="newSalesQty" class="form-input" style="background:var(--bg-primary);" value="1" /></div>
+                <div class="form-group"><label class="form-label">قیمت واحد:</label><input type="number" id="newSalesPrice" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group" style="align-self:flex-end; display:flex; gap:6px;">
+                  <button class="btn btn-primary" onclick="saveNewSalesInvoice()">ثبت فاکتور</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addSalesInvoiceRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1857,25 +1897,55 @@
         <div id="form-personnel" class="form-section">
           <h2 class="form-heading">👔 پرونده پرسنلی و حکم حقوقی (PersonnelForm)</h2>
           <div class="card form-card">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-primary">+ پرسنل جدید</button></div>
-            <div class="table-wrapper">
-              <table><thead><tr><th>کد پرسنلی</th><th>نام کامل</th><th>واحد سازمانی</th><th>سمت</th><th>حقوق پایه</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody>
-                <tr><td>EMP-001</td><td>علی رضایی</td><td>حسابداری</td><td>حسابدار ارشد</td><td>۲۵,۰۰۰,۰۰۰ ریال</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
-                <tr><td>EMP-002</td><td>رضا حسینی</td><td>انبارداری</td><td>انباردار</td><td>۱۸,۰۰۰,۰۰۰ ریال</td><td><span class="badge badge-success">فعال</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">✏️</button></td></tr>
-              </tbody></table>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+              <button class="btn btn-primary" onclick="openAddPersonnelRow()">+ پرسنل جدید</button>
             </div>
+            <div class="table-wrapper">
+              <table><thead><tr><th>کد پرسنلی</th><th>نام کامل</th><th>کد ملی</th><th>سمت / نقش</th><th>حقوق پایه (ریال)</th><th>حق مسکن (ریال)</th><th>بن خواروبار (ریال)</th></tr></thead>
+              <tbody id="personnelTableBody"></tbody></table>
+            </div>
+
+            <!-- Add personnel inline form -->
+            <div id="addPersonnelRow" style="display:none; margin-top:20px; border-top:1px dashed var(--border-color); padding-top:15px;" class="inline-form">
+              <h4 style="margin-bottom:10px; color:var(--accent-color);">ثبت پرسنل و حکم حقوقی جدید</h4>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">نام و نام خانوادگی:</label><input type="text" id="newPersName" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">کد ملی:</label><input type="text" id="newPersNationalId" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">سمت / نقش:</label><input type="text" id="newPersRole" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">حقوق پایه (ریال):</label><input type="number" id="newPersBase" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">حق مسکن (ریال):</label><input type="number" id="newPersHousing" class="form-input" style="background:var(--bg-primary);" value="15000000" /></div>
+                <div class="form-group"><label class="form-label">بن خواروبار (ریال):</label><input type="number" id="newPersGrocery" class="form-input" style="background:var(--bg-primary);" value="10000000" /></div>
+                <div class="form-group" style="align-self:flex-end; display:flex; gap:6px;">
+                  <button class="btn btn-primary" onclick="saveNewPersonnel()">ذخیره حکم</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addPersonnelRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
         <div id="form-payslip" class="form-section">
           <h2 class="form-heading">💵 محاسبه حقوق و صدور فیش (PayslipForm)</h2>
           <div class="card form-card">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">ماه محاسبه:</label><select class="form-select"><option>مرداد ۱۴۰۳</option><option>تیر ۱۴۰۳</option></select></div>
-              <div class="form-group"><label class="form-label">واحد سازمانی:</label><select class="form-select"><option>همه واحدها</option><option>حسابداری</option><option>انبارداری</option></select></div>
+            <div class="form-row" style="direction:rtl;">
+              <div class="form-group" style="width:250px;"><label class="form-label">انتخاب پرسنل:</label>
+                <select id="payslipPersonnelSelect" class="form-select"></select>
+              </div>
+              <div class="form-group" style="width:150px;"><label class="form-label">ماه محاسبه:</label>
+                <select id="payslipMonthSelect" class="form-select">
+                  <option value="05">مرداد ۱۴۰۳</option>
+                  <option value="04">تیر ۱۴۰۳</option>
+                </select>
+              </div>
+              <div class="form-group" style="align-self:flex-end;"><button class="btn btn-primary" onclick="generatePersonnelPayslip()">💵 محاسبه و صدور فیش</button></div>
             </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('فیش حقوقی مرداد ۱۴۰۳ محاسبه و صادر گردید.')">💵 محاسبه و صدور فیش</button></div>
+
+            <!-- Payslip details card -->
+            <div id="payslipResultCard" style="display:none; margin-top:20px; border-top:1px dashed var(--border-color); padding-top:20px;">
+              <!-- Dynamically populated -->
+            </div>
+
           </div>
         </div>
 
@@ -1977,15 +2047,30 @@
           <h2 class="form-heading">💰 مدیریت چک‌ها (ChecksForm)</h2>
           <div class="card form-card">
             <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:12px;">
-              <button class="btn btn-outline">+ چک دریافتی</button>
-              <button class="btn btn-primary">+ چک پرداختی</button>
+              <button class="btn btn-outline" onclick="openAddCheckRow('دریافتی')">+ چک دریافتی جدید</button>
+              <button class="btn btn-primary" onclick="openAddCheckRow('پرداختی')">+ ثبت چک پرداختی جدید</button>
             </div>
             <div class="table-wrapper">
-              <table><thead><tr><th>شماره چک</th><th>بانک</th><th>مبلغ</th><th>تاریخ سررسید</th><th>نوع</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-              <tbody>
-                <tr><td>1234567</td><td>ملی</td><td>۱۵۰,۰۰۰,۰۰۰</td><td>1403/06/01</td><td><span class="badge badge-success">دریافتی</span></td><td><span class="badge badge-warning">در جریان</span></td><td><button class="btn btn-outline" style="padding:3px 8px;">وصول</button></td></tr>
-              </tbody></table>
+              <table><thead><tr><th>شماره چک</th><th>بانک صادرکننده</th><th>مبلغ (ریال)</th><th>تاریخ سررسید</th><th>نوع چک</th><th>وضعیت فعلی</th><th>عملیات</th></tr></thead>
+              <tbody id="checksTableBody"></tbody></table>
             </div>
+
+            <!-- Add Check Inline Form -->
+            <div id="addCheckRow" style="display:none; margin-top:20px; border-top:1px dashed var(--border-color); padding-top:15px;" class="inline-form">
+              <h4 id="lblAddCheckTitle" style="margin-bottom:10px; color:var(--accent-color);">ثبت چک جدید</h4>
+              <div class="form-row">
+                <input type="hidden" id="newCheckType" />
+                <div class="form-group"><label class="form-label">شماره چک:</label><input type="text" id="newCheckNo" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">بانک صادرکننده:</label><input type="text" id="newCheckBank" class="form-input" style="background:var(--bg-primary);" value="بانک ملی" /></div>
+                <div class="form-group"><label class="form-label">مبلغ (ریال):</label><input type="number" id="newCheckAmount" class="form-input" style="background:var(--bg-primary);" /></div>
+                <div class="form-group"><label class="form-label">تاریخ سررسید:</label><input type="text" id="newCheckDueDate" class="form-input" style="background:var(--bg-primary);" value="1403/06/01" /></div>
+                <div class="form-group" style="align-self:flex-end; display:flex; gap:6px;">
+                  <button class="btn btn-primary" onclick="saveNewCheck()">ذخیره چک</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('addCheckRow').style.display='none'">لغو</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1993,11 +2078,8 @@
           <h2 class="form-heading">🏦 مدیریت حساب‌های بانکی و صندوق (BankAccountsForm)</h2>
           <div class="card form-card">
             <div class="table-wrapper">
-              <table><thead><tr><th>نام</th><th>نوع</th><th>شماره حساب</th><th>بانک / شعبه</th><th>مانده جاری</th><th>عملیات</th></tr></thead>
-              <tbody>
-                <tr><td>صندوق مرکزی</td><td>صندوق</td><td>-</td><td>-</td><td>۴۵,۰۰۰,۰۰۰ ریال</td><td><button class="btn btn-outline" style="padding:3px 8px;">گردش</button></td></tr>
-                <tr><td>بانک ملی مرکزی</td><td>حساب بانکی</td><td>0105000000001</td><td>بانک ملی - شعبه مرکزی</td><td>۳,۴۰۰,۰۰۰,۰۰۰ ریال</td><td><button class="btn btn-outline" style="padding:3px 8px;">گردش</button></td></tr>
-              </tbody></table>
+              <table><thead><tr><th>عنوان حساب / صندوق</th><th>نوع حساب</th><th>شماره حساب / شبا</th><th>بانک / شعبه</th><th>مانده جاری (ریال)</th></tr></thead>
+              <tbody id="bankAccountsTableBody"></tbody></table>
             </div>
           </div>
         </div>

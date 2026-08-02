@@ -232,6 +232,14 @@ const AppState = {
   ],
   salesInvoices: [
     { id: 'INV-8001', date: '1403/05/08', party: 'شرکت فناوری آریا', total: 630000000, warehouse: 'انبار مرکزی', status: 'ثبت نهایی' }
+  ],
+  checks: [
+    { id: 1, number: '1234567', bank: 'بانک ملی', amount: 150000000, dueDate: '1403/06/01', type: 'دریافتی', status: 'در جریان' },
+    { id: 2, number: '7654321', bank: 'بانک ملت', amount: 85000000, dueDate: '1403/05/20', type: 'پرداختی', status: 'در جریان' }
+  ],
+  personnel: [
+    { id: 1, nationalId: '1234567890', fullName: 'مهران رجبی', role: 'حسابدار ارشد', baseSalary: 180000000, housingAllowance: 15000000, groceryAllowance: 10000000 },
+    { id: 2, nationalId: '0987654321', fullName: 'سارا کریمی', role: 'کارشناس انبار', baseSalary: 140000000, housingAllowance: 15000000, groceryAllowance: 10000000 }
   ]
 };
 
@@ -342,6 +350,11 @@ function showForm(formId) {
   if (formId === 'form-warehouses') renderWarehousesTable();
   if (formId === 'form-purchase-invoice') renderPurchaseInvoicesTable();
   if (formId === 'form-sales-invoice') renderSalesInvoicesTable();
+  if (formId === 'form-checks') renderChecksTable();
+  if (formId === 'form-bank-accounts') renderBankAccountsTable();
+  if (formId === 'form-personnel') renderPersonnelTable();
+  if (formId === 'form-payslip') initPayslipForm();
+  if (formId === 'form-cardex') initCardexForm();
   if (formId === 'form-permissions-matrix') renderPermissionsMatrix();
   if (formId === 'form-companies-list') renderCompaniesTable();
   if (formId === 'form-fiscal-years') renderFiscalYearsTable();
@@ -4416,10 +4429,532 @@ function calculateBalanceSheet() {
       </div>
       
       <!-- Balance Check Indicator -->
-      <div style="text-align:center; margin-top:25px; font-weight:bold; color:${totalAssets === (totalLiabilities + equity) ? '#047857' : '#b91c1c'}; font-size:0.85rem; padding:6px; border-radius:4px; background:rgba(0,0,0,0.02);">
-        ${totalAssets === (totalLiabilities + equity) ? '✅ ترازنامه تراز می‌باشد (دارایی‌ها = بدهی‌ها + سرمایه)' : '❌ ترازنامه ناهمخوان می‌باشد!'}
+      <div style="text-align:center; margin-top:25px; font-weight:bold; color:\${totalAssets === (totalLiabilities + equity) ? '#047857' : '#b91c1c'}; font-size:0.85rem; padding:6px; border-radius:4px; background:rgba(0,0,0,0.02);">
+        \${totalAssets === (totalLiabilities + equity) ? '✅ ترازنامه تراز می‌باشد (دارایی‌ها = بدهی‌ها + سرمایه)' : '❌ ترازنامه ناهمخوان می‌باشد!'}
       </div>
     </div>
   `;
+}
+
+
+// ==========================================
+// TREASURY: CHECKS & BANK ACCOUNTS
+// ==========================================
+
+function renderChecksTable() {
+  const tbody = document.getElementById('checksTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = AppState.checks.map(c => {
+    const badgeType = c.type === 'دریافتی' ? 'badge-success' : 'badge-danger';
+    let statusClass = 'badge-warning';
+    if (c.status === 'وصول شده') statusClass = 'badge-success';
+    if (c.status === 'برگشت خورده') statusClass = 'badge-danger';
+
+    let actionBtn = '';
+    if (c.status === 'در جریان') {
+      actionBtn = `
+        <button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem;" onclick="processCheckAction(${c.id}, 'وصول شده')">وصول</button>
+        <button class="btn btn-outline" style="padding:2px 6px; font-size:0.75rem; color:#b91c1c; border-color:#b91c1c;" onclick="processCheckAction(${c.id}, 'برگشت خورده')">برگشت</button>
+      `;
+    } else {
+      actionBtn = `<span style="color:var(--text-muted); font-size:0.75rem;">خاتمه یافته</span>`;
+    }
+
+    return `
+      <tr>
+        <td style="text-align:center; font-family:monospace; font-weight:bold;">${c.number}</td>
+        <td>${c.bank}</td>
+        <td style="text-align:left; font-weight:bold;">${c.amount.toLocaleString()}</td>
+        <td style="text-align:center; font-family:monospace;">${c.dueDate}</td>
+        <td style="text-align:center;"><span class="badge ${badgeType}">${c.type}</span></td>
+        <td style="text-align:center;"><span class="badge ${statusClass}">${c.status}</span></td>
+        <td style="text-align:center;">${actionBtn}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openAddCheckRow(type) {
+  const form = document.getElementById('addCheckRow');
+  const title = document.getElementById('lblAddCheckTitle');
+  const typeInput = document.getElementById('newCheckType');
+  if (form && title && typeInput) {
+    form.style.display = 'block';
+    typeInput.value = type;
+    title.textContent = `ثبت چک ${type} جدید`;
+    document.getElementById('newCheckNo').value = '';
+    document.getElementById('newCheckAmount').value = '';
+  }
+}
+
+function saveNewCheck() {
+  const type = document.getElementById('newCheckType').value;
+  const number = document.getElementById('newCheckNo').value.trim();
+  const bank = document.getElementById('newCheckBank').value.trim();
+  const amount = Number(document.getElementById('newCheckAmount').value);
+  const dueDate = document.getElementById('newCheckDueDate').value.trim();
+
+  if (!number || !amount) {
+    alert('لطفاً شماره چک و مبلغ را وارد نمایید.');
+    return;
+  }
+
+  const nextId = AppState.checks.length > 0 ? Math.max(...AppState.checks.map(c => c.id)) + 1 : 1;
+  AppState.checks.push({
+    id: nextId,
+    number,
+    bank,
+    amount,
+    dueDate,
+    type,
+    status: 'در جریان'
+  });
+
+  alert('چک با موفقیت در سیستم ثبت گردید.');
+  document.getElementById('addCheckRow').style.display = 'none';
+  renderChecksTable();
+}
+
+function processCheckAction(checkId, newStatus) {
+  const c = AppState.checks.find(x => x.id === checkId);
+  if (!c) return;
+
+  c.status = newStatus;
+  alert(`وضعیت چک شماره ${c.number} به "${newStatus}" تغییر یافت.`);
+  renderChecksTable();
+  if (typeof renderBankAccountsTable === 'function') {
+    renderBankAccountsTable();
+  }
+}
+
+function renderBankAccountsTable() {
+  const tbody = document.getElementById('bankAccountsTableBody');
+  if (!tbody) return;
+
+  let bankNationalBalance = 3400000000;
+  let centralBoxBalance = 45000000;
+
+  AppState.checks.forEach(c => {
+    if (c.status === 'وصول شده') {
+      if (c.type === 'دریافتی') {
+        bankNationalBalance += c.amount;
+      } else {
+        bankNationalBalance -= c.amount;
+      }
+    }
+  });
+
+  tbody.innerHTML = `
+    <tr>
+      <td style="font-weight:bold;">صندوق مرکزی</td>
+      <td style="text-align:center;">صندوق نقدی</td>
+      <td style="text-align:center;">-</td>
+      <td>دفتر مرکزی نمونه</td>
+      <td style="text-align:left; font-weight:bold; color:#047857;">${centralBoxBalance.toLocaleString()}</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold;">بانک ملی مرکزی</td>
+      <td style="text-align:center;">حساب بانکی جاری</td>
+      <td style="text-align:center; font-family:monospace;">0105000000001</td>
+      <td>بانک ملی - شعبه مرکزی تهران</td>
+      <td style="text-align:left; font-weight:bold; color:#047857;">${bankNationalBalance.toLocaleString()}</td>
+    </tr>
+  `;
+}
+
+
+// ==========================================
+// PAYROLL: PERSONNEL & PAYSLIPS
+// ==========================================
+
+function renderPersonnelTable() {
+  const tbody = document.getElementById('personnelTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = AppState.personnel.map(p => `
+    <tr>
+      <td style="text-align:center; font-weight:bold; color:var(--accent-color);">EMP-00${p.id}</td>
+      <td style="font-weight:bold;">${p.fullName}</td>
+      <td style="text-align:center; font-family:monospace;">${p.nationalId}</td>
+      <td>${p.role}</td>
+      <td style="text-align:left;">${p.baseSalary.toLocaleString()}</td>
+      <td style="text-align:left;">${p.housingAllowance.toLocaleString()}</td>
+      <td style="text-align:left;">${p.groceryAllowance.toLocaleString()}</td>
+    </tr>
+  `).join('');
+}
+
+function openAddPersonnelRow() {
+  const form = document.getElementById('addPersonnelRow');
+  if (form) {
+    form.style.display = 'block';
+    document.getElementById('newPersName').value = '';
+    document.getElementById('newPersNationalId').value = '';
+    document.getElementById('newPersRole').value = '';
+    document.getElementById('newPersBase').value = '';
+  }
+}
+
+function saveNewPersonnel() {
+  const fullName = document.getElementById('newPersName').value.trim();
+  const nationalId = document.getElementById('newPersNationalId').value.trim();
+  const role = document.getElementById('newPersRole').value.trim();
+  const baseSalary = Number(document.getElementById('newPersBase').value);
+  const housingAllowance = Number(document.getElementById('newPersHousing').value || 15000000);
+  const groceryAllowance = Number(document.getElementById('newPersGrocery').value || 10000000);
+
+  if (!fullName || !nationalId || !baseSalary) {
+    alert('لطفاً مشخصات پرسنل و حقوق پایه را وارد نمایید.');
+    return;
+  }
+
+  const nextId = AppState.personnel.length > 0 ? Math.max(...AppState.personnel.map(p => p.id)) + 1 : 1;
+  AppState.personnel.push({
+    id: nextId,
+    fullName,
+    nationalId,
+    role,
+    baseSalary,
+    housingAllowance,
+    groceryAllowance
+  });
+
+  alert('حکم حقوقی و پرونده پرسنلی جدید با موفقیت صادر گردید.');
+  document.getElementById('addPersonnelRow').style.display = 'none';
+  renderPersonnelTable();
+}
+
+function initPayslipForm() {
+  const select = document.getElementById('payslipPersonnelSelect');
+  if (!select) return;
+
+  select.innerHTML = AppState.personnel.map(p => `
+    <option value="${p.id}">${p.fullName} (EMP-00${p.id})</option>
+  `).join('');
+}
+
+function generatePersonnelPayslip() {
+  const id = Number(document.getElementById('payslipPersonnelSelect').value);
+  const monthVal = document.getElementById('payslipMonthSelect').value;
+  const p = AppState.personnel.find(x => x.id === id);
+  if (!p) return;
+
+  const totalGross = p.baseSalary + p.housingAllowance + p.groceryAllowance;
+  const insurance = Math.round(p.baseSalary * 0.07); 
+  const taxableAmount = totalGross - 120000000;
+  const tax = taxableAmount > 0 ? Math.round(taxableAmount * 0.1) : 0;
+
+  const totalDeductions = insurance + tax;
+  const netPay = totalGross - totalDeductions;
+  const monthName = monthVal === '05' ? 'مرداد' : 'تیر';
+
+  const card = document.getElementById('payslipResultCard');
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div style="border:2px solid #166534; padding:20px; border-radius:8px; max-width:650px; margin:0 auto; background:rgba(22,101,52,0.02); direction:rtl;">
+      <h3 style="text-align:center; color:#166534; margin-bottom:12px;">فیش حقوقی ماهانه پرسنل</h3>
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid #166534; padding-bottom:8px; font-size:0.85rem;">
+        <span>نام کارمند: <strong>${p.fullName}</strong></span>
+        <span>سمت: <strong>${p.role}</strong></span>
+        <span>دوره مالی: <strong>${monthName} ۱۴۰۳</strong></span>
+      </div>
+
+      <div style="display:flex; gap:20px;">
+        <div style="flex:1; border-left:1px solid rgba(22,101,52,0.2); padding-left:15px;">
+          <h4 style="color:#166534; border-bottom:1px solid #166534; padding-bottom:4px; margin-bottom:8px;">➕ حقوق و مزایا</h4>
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0;">
+            <span>حقوق پایه:</span>
+            <span>${p.baseSalary.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0;">
+            <span>حق مسکن:</span>
+            <span>${p.housingAllowance.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0;">
+            <span>بن خواروبار:</span>
+            <span>${p.groceryAllowance.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; padding:8px 0; border-top:1px dashed #166534; margin-top:8px;">
+            <span>جمع ناخالص:</span>
+            <span>${totalGross.toLocaleString()} ریال</span>
+          </div>
+        </div>
+
+        <div style="flex:1; padding-right:15px;">
+          <h4 style="color:#b91c1c; border-bottom:1px solid #b91c1c; padding-bottom:4px; margin-bottom:8px;">➖ کسورات قانونی</h4>
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0;">
+            <span>بیمه سهم کارمند (۷٪):</span>
+            <span>${insurance.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:4px 0;">
+            <span>مالیات حقوق:</span>
+            <span>${tax.toLocaleString()} ریال</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.85rem; padding:8px 0; border-top:1px dashed #b91c1c; margin-top:20px;">
+            <span>جمع کسورات:</span>
+            <span>${totalDeductions.toLocaleString()} ریال</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; padding:12px 10px; border-radius:4px; font-weight:bold; background:#166534; color:#fff; margin-top:20px; font-size:0.95rem; text-align:center;">
+        <span>🏆 خالص پرداختی کارمند:</span>
+        <span>${netPay.toLocaleString()} ریال</span>
+      </div>
+      <div style="text-align:center; margin-top:15px;"><button class="btn btn-outline" style="background:var(--bg-primary); border-color:#166534; color:#166534; font-weight:bold;" onclick="window.print()">🖨️ چاپ فیش حقوقی</button></div>
+    </div>
+  `;
+}
+
+
+// ==========================================
+// WAREHOUSE & INVENTORY: INVOICES & CARDEX
+// ==========================================
+
+function renderPurchaseInvoicesTable() {
+  const tbody = document.getElementById('purchaseInvoicesBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = AppState.purchaseInvoices.map(inv => {
+    const totalVal = inv.total || 0;
+    return `
+      <tr>
+        <td style="text-align:center; font-family:monospace; font-weight:bold;">${inv.id}</td>
+        <td style="text-align:center; font-family:monospace;">${inv.date}</td>
+        <td style="font-weight:bold;">${inv.party}</td>
+        <td style="text-align:center;">${inv.warehouse}</td>
+        <td style="text-align:left; font-weight:bold; color:#047857;">${totalVal.toLocaleString()}</td>
+        <td style="text-align:center;"><span class="badge badge-success">${inv.status}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openAddPurchaseInvoiceRow() {
+  const form = document.getElementById('addPurchaseInvoiceRow');
+  const select = document.getElementById('newPurchProduct');
+  if (form && select) {
+    form.style.display = 'block';
+    select.innerHTML = AppState.products.map(p => `
+      <option value="${p.code}">${p.code} - ${p.name}</option>
+    `).join('');
+    
+    const nextNo = AppState.purchaseInvoices.length > 0 ? 'PINV-' + (4002 + AppState.purchaseInvoices.length) : 'PINV-4001';
+    document.getElementById('newPurchNo').value = nextNo;
+    document.getElementById('newPurchPrice').value = AppState.products[0]?.price || 0;
+  }
+}
+
+function saveNewPurchaseInvoice() {
+  const id = document.getElementById('newPurchNo').value.trim();
+  const date = document.getElementById('newPurchDate').value.trim();
+  const party = document.getElementById('newPurchVendor').value.trim();
+  const prodCode = document.getElementById('newPurchProduct').value;
+  const qty = Number(document.getElementById('newPurchQty').value);
+  const price = Number(document.getElementById('newPurchPrice').value);
+
+  if (!id || !party || !qty || !price) {
+    alert('لطفاً اطلاعات فاکتور خرید را کامل کنید.');
+    return;
+  }
+
+  const total = qty * price;
+  AppState.purchaseInvoices.push({
+    id,
+    date,
+    party,
+    total,
+    warehouse: 'انبار مرکزی',
+    status: 'ثبت نهایی',
+    lines: [{ prodCode, qty, price }]
+  });
+
+  const prod = AppState.products.find(p => p.code === prodCode);
+  if (prod) prod.stock += qty;
+
+  alert(`فاکتور خرید ${id} با موفقیت ثبت و به موجودی انبار اضافه شد.`);
+  document.getElementById('addPurchaseInvoiceRow').style.display = 'none';
+  renderPurchaseInvoicesTable();
+}
+
+function renderSalesInvoicesTable() {
+  const tbody = document.getElementById('salesInvoicesBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = AppState.salesInvoices.map(inv => {
+    const totalVal = inv.total || 0;
+    return `
+      <tr>
+        <td style="text-align:center; font-family:monospace; font-weight:bold;">${inv.id}</td>
+        <td style="text-align:center; font-family:monospace;">${inv.date}</td>
+        <td style="font-weight:bold;">${inv.party}</td>
+        <td style="text-align:center;">${inv.warehouse}</td>
+        <td style="text-align:left; font-weight:bold; color:#b91c1c;">${totalVal.toLocaleString()}</td>
+        <td style="text-align:center;"><span class="badge badge-success">${inv.status}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function openAddSalesInvoiceRow() {
+  const form = document.getElementById('addSalesInvoiceRow');
+  const select = document.getElementById('newSalesProduct');
+  if (form && select) {
+    form.style.display = 'block';
+    select.innerHTML = AppState.products.map(p => `
+      <option value="${p.code}">${p.code} - ${p.name}</option>
+    `).join('');
+    
+    const nextNo = AppState.salesInvoices.length > 0 ? 'INV-' + (8002 + AppState.salesInvoices.length) : 'INV-8001';
+    document.getElementById('newSalesNo').value = nextNo;
+    document.getElementById('newSalesPrice').value = AppState.products[0]?.price || 0;
+  }
+}
+
+function saveNewSalesInvoice() {
+  const id = document.getElementById('newSalesNo').value.trim();
+  const date = document.getElementById('newSalesDate').value.trim();
+  const party = document.getElementById('newSalesCustomer').value.trim();
+  const prodCode = document.getElementById('newSalesProduct').value;
+  const qty = Number(document.getElementById('newSalesQty').value);
+  const price = Number(document.getElementById('newSalesPrice').value);
+
+  if (!id || !party || !qty || !price) {
+    alert('لطفاً اطلاعات فاکتور فروش را کامل کنید.');
+    return;
+  }
+
+  const prod = AppState.products.find(p => p.code === prodCode);
+  if (prod && prod.stock < qty) {
+    alert(`خطا: موجودی کالا برای فروش کافی نیست (موجودی فعلی: ${prod.stock} ${prod.unit})`);
+    return;
+  }
+
+  const total = qty * price;
+  AppState.salesInvoices.push({
+    id,
+    date,
+    party,
+    total,
+    warehouse: 'انبار مرکزی',
+    status: 'ثبت نهایی',
+    lines: [{ prodCode, qty, price }]
+  });
+
+  if (prod) prod.stock -= qty;
+
+  alert(`فاکتور فروش ${id} ثبت نهایی شده و از انبار صادر گردید.`);
+  document.getElementById('addSalesInvoiceRow').style.display = 'none';
+  renderSalesInvoicesTable();
+}
+
+function initCardexForm() {
+  const select = document.getElementById('cardexProductSelect');
+  if (!select) return;
+
+  select.innerHTML = AppState.products.map(p => `
+    <option value="${p.code}">${p.code} - ${p.name}</option>
+  `).join('');
+}
+
+function showCardex() {
+  const prodCode = document.getElementById('cardexProductSelect').value;
+  const tbody = document.getElementById('cardexTableBody');
+  const resultDiv = document.getElementById('cardexResult');
+  if (!tbody || !resultDiv) return;
+
+  const prod = AppState.products.find(p => p.code === prodCode);
+  if (!prod) return;
+
+  resultDiv.style.display = 'block';
+
+  let runningStock = 20; 
+  let html = `
+    <tr style="background:rgba(220, 235, 255, 0.5); font-weight:bold;">
+      <td style="text-align:center;">-</td>
+      <td>موجودی اولیه قبل از دوره جاری</td>
+      <td style="text-align:center;">${runningStock}</td>
+      <td style="text-align:center;">0</td>
+      <td style="text-align:center;">${runningStock}</td>
+      <td style="text-align:left;">${prod.price.toLocaleString()}</td>
+      <td style="text-align:left;">${(runningStock * prod.price).toLocaleString()}</td>
+    </tr>
+  `;
+
+  let transactions = [];
+  AppState.purchaseInvoices.forEach(inv => {
+    if (inv.lines) {
+      inv.lines.forEach(line => {
+        if (line.prodCode === prodCode) {
+          transactions.push({
+            date: inv.date,
+            type: 'فاکتور خرید ' + inv.id,
+            inQty: line.qty,
+            outQty: 0,
+            price: line.price
+          });
+        }
+      });
+    } else {
+      // Handle legacy
+      if (prodCode === 'PRD-101') {
+        transactions.push({
+          date: inv.date,
+          type: 'فاکتور خرید ' + inv.id,
+          inQty: 4,
+          outQty: 0,
+          price: prod.price
+        });
+      }
+    }
+  });
+
+  AppState.salesInvoices.forEach(inv => {
+    if (inv.lines) {
+      inv.lines.forEach(line => {
+        if (line.prodCode === prodCode) {
+          transactions.push({
+            date: inv.date,
+            type: 'فاکتور فروش ' + inv.id,
+            inQty: 0,
+            outQty: line.qty,
+            price: line.price
+          });
+        }
+      });
+    } else {
+      // Handle legacy
+      if (prodCode === 'PRD-101') {
+        transactions.push({
+          date: inv.date,
+          type: 'فاکتور فروش ' + inv.id,
+          inQty: 0,
+          outQty: 1,
+          price: prod.price
+        });
+      }
+    }
+  });
+
+  transactions.sort((a, b) => a.date.localeCompare(b.date));
+
+  transactions.forEach(tx => {
+    runningStock += tx.inQty - tx.outQty;
+    const totalVal = runningStock * tx.price;
+    html += `
+      <tr>
+        <td style="text-align:center; font-family:monospace;">${tx.date}</td>
+        <td style="font-weight:bold;">${tx.type}</td>
+        <td style="text-align:center; color:#047857; font-weight:bold;">${tx.inQty || '-'}</td>
+        <td style="text-align:center; color:#b91c1c; font-weight:bold;">${tx.outQty || '-'}</td>
+        <td style="text-align:center; font-weight:bold;">${runningStock}</td>
+        <td style="text-align:left;">${tx.price.toLocaleString()}</td>
+        <td style="text-align:left;">${totalVal.toLocaleString()}</td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
 }
 
