@@ -1549,6 +1549,15 @@ function alignFooterTotals() {
   if (labelDiff) {
     labelDiff.style.left = `${labelLeft}px`;
   }
+
+  // Centered inside leftmost empty space (0 to creditLeft)
+  const statusContainer = document.getElementById('sanadBalanceStatusContainer');
+  if (statusContainer) {
+    statusContainer.style.left = '12px';
+    statusContainer.style.width = `${creditLeft - 12}px`;
+    statusContainer.style.top = '12px';
+    statusContainer.style.height = '50px';
+  }
 }
 
 function openNewSanadForm() {

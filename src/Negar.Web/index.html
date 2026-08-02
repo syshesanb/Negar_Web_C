@@ -1188,11 +1188,11 @@
               <!-- Right Side: Voucher Description (reduced width) -->
               <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
                 <span style="font-weight:bold; font-size:0.8rem; color:var(--text-muted); min-width:60px;">شرح سند:</span>
-                <textarea id="sanadDescInput" class="form-input" style="width:280px; height:45px; resize:none; font-size:0.8rem;" placeholder="به شرح سند صادره..."></textarea>
+                <textarea id="sanadDescInput" class="form-input" style="width:350px; height:45px; resize:none; font-size:0.8rem;" placeholder="به شرح سند صادره..."></textarea>
               </div>
 
-              <!-- Middle: Balance Status Badge (Centered in the remaining empty space) -->
-              <div id="sanadBalanceStatusContainer" style="display:flex; align-items:center; gap:6px; flex-grow:1; justify-content:center; padding-left:350px;">
+              <!-- Middle/Left: Balance Status Badge (Positioned dynamically via JS inside leftmost space) -->
+              <div id="sanadBalanceStatusContainer" style="display:flex; align-items:center; gap:6px; justify-content:center; position:absolute; z-index:5; direction:rtl;">
                 <span style="font-weight:bold; font-size:0.8rem; color:var(--text-muted);">تعادل سند:</span>
                 <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.8rem; padding:4px 10px; font-weight:bold;">تراز</span>
                 <span style="font-size:0.8rem; font-weight:bold; color:var(--text-muted);">است</span>
