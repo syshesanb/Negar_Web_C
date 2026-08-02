@@ -282,6 +282,16 @@ function showForm(formId) {
   const formsArea = document.getElementById('formsArea');
   formsArea.style.display = 'block';
 
+  // Hide back-bar when in voucher editor (form-sanad2)
+  const backBar = document.querySelector('.back-bar');
+  if (backBar) {
+    if (formId === 'form-sanad2') {
+      backBar.style.display = 'none';
+    } else {
+      backBar.style.display = 'flex';
+    }
+  }
+
   // Hide all individual form sections
   document.querySelectorAll('.form-section').forEach(f => {
     f.style.display = 'none';
