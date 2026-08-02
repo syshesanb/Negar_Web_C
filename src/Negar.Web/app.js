@@ -1236,8 +1236,12 @@ function updateFocusedPaths(i) {
   
   const accEl = document.getElementById('focusedAccountPath');
   const shenEl = document.getElementById('focusedShenavarPath');
+  const lineDescEl = document.getElementById('focusedLineDesc');
   if (accEl) accEl.innerHTML = accPath;
   if (shenEl) shenEl.innerHTML = shenPath;
+  if (lineDescEl) {
+    lineDescEl.innerHTML = `متن کامل شرح ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${line.desc || '-'}</span>`;
+  }
 }
 
 function updateSanadLineField(i, field, value) {
@@ -1250,6 +1254,12 @@ function updateSanadLineField(i, field, value) {
   }
   if (field === 'account' || field === 'shenavarCode') {
     updateFocusedPaths(i);
+  }
+  if (field === 'desc') {
+    const lineDescEl = document.getElementById('focusedLineDesc');
+    if (lineDescEl) {
+      lineDescEl.innerHTML = `متن کامل شرح ردیف جاری: <span style="color:var(--accent-color); font-weight:bold;">${value || '-'}</span>`;
+    }
   }
 }
 

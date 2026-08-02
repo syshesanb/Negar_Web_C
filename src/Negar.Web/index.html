@@ -1128,32 +1128,49 @@
           <h2 class="form-heading" style="display:none;">📝 ثبت و ویرایش سند حسابداری (JournalVoucherForm)</h2>
           
           <div class="card form-card" style="padding: 15px; border-radius: 6px;">
-            <!-- Top Row: Tabs/Actions and Voucher details -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
-              <!-- Left side tabs/links -->
-              <div style="display:flex; gap:8px;">
-                <button class="btn btn-outline active" style="padding:4px 12px; font-size:0.8rem; background:rgba(56,189,248,0.1); border-color:var(--accent-color);">سطرهای سند</button>
-                <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem; color:var(--text-muted);" onclick="alert('بخش ضمائم سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">ضمائم سند</button>
-                <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem; color:var(--text-muted);" onclick="alert('بخش یادداشت برای سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">یادداشت برای سند</button>
-              </div>
-              
-              <!-- Right side voucher number and date -->
-              <div style="display:flex; gap:15px; align-items:center; direction:ltr;">
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-size:0.8rem; color:var(--text-muted); font-weight:bold;">شماره سند:</span>
-                  <input type="text" id="sanadNumberInput" class="form-input" style="width:80px; text-align:center; padding:3px 8px; font-weight:bold;" />
-                </div>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-size:0.8rem; color:var(--text-muted); font-weight:bold;">تاریخ سند:</span>
-                  <input type="text" id="sanadDateInput" class="form-input date-picker-wrapper" style="width:100px; text-align:center; padding:3px 8px;" />
-                </div>
+            <!-- Consolidated Top Ribbon Bar (Tabs and Action Buttons) -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:12px; direction:rtl;">
+              <!-- Right Side: Tabs + Action Buttons in one line -->
+              <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+                <!-- Tabs -->
+                <button class="btn btn-outline active" style="padding:4px 10px; font-size:0.75rem; background:rgba(56,189,248,0.1); border-color:var(--accent-color);">سطرهای سند</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش ضمائم سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">ضمائم سند</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش یادداشت برای سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">یادداشت برای سند</button>
+                
+                <!-- Separator -->
+                <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 4px;"></div>
+                
+                <!-- Compact Action Buttons -->
+                <button class="btn btn-primary" style="padding:4px 12px; font-size:0.75rem;" onclick="saveSanadEntry()">💾 ثبت سند و خروج</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="printVouchers()">🖨️ چاپ سند (Ctrl+P)</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; border-color:#10b981; color:#10b981;" onclick="addSanadLine()">➕ افزودن سطر خالی</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="deleteFocusedSanadLine()">🗑️ حذف سطر جاری</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('below')">📋 کپی در زیر</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="copyFocusedSanadLine('above')">📋 کپی در بالا</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('کپی در محل دلخواه فعال شد.')">📋 کپی در محل دلخواه</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('جستجوها پاک شدند.')">🧹 پاک کردن جستجوها</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="closeSanadEditor()">🔙 خروج</button>
               </div>
             </div>
 
-            <!-- Path indicator section (Fills with selected account pathway) -->
-            <div style="background:rgba(16,185,129,0.06); color:#10b981; border:1px solid rgba(16,185,129,0.25); padding:8px 12px; border-radius:4px; margin-bottom:12px; font-size:0.8rem; font-weight:bold; line-height:1.6;">
+            <!-- Path & Header indicator section (Fills with selected account pathway) -->
+            <div style="background:rgba(16,185,129,0.06); color:#10b981; border:1px solid rgba(16,185,129,0.25); padding:10px 15px; border-radius:4px; margin-bottom:12px; font-size:0.8rem; font-weight:bold; line-height:1.6; direction:rtl;">
+              <!-- Document Details (Number & Date) -->
+              <div style="display:flex; justify-content:flex-start; align-items:center; gap:25px; margin-bottom:10px; border-bottom:1px solid rgba(16,185,129,0.15); padding-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="color:#166534; font-weight:bold; font-size:0.85rem;">شماره سند:</span>
+                  <input type="text" id="sanadNumberInput" class="form-input" style="width:90px; text-align:center; padding:3px 8px; font-weight:bold; height:26px; font-size:0.8rem; border-color:rgba(16,185,129,0.3); background:#f0fdf4;" />
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="color:#166534; font-weight:bold; font-size:0.85rem;">تاریخ سند:</span>
+                  <input type="text" id="sanadDateInput" class="form-input date-picker-wrapper" style="width:110px; text-align:center; padding:3px 8px; height:26px; font-size:0.8rem; border-color:rgba(16,185,129,0.3); background:#f0fdf4;" />
+                </div>
+              </div>
+
+              <!-- Pathway details -->
               <div id="focusedAccountPath">کد و نام حساب سرفصل ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
-              <div id="focusedShenavarPath" style="margin-top:2px;">کد و نام حساب شناور ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
+              <div id="focusedShenavarPath" style="margin-top:4px;">کد و نام حساب شناور ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
+              <div id="focusedLineDesc" style="margin-top:4px;">متن کامل شرح ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
             </div>
 
             <!-- Spreadsheet Grid Container: Scroll only in this datagrid! -->
@@ -1216,26 +1233,6 @@
                   <span id="sanadBalanceStatusBadge" class="badge badge-success" style="font-size:0.85rem; padding:5px 12px; font-weight:bold;">تراز</span>
                   <span style="font-size:0.85rem; font-weight:bold; color:var(--text-muted);">است</span>
                 </div>
-              </div>
-            </div>
-
-            <!-- Bottom Command Buttons Row -->
-            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; direction:rtl;">
-              <!-- Right side actions (rendered first in HTML, so on the right side in RTL) -->
-              <div style="display:flex; gap:6px;">
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="printVouchers()">چاپ سند (Ctrl+P)</button>
-                <button class="btn btn-primary" style="padding:6px 16px; font-size:0.8rem;" onclick="saveSanadEntry()">ثبت سند و خروج</button>
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem; border-color:var(--accent-color); color:var(--accent-color);" onclick="addSanadLine()">افزودن سطر خالی</button>
-              </div>
-
-              <!-- Left side actions (rendered second in HTML, so on the left side in RTL) -->
-              <div style="display:flex; gap:6px;">
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem; color:red;" onclick="deleteFocusedSanadLine()">حذف سطر جاری</button>
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="copyFocusedSanadLine('below')">کپی در زیر</button>
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="copyFocusedSanadLine('above')">کپی در بالا</button>
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem; color:var(--text-muted);" onclick="alert('کپی در محل دلخواه فعال شد.')">کپی در محل دلخواه</button>
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem; color:var(--text-muted);" onclick="alert('جستجوها پاک شدند.')">پاک کردن جستجوها</button>
-                <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="closeSanadEditor()">خروج</button>
               </div>
             </div>
 
