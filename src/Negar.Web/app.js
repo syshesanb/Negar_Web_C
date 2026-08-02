@@ -186,6 +186,7 @@ const AppState = {
     { id: 2, code: '0110', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
     { id: 3, code: '011001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
     { id: 4, code: '011002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
+    { id: 14, code: '011003', name: 'بانک ملت شعبه ۲۲', type: 'معین', nature: 'بدهکار', parentId: 2 },
     { id: 5, code: '0111', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
     { id: 6, code: '011101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parentId: 5 },
     { id: 7, code: '02', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
@@ -1683,6 +1684,9 @@ function alignFooterTotals() {
 let activePopupRowIndex = null;
 
 function openSfPopup(rowIndex) {
+  if (activePopupMode !== 'moghayerat') {
+    activePopupMode = 'sanad';
+  }
   activePopupRowIndex = rowIndex;
   lastSelectedPopupAccId = null;
   
@@ -1812,14 +1816,19 @@ function filterPopupAccounts() {
   renderPopupAccounts();
 }
 
+let activePopupMode = 'sanad';
+
 function selectAccountInPopup(code) {
+  if (activePopupMode === 'moghayerat') {
+    const el = document.getElementById('lblMoghBankAccText');
+    if (el) el.textContent = code;
+    closeSfPopup();
+    return;
+  }
+  
   if (activePopupRowIndex !== null && AppState.sanadLines[activePopupRowIndex]) {
     AppState.sanadLines[activePopupRowIndex].account = code;
-    
-    // Rerender row template to show the new value in text box
     renderSanadEditorLines();
-    
-    // Also, trigger manual path update for header
     updateFocusedPaths(activePopupRowIndex);
   }
   closeSfPopup();
@@ -2981,7 +2990,651 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 }, true);
+}, true);
 
+// ==========================================
+// ── Bank Reconciliation Module (مغایرات بانکی) ──
+// ==========================================
 
+AppState.moghayeratBanks = [
+  {
+    id: 1,
+    bankName: 'ملت',
+    branchName: 'جاری ۲۲',
+    branchCode: '1020',
+    branchAddress: 'خیابان ولیعصر',
+    accountType: 'جاری',
+    accountNumber: '222217831',
+    accountId: 14 // بانک ملت شعبه ۲۲
+  }
+];
 
+AppState.bankTransactions = []; // تراکنش‌های ایمپورت‌شده صورتحساب
+AppState.ledgerTransactions = []; // تراکنش‌های استخراج‌شده از دفاتر شرکت
+AppState.moghayeratReconciled = false;
+AppState.moghCurrentSubtab = 'defs';
+AppState.moghBankSubtabFilter = 'all';
+AppState.moghLedgerSubtabFilter = 'all';
+AppState.selectedMoghBankId = 1;
+
+// بارگذاری اولیه مقادیر کامبوها به صورت پیش‌فرض
+document.addEventListener('DOMContentLoaded', () => {
+  populateMoghCombos();
+  renderMoghayeratBanksTable();
+});
+
+function switchBankSubtab(subtab) {
+  AppState.moghCurrentSubtab = subtab;
+  
+  // بروزرسانی دکمه‌های ناوبری زیرتب
+  const btnIds = {
+    defs: 'btnSubtabBankDefs',
+    import: 'btnSubtabBankImport',
+    reconcile: 'btnSubtabBankReconcile',
+    suggestions: 'btnSubtabBankSuggestions'
+  };
+  
+  for (let key in btnIds) {
+    const btn = document.getElementById(btnIds[key]);
+    if (btn) {
+      if (key === subtab) btn.classList.add('active');
+      else btn.classList.remove('active');
+    }
+  }
+  
+  // بروزرسانی پنل‌های نمایش زیرتب
+  const panelIds = {
+    defs: 'pnlBankSubtabDefs',
+    import: 'pnlBankSubtabImport',
+    reconcile: 'pnlBankSubtabReconcile',
+    suggestions: 'pnlBankSubtabSuggestions'
+  };
+  
+  for (let key in panelIds) {
+    const panel = document.getElementById(panelIds[key]);
+    if (panel) {
+      if (key === subtab) {
+        panel.style.display = (key === 'defs') ? 'flex' : 'flex'; // flex for defs, block/flex for others
+        if (key === 'import') panel.style.display = 'flex';
+        if (key === 'reconcile') panel.style.display = 'flex';
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+  }
+  
+  // رندر متناسب با تب جاری
+  if (subtab === 'defs') renderMoghayeratBanksTable();
+  else if (subtab === 'import') loadImportedBankState();
+  else if (subtab === 'reconcile') renderMoghayeratReconcilePanel();
+  else if (subtab === 'suggestions') renderMoghayeratSuggestions();
+}
+
+function openSelectLedgerForMoghayerat() {
+  activePopupMode = 'moghayerat';
+  openSfPopup();
+}
+
+function populateMoghCombos() {
+  const cmbImport = document.getElementById('cmbMoghImportBank');
+  const cmbReconcile = document.getElementById('cmbMoghReconcileBank');
+  
+  const optionsHtml = AppState.moghayeratBanks.map(b => 
+    `<option value="${b.id}">${b.bankName} - ${b.branchName} - ${b.accountNumber}</option>`
+  ).join('');
+  
+  if (cmbImport) {
+    cmbImport.innerHTML = optionsHtml;
+    if (AppState.moghayeratBanks.length > 0) cmbImport.value = AppState.moghayeratBanks[0].id;
+  }
+  if (cmbReconcile) {
+    cmbReconcile.innerHTML = optionsHtml;
+    if (AppState.moghayeratBanks.length > 0) cmbReconcile.value = AppState.moghayeratBanks[0].id;
+  }
+}
+
+function renderMoghayeratBanksTable() {
+  const tbody = document.getElementById('tblMoghayeratBanksBody');
+  if (!tbody) return;
+  
+  if (AppState.moghayeratBanks.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">هیچ بانکی تعریف نشده است.</td></tr>`;
+    updateBankStatementRangeHeader(null);
+    return;
+  }
+  
+  tbody.innerHTML = AppState.moghayeratBanks.map(b => {
+    const acc = AppState.accounts.find(a => a.id === b.accountId);
+    const accName = acc ? `${acc.code} - ${acc.name}` : '-';
+    
+    // ردیف انتخاب شده
+    const isSelected = (AppState.selectedMoghBankId === b.id);
+    const selectedStyle = isSelected ? 'background-color:rgba(56, 189, 248, 0.12); font-weight:bold;' : '';
+    
+    return `
+      <tr onclick="selectMoghayeratBank(${b.id})" style="cursor:pointer; ${selectedStyle}">
+        <td style="padding:8px; text-align:center;">${b.bankName}</td>
+        <td style="padding:8px; text-align:center;">${b.branchName}</td>
+        <td style="padding:8px; text-align:center;">${b.branchCode || '-'}</td>
+        <td style="padding:8px; text-align:center;">${b.branchAddress || '-'}</td>
+        <td style="padding:8px; text-align:center;">${b.accountType || '-'}</td>
+        <td style="padding:8px; text-align:center;">${b.accountNumber}</td>
+        <td style="padding:8px; text-align:center; direction:ltr;">${accName}</td>
+      </tr>
+    `;
+  }).join('');
+  
+  // آپدیت هدر بازه تاریخ بر اساس بانک انتخاب شده
+  updateBankStatementRangeHeader(AppState.selectedMoghBankId);
+}
+
+function selectMoghayeratBank(id) {
+  AppState.selectedMoghBankId = id;
+  const b = AppState.moghayeratBanks.find(x => x.id === id);
+  if (!b) return;
+  
+  document.getElementById('moghBankEditId').value = b.id;
+  document.getElementById('moghBankName').value = b.bankName;
+  document.getElementById('moghBankBranch').value = b.branchName;
+  document.getElementById('moghBankBranchCode').value = b.branchCode || '';
+  document.getElementById('moghBankBranchAddress').value = b.branchAddress || '';
+  document.getElementById('moghBankAccountType').value = b.accountType || '';
+  document.getElementById('moghBankAccountNo').value = b.accountNumber;
+  
+  const acc = AppState.accounts.find(a => a.id === b.accountId);
+  document.getElementById('lblMoghBankAccText').textContent = acc ? acc.code : '-';
+  
+  renderMoghayeratBanksTable();
+}
+
+function updateBankStatementRangeHeader(bankId) {
+  const lbl = document.getElementById('lblBankStatementRangeHeader');
+  if (!lbl) return;
+  
+  if (!bankId) {
+    lbl.textContent = 'بازه تاریخی صورت حساب وارد شده: فاقد صورت حساب وارد شده';
+    return;
+  }
+  
+  const txs = AppState.bankTransactions.filter(t => t.bankId === bankId);
+  if (txs.length === 0) {
+    lbl.textContent = 'بازه تاریخی صورت حساب وارد شده: فاقد صورت حساب وارد شده';
+    return;
+  }
+  
+  // پیدا کردن مینیمم و ماکسیمم تاریخ
+  const dates = txs.map(t => t.txDate).sort();
+  const minDate = dates[0];
+  const maxDate = dates[dates.length - 1];
+  lbl.textContent = `بازه تاریخی صورت حساب وارد شده: از تاریخ: ${minDate} تا تاریخ: ${maxDate}`;
+}
+
+function saveMoghayeratBank() {
+  const name = document.getElementById('moghBankName').value.trim();
+  const branch = document.getElementById('moghBankBranch').value.trim();
+  const code = document.getElementById('moghBankBranchCode').value.trim();
+  const address = document.getElementById('moghBankBranchAddress').value.trim();
+  const type = document.getElementById('moghBankAccountType').value.trim();
+  const accNo = document.getElementById('moghBankAccountNo').value.trim();
+  const accCode = document.getElementById('lblMoghBankAccText').textContent.trim();
+  
+  if (!name || !accNo) {
+    alert('نام بانک و شماره حساب الزامی هستند.');
+    return;
+  }
+  
+  const acc = AppState.accounts.find(a => a.code === accCode);
+  if (!acc) {
+    alert('انتخاب سرفصل حساب الزامی است.');
+    return;
+  }
+  
+  const editIdStr = document.getElementById('moghBankEditId').value;
+  if (editIdStr) {
+    // Edit
+    const id = parseInt(editIdStr, 10);
+    const idx = AppState.moghayeratBanks.findIndex(x => x.id === id);
+    if (idx !== -1) {
+      AppState.moghayeratBanks[idx] = {
+        id, bankName: name, branchName: branch, branchCode: code, branchAddress: address,
+        accountType: type, accountNumber: accNo, accountId: acc.id
+      };
+      alert('مشخصات بانک با موفقیت ویرایش شد.');
+    }
+  } else {
+    // Add New
+    const newId = AppState.moghayeratBanks.length > 0 ? Math.max(...AppState.moghayeratBanks.map(x => x.id)) + 1 : 1;
+    AppState.moghayeratBanks.push({
+      id: newId, bankName: name, branchName: branch, branchCode: code, branchAddress: address,
+      accountType: type, accountNumber: accNo, accountId: acc.id
+    });
+    AppState.selectedMoghBankId = newId;
+    alert('مشخصات بانک با موفقیت ثبت شد.');
+  }
+  
+  populateMoghCombos();
+  clearMoghayeratBankForm();
+  renderMoghayeratBanksTable();
+}
+
+function clearMoghayeratBankForm() {
+  document.getElementById('moghBankEditId').value = '';
+  document.getElementById('moghBankName').value = '';
+  document.getElementById('moghBankBranch').value = '';
+  document.getElementById('moghBankBranchCode').value = '';
+  document.getElementById('moghBankBranchAddress').value = '';
+  document.getElementById('moghBankAccountType').value = '';
+  document.getElementById('moghBankAccountNo').value = '';
+  document.getElementById('lblMoghBankAccText').textContent = '-';
+}
+
+function deleteMoghayeratBank() {
+  const editIdStr = document.getElementById('moghBankEditId').value;
+  if (!editIdStr) {
+    alert('لطفا ابتدا یک بانک را از جدول انتخاب کنید.');
+    return;
+  }
+  
+  if (!confirm('آیا از حذف بانک انتخاب شده اطمینان دارید؟')) return;
+  
+  const id = parseInt(editIdStr, 10);
+  AppState.moghayeratBanks = AppState.moghayeratBanks.filter(x => x.id !== id);
+  if (AppState.selectedMoghBankId === id) {
+    AppState.selectedMoghBankId = AppState.moghayeratBanks.length > 0 ? AppState.moghayeratBanks[0].id : null;
+  }
+  
+  populateMoghCombos();
+  clearMoghayeratBankForm();
+  renderMoghayeratBanksTable();
+}
+
+// ── زیرتب ۲: ورود صورتحساب ──
+
+function triggerMoghBrowseFile() {
+  document.getElementById('fileMoghImport').click();
+}
+
+function handleMoghFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('lblMoghFileName').textContent = file.name;
+  loadSampleMoghData();
+}
+
+let mockExcelData = [];
+
+function loadSampleMoghData() {
+  // شبیه‌سازی خواندن اکسل با ۶ سطر تستی باکیفیت
+  mockExcelData = [
+    { date: '1403/05/10', refNo: '982711', debit: 0, credit: 15000000, desc: 'واریز سود سپرده ملت', ben: 'بانک ملت' },
+    { date: '1403/05/11', refNo: '887251', debit: 120000000, credit: 0, desc: 'برداشت بابت چک شماره ۵۱۲', ben: 'علی رضایی' },
+    { date: '1403/05/12', refNo: '772152', debit: 0, credit: 450000000, desc: 'حواله دریافتی از مشتری', ben: 'شرکت آریا' },
+    { date: '1403/05/13', refNo: '662198', debit: 5000000, credit: 0, desc: 'کارمزد انتقال وجه شتاب', ben: 'بانک ملت' },
+    { date: '1403/05/14', refNo: '551223', debit: 0, credit: 75000000, desc: 'واریز نقدی صندوقدار به بانک', ben: 'صندوقدار' },
+    { date: '1403/05/15', refNo: '441029', debit: 23000000, credit: 0, desc: 'برداشت خرید تجهیزات اداری', ben: 'دیجی‌کالا' }
+  ];
+  
+  // پر کردن کامبوهای نگاشت ستون‌ها با اسامی فیلدها
+  const cols = ['ستون A (تاریخ)', 'ستون B (پیگیری)', 'ستون C (بدهکار/برداشت)', 'ستون D (بستانکار/واریز)', 'ستون E (شرح)', 'ستون F (ذینفع)'];
+  const fillSelect = (id, defIdx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = cols.map((c, i) => `<option value="${i}" ${i === defIdx ? 'selected' : ''}>${c}</option>`).join('');
+  };
+  
+  fillSelect('mapColTxDate', 0);
+  fillSelect('mapColTxNo', 1);
+  fillSelect('mapColDebit', 2);
+  fillSelect('mapColCredit', 3);
+  fillSelect('mapColDesc', 4);
+  fillSelect('mapColBeneficiary', 5);
+  
+  renderMoghayeratImportPreview();
+}
+
+function renderMoghayeratImportPreview() {
+  const thead = document.querySelector('#tblMoghImportPreview thead');
+  const tbody = document.querySelector('#tblMoghImportPreview tbody');
+  if (!thead || !tbody) return;
+  
+  thead.innerHTML = `
+    <tr style="border-bottom:1px solid var(--border-color);">
+      <th style="padding:6px; text-align:center;">ردیف</th>
+      <th style="padding:6px; text-align:center;">تاریخ تراکنش</th>
+      <th style="padding:6px; text-align:center;">شماره پیگیری</th>
+      <th style="padding:6px; text-align:center;">برداشت (بدهکار)</th>
+      <th style="padding:6px; text-align:center;">واریز (بستانکار)</th>
+      <th style="padding:6px; text-align:center;">شرح</th>
+      <th style="padding:6px; text-align:center;">واریز کننده / ذینفع</th>
+    </tr>
+  `;
+  
+  if (mockExcelData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">هیچ داده‌ای بارگذاری نشده است.</td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = mockExcelData.map((row, i) => `
+    <tr>
+      <td style="padding:6px; text-align:center;">${i + 1}</td>
+      <td style="padding:6px; text-align:center;">${row.date}</td>
+      <td style="padding:6px; text-align:center;">${row.refNo}</td>
+      <td style="padding:6px; text-align:left; color:#ef4444;">${row.debit === 0 ? '-' : row.debit.toLocaleString()}</td>
+      <td style="padding:6px; text-align:left; color:#10b981;">${row.credit === 0 ? '-' : row.credit.toLocaleString()}</td>
+      <td style="padding:6px; text-align:right;">${row.desc}</td>
+      <td style="padding:6px; text-align:right;">${row.ben}</td>
+    </tr>
+  `).join('');
+}
+
+function loadImportedBankState() {
+  const bankId = Number(document.getElementById('cmbMoghImportBank')?.value || 1);
+  const fileLabel = document.getElementById('lblMoghFileName');
+  
+  const hasData = AppState.bankTransactions.some(t => t.bankId === bankId);
+  if (hasData) {
+    if (fileLabel) fileLabel.textContent = 'صورت حساب ذخیره شده در سیستم';
+    mockExcelData = AppState.bankTransactions.filter(t => t.bankId === bankId).map(t => ({
+      date: t.txDate, refNo: t.refNo, debit: t.debit, credit: t.credit, desc: t.desc, ben: t.beneficiary
+    }));
+    renderMoghayeratImportPreview();
+  } else {
+    if (fileLabel) fileLabel.textContent = 'فایلی انتخاب نشده است';
+    mockExcelData = [];
+    renderMoghayeratImportPreview();
+  }
+}
+
+function saveMoghImportedTransactions() {
+  const bankId = Number(document.getElementById('cmbMoghImportBank')?.value || 1);
+  if (mockExcelData.length === 0) {
+    alert('لطفاً ابتدا داده‌های صورتحساب را بارگذاری کنید.');
+    return;
+  }
+  
+  // پاکسازی تراکنش‌های قدیمی این بانک
+  AppState.bankTransactions = AppState.bankTransactions.filter(t => t.bankId !== bankId);
+  
+  // درج تراکنش‌های جدید
+  mockExcelData.forEach((row, i) => {
+    AppState.bankTransactions.push({
+      id: i + 1,
+      bankId: bankId,
+      txDate: row.date,
+      refNo: row.refNo,
+      debit: row.debit,
+      credit: row.credit,
+      desc: row.desc,
+      beneficiary: row.ben,
+      isClosed: false
+    });
+  });
+  
+  alert('اطلاعات صورت‌حساب بانکی با موفقیت در پایگاه داده ذخیره شد.');
+  updateBankStatementRangeHeader(bankId);
+}
+
+// ── زیرتب ۳: مغایرت گیری ──
+
+function toggleMoghDateInputs(show) {
+  const el = document.getElementById('divMoghCustomDates');
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+function runMoghReconciliation() {
+  const bankId = Number(document.getElementById('cmbMoghReconcileBank')?.value || 1);
+  const bank = AppState.moghayeratBanks.find(b => b.id === bankId);
+  if (!bank) {
+    alert('لطفاً ابتدا مشخصات بانک را در تب اول تعریف کنید.');
+    return;
+  }
+  
+  const bankTxs = AppState.bankTransactions.filter(t => t.bankId === bankId);
+  if (bankTxs.length === 0) {
+    alert('صورتحسابی برای این بانک یافت نشد. ابتدا باید صورتحساب را در تب دوم بارگذاری و ذخیره کنید.');
+    return;
+  }
+  
+  // استخراج اقلام دفاتر بر اساس سرفصل متناظر بانک
+  // برای ایجاد یک سناریوی جذاب، ما ۶ تراکنش در دفاتر ایجاد می‌کنیم که تعدادی مطابقت داشته باشند
+  AppState.ledgerTransactions = [
+    { id: 1, date: '1403/05/11', sanadNo: '102', debit: 0, credit: 120000000, desc: 'صدور چک ۵۱۲ در وجه علی رضایی', isClosed: false },
+    { id: 2, date: '1403/05/12', sanadNo: '103', debit: 450000000, credit: 0, desc: 'دریافت حواله بانکی از شرکت آریا', isClosed: false },
+    { id: 3, date: '1403/05/14', sanadNo: '104', debit: 75000000, credit: 0, desc: 'واریز نقدی صندوق به بانک', isClosed: false },
+    { id: 4, date: '1403/05/14', sanadNo: '105', debit: 90000000, credit: 0, desc: 'حواله دریافتی بابت طلب شرکت سارا (ثبت اشتباه در دفتر)', isClosed: false },
+    { id: 5, date: '1403/05/15', sanadNo: '106', debit: 0, credit: 20000000, desc: 'پرداخت بابت هزینه‌های خرید تجهیزات اداری (اختلاف با فاکتور بانک)', isClosed: false }
+  ];
+  
+  // الگوریتم تطابق مغایرت
+  // بانک:
+  // ۱. واریز سود ۱۵,۰۰۰,۰۰۰ (بستانکار بانک) -> دفتری وجود ندارد (تراکنش باز)
+  // ۲. چک ۵۱۲ ۱۲۰,۰۰۰,۰۰۰ (بدهکار بانک) -> در دفاتر بستانکار است (بسته می‌شود)
+  // ۳. حواله مشتری ۴۵۰,۰۰۰,۰۰۰ (بستانکار بانک) -> در دفاتر بدهکار است (بسته می‌شود)
+  // ۴. کارمزد ۵,۰۰۰ (بدهکار بانک) -> دفتری وجود ندارد (تراکنش باز)
+  // ۵. واریز نقدی ۷۵,۰۰۰,۰۰۰ (بستانکار بانک) -> در دفاتر بدهکار است (بسته می‌شود)
+  // ۶. خرید ۲۳,۰۰۰,۰۰۰ (بدهکار بانک) -> در دفاتر ۲۰,۰۰۰,۰۰۰ ثبت شده (تراکنش باز به دلیل اختلاف مبلغ)
+  
+  // بازنشانی
+  bankTxs.forEach(t => t.isClosed = false);
+  AppState.ledgerTransactions.forEach(t => t.isClosed = false);
+  
+  // تطبیق بدهکار بانک با بستانکار دفتر
+  bankTxs.forEach(bt => {
+    if (bt.debit > 0) {
+      const match = AppState.ledgerTransactions.find(lt => lt.credit === bt.debit && !lt.isClosed);
+      if (match) {
+        bt.isClosed = true;
+        match.isClosed = true;
+      }
+    } else if (bt.credit > 0) {
+      const match = AppState.ledgerTransactions.find(lt => lt.debit === bt.credit && !lt.isClosed);
+      if (match) {
+        bt.isClosed = true;
+        match.isClosed = true;
+      }
+    }
+  });
+  
+  AppState.moghayeratReconciled = true;
+  alert('مغایرت‌گیری بانکی با موفقیت انجام شد! نتایج تطابق در جداول نمایش داده می‌شوند.');
+  
+  renderMoghayeratReconcilePanel();
+}
+
+function switchBankGridSubtab(filter) {
+  AppState.moghBankSubtabFilter = filter;
+  renderMoghayeratReconcilePanel();
+}
+
+function switchLedgerGridSubtab(filter) {
+  AppState.moghLedgerSubtabFilter = filter;
+  renderMoghayeratReconcilePanel();
+}
+
+function renderMoghayeratReconcilePanel() {
+  const tbodyBank = document.getElementById('tblMoghBankStatementBody');
+  const tbodyLedger = document.getElementById('tblMoghLedgerBody');
+  if (!tbodyBank || !tbodyLedger) return;
+  
+  const bankId = Number(document.getElementById('cmbMoghReconcileBank')?.value || 1);
+  
+  // سوییچ کلاس فعال دکمه‌های گرید بانک
+  const bankSubtabs = ['all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
+  bankSubtabs.forEach(s => {
+    const el = document.getElementById('btnBankSubtab' + s.charAt(0).toUpperCase() + s.slice(1));
+    if (el) {
+      if (s === AppState.moghBankSubtabFilter) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+  
+  // سوییچ کلاس فعال دکمه‌های گرید دفتر
+  const ledgerSubtabs = ['all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
+  ledgerSubtabs.forEach(s => {
+    const el = document.getElementById('btnLedgerSubtab' + s.charAt(0).toUpperCase() + s.slice(1));
+    if (el) {
+      if (s === AppState.moghLedgerSubtabFilter) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+  
+  // فیلترینگ تراکنش‌های بانک
+  let bankList = AppState.bankTransactions.filter(t => t.bankId === bankId);
+  if (AppState.moghayeratReconciled) {
+    if (AppState.moghBankSubtabFilter === 'debit') bankList = bankList.filter(t => !t.isClosed && t.debit > 0);
+    else if (AppState.moghBankSubtabFilter === 'credit') bankList = bankList.filter(t => !t.isClosed && t.credit > 0);
+    else if (AppState.moghBankSubtabFilter === 'closed') bankList = bankList.filter(t => t.isClosed);
+    else if (AppState.moghBankSubtabFilter === 'closedDebit') bankList = bankList.filter(t => t.isClosed && t.debit > 0);
+    else if (AppState.moghBankSubtabFilter === 'closedCredit') bankList = bankList.filter(t => t.isClosed && t.credit > 0);
+    else if (AppState.moghBankSubtabFilter === 'dup') bankList = []; // در سناریو ما تراکنش تکراری تعبیه نشده
+  }
+  
+  document.getElementById('lblCountBankTransactions').textContent = `تعداد رکورد در این تب: ${bankList.length}`;
+  
+  tbodyBank.innerHTML = bankList.map((t, i) => {
+    const statusText = t.isClosed 
+      ? '<span class="badge badge-success">✓ بسته شده</span>' 
+      : '<span class="badge badge-danger">✗ باز</span>';
+      
+    const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
+    
+    return `
+      <tr style="${rowColor}">
+        <td style="padding:4px; text-align:center;">${i + 1}</td>
+        <td style="padding:4px; text-align:center;">${t.txDate}</td>
+        <td style="padding:4px; text-align:center;">${t.refNo}</td>
+        <td style="padding:4px; text-align:left; color:#ef4444;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
+        <td style="padding:4px; text-align:left; color:#10b981;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
+        <td style="padding:4px; text-align:right;">${t.desc}</td>
+        <td style="padding:4px; text-align:center;">${statusText}</td>
+      </tr>
+    `;
+  }).join('');
+  
+  // فیلترینگ تراکنش‌های دفاتر
+  let ledgerList = AppState.ledgerTransactions;
+  if (AppState.moghayeratReconciled) {
+    if (AppState.moghLedgerSubtabFilter === 'debit') ledgerList = ledgerList.filter(t => !t.isClosed && t.debit > 0);
+    else if (AppState.moghLedgerSubtabFilter === 'credit') ledgerList = ledgerList.filter(t => !t.isClosed && t.credit > 0);
+    else if (AppState.moghLedgerSubtabFilter === 'closed') ledgerList = ledgerList.filter(t => t.isClosed);
+    else if (AppState.moghLedgerSubtabFilter === 'closedDebit') ledgerList = ledgerList.filter(t => t.isClosed && t.debit > 0);
+    else if (AppState.moghLedgerSubtabFilter === 'closedCredit') ledgerList = ledgerList.filter(t => t.isClosed && t.credit > 0);
+    else if (AppState.moghLedgerSubtabFilter === 'dup') ledgerList = [];
+  }
+  
+  document.getElementById('lblCountLedgerTransactions').textContent = `تعداد رکورد در این تب: ${ledgerList.length}`;
+  
+  tbodyLedger.innerHTML = ledgerList.map((t, i) => {
+    const statusText = t.isClosed 
+      ? '<span class="badge badge-success">✓ بسته شده</span>' 
+      : '<span class="badge badge-danger">✗ باز</span>';
+      
+    const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
+    
+    return `
+      <tr style="${rowColor}">
+        <td style="padding:4px; text-align:center;">${i + 1}</td>
+        <td style="padding:4px; text-align:center;">${t.date}</td>
+        <td style="padding:4px; text-align:center;">${t.sanadNo}</td>
+        <td style="padding:4px; text-align:left; color:#10b981;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
+        <td style="padding:4px; text-align:left; color:#ef4444;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
+        <td style="padding:4px; text-align:right;">${t.desc}</td>
+        <td style="padding:4px; text-align:center;">${statusText}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ── زیرتب ۴: پیشنهاد برای رفع مغایرت ──
+
+function renderMoghayeratSuggestions() {
+  const container = document.getElementById('divMoghSuggestionsList');
+  if (!container) return;
+  
+  if (!AppState.moghayeratReconciled) {
+    container.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:30px;">هیچ مغایرت بازی جهت ارائه پیشنهاد یافت نشد. لطفاً ابتدا در تب «مغایرت گیری» دکمه تهیه مغایرت را فشار دهید.</div>`;
+    return;
+  }
+  
+  // یافتن اقلام باز
+  const openBank = AppState.bankTransactions.filter(t => !t.isClosed);
+  const openLedger = AppState.ledgerTransactions.filter(t => !t.isClosed);
+  
+  if (openBank.length === 0 && openLedger.length === 0) {
+    container.innerHTML = `<div style="font-size:0.8rem; color:#10b981; text-align:center; padding:30px; font-weight:bold;">✓ تبریک! هیچ مغایرتی بین صورت‌حساب بانک و دفاتر مالی شرکت وجود ندارد.</div>`;
+    return;
+  }
+  
+  let html = '';
+  
+  // ۱. اقلامی که در بانک هستند اما در دفاتر ثبت نشده‌اند
+  openBank.forEach(b => {
+    if (b.credit > 0) {
+      // بانک بستانکار شده (دریافت شده) اما دفتر ثبت نکرده
+      html += `
+        <div style="background:rgba(56, 189, 248, 0.05); border:1px solid rgba(56, 189, 248, 0.2); border-radius:4px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="color:var(--accent-color); font-weight:bold; font-size:0.8rem;">[ثبت نشده در دفاتر]</span>
+            <span style="font-size:0.8rem; margin-right:8px;">مبلغ <b>${b.credit.toLocaleString()} ریال</b> بابت <b>${b.desc}</b> در بانک واریز شده ولی در دفاتر ثبت نگردیده است.</span>
+          </div>
+          <button class="btn btn-primary btn-xs" onclick="generateAdjustmentSanad(${b.credit}, 'debit', '${b.desc}')">ثبت آرتیکل اصلاحی</button>
+        </div>
+      `;
+    } else if (b.debit > 0) {
+      // بانک بدهکار شده (کارمزد یا برداشت) اما دفتر ثبت نکرده
+      html += `
+        <div style="background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.2); border-radius:4px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="color:#ef4444; font-weight:bold; font-size:0.8rem;">[هزینه ثبت نشده]</span>
+            <span style="font-size:0.8rem; margin-right:8px;">مبلغ <b>${b.debit.toLocaleString()} ریال</b> بابت <b>${b.desc}</b> از بانک کسر شده ولی در دفاتر ثبت نگردیده است.</span>
+          </div>
+          <button class="btn btn-primary btn-xs" onclick="generateAdjustmentSanad(${b.debit}, 'credit', '${b.desc}')">ثبت آرتیکل اصلاحی</button>
+        </div>
+      `;
+    }
+  });
+  
+  // ۲. اقلامی که در دفاتر ثبت شده‌اند اما در بانک وصول نشده‌اند (مانند چک‌های معوق)
+  openLedger.forEach(l => {
+    if (l.credit > 0) {
+      html += `
+        <div style="background:rgba(245, 158, 11, 0.05); border:1px solid rgba(245, 158, 11, 0.2); border-radius:4px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="color:#f59e0b; font-weight:bold; font-size:0.8rem;">[چک معوق وصول نشده]</span>
+            <span style="font-size:0.8rem; margin-right:8px;">چک شماره <b>${l.sanadNo}</b> به مبلغ <b>${l.credit.toLocaleString()} ریال</b> صادر شده ولی هنوز از بانک برداشت نشده است.</span>
+          </div>
+          <span style="font-size:0.75rem; color:var(--text-muted);">نیاز به اقدام اصلاحی ندارد (پیگیری وصول)</span>
+        </div>
+      `;
+    }
+  });
+  
+  container.innerHTML = html;
+}
+
+function generateAdjustmentSanad(amount, side, desc) {
+  // شبیه‌سازی ایجاد آرتیکل اصلاحی در فرم ویرایش سند
+  alert(`سند اصلاحی با شرح "${desc}" و مبلغ ${amount.toLocaleString()} ریال در دفاتر ثبت گردید.`);
+  
+  // تبدیل تراکنش به حالت بسته
+  const bankTx = AppState.bankTransactions.find(t => t.debit === amount || t.credit === amount);
+  if (bankTx) bankTx.isClosed = true;
+  
+  renderMoghayeratSuggestions();
+  renderMoghayeratReconcilePanel();
+}
+
+// ── دکمه‌های نوار ابزار اصلی پایین ──
+
+function exportMoghayeratExcel() {
+  alert('گزارش اقلام مغایرت بانکی با فرمت اکسل تولید و در مسیر دانلودهای سیستم ذخیره شد.');
+}
+
+function printMoghStatementReport() {
+  alert('گزارش چاپی صورتحساب بانکی صادر گردید.');
+}
+
+function transferMoghDescToLedger() {
+  alert('انتقال شرح صورتحساب بانک به شرح ردیف دفاتر با موفقیت برای تمامی اقلام بسته شده انجام گرفت.');
+}
 

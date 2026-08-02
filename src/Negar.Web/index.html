@@ -1014,20 +1014,280 @@
           </div>
 
           <!-- Tab 5: مغایرت بانکی -->
+          <!-- Tab 5: مغایرت بانکی -->
           <div id="tab-panel-bank" class="hesabdari-tab-panel">
-            <div class="card form-card">
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">انتخاب حساب بانک:</label>
-                  <select class="form-select"><option>بانک ملی شعبه مرکزی - ۱۰۰۲</option></select>
-                </div>
-                <div class="form-group"><label class="form-label">تاریخ صورتحساب بانک:</label><input type="text" class="form-input" value="1403/05/01" /></div>
-              </div>
-              <div class="form-row">
-                <div class="form-group"><label class="form-label">مانده دفاتر نگار (ریال):</label><input type="text" class="form-input" value="3,450,000,000" readonly /></div>
-                <div class="form-group"><label class="form-label">مانده صورتحساب بانک (ریال):</label><input type="text" class="form-input" placeholder="مانده بانک را وارد کنید..." /></div>
-              </div>
-              <div class="form-actions"><button class="btn btn-primary" onclick="alert('گزارش مغایرت‌گیری بانکی تولید شد.')">📊 مغایرت‌گیری</button></div>
+            
+            <!-- Sub tabs bar -->
+            <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:8px; direction:rtl;">
+              <button class="btn btn-outline active" id="btnSubtabBankDefs" onclick="switchBankSubtab('defs')" style="font-size:0.8rem; padding:6px 15px; font-weight:bold;">معرفی بانک‌ها</button>
+              <button class="btn btn-outline" id="btnSubtabBankImport" onclick="switchBankSubtab('import')" style="font-size:0.8rem; padding:6px 15px; font-weight:bold;">ورود صورتحساب بانک</button>
+              <button class="btn btn-outline" id="btnSubtabBankReconcile" onclick="switchBankSubtab('reconcile')" style="font-size:0.8rem; padding:6px 15px; font-weight:bold;">مغایرت گیری</button>
+              <button class="btn btn-outline" id="btnSubtabBankSuggestions" onclick="switchBankSubtab('suggestions')" style="font-size:0.8rem; padding:6px 15px; font-weight:bold;">پیشنهاد برای رفع مغایرت</button>
             </div>
+
+            <!-- Subtab 1: معرفی بانک‌ها -->
+            <div id="pnlBankSubtabDefs" class="bank-subtab-panel" style="display:flex; gap:20px; direction:rtl; min-height:380px;">
+              <!-- Grid -->
+              <div style="flex:2; border:1px solid var(--border-color); border-radius:4px; padding:12px; background:var(--bg-primary); display:flex; flex-direction:column;">
+                <div id="lblBankStatementRangeHeader" style="font-weight:bold; font-size:0.8rem; color:#166534; background:rgba(22,101,52,0.06); padding:6px 12px; border-radius:4px; border:1px solid rgba(22,101,52,0.2); margin-bottom:12px;">بازه تاریخی صورت حساب وارد شده: فاقد صورت حساب وارد شده</div>
+                <div style="overflow-y:auto; flex:1; max-height:320px;">
+                  <table style="width:100%; border-collapse:collapse; font-size:0.8rem;" id="tblMoghayeratBanks">
+                    <thead>
+                      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                        <th style="padding:6px; font-weight:bold; text-align:center;">نام بانک</th>
+                        <th style="padding:6px; font-weight:bold; text-align:center;">نام شعبه</th>
+                        <th style="padding:6px; font-weight:bold; text-align:center;">کد شعبه</th>
+                        <th style="padding:6px; font-weight:bold; text-align:center;">آدرس شعبه</th>
+                        <th style="padding:6px; font-weight:bold; text-align:center;">نوع حساب</th>
+                        <th style="padding:6px; font-weight:bold; text-align:center;">شماره حساب</th>
+                        <th style="padding:6px; font-weight:bold; text-align:center;">سرفصل متناظر</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tblMoghayeratBanksBody">
+                      <!-- Dynamic Bank List Rows -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <!-- Form -->
+              <div style="flex:1; border:1px solid var(--border-color); border-radius:4px; padding:15px; background:var(--bg-secondary); display:flex; flex-direction:column; gap:10px;">
+                <h3 style="font-size:0.85rem; border-bottom:1px solid var(--border-color); padding-bottom:6px; margin-bottom:5px; font-weight:bold;">مشخصات بانک</h3>
+                <input type="hidden" id="moghBankEditId" value="" />
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نام بانک:</label>
+                  <input type="text" id="moghBankName" class="form-input" style="height:26px; font-size:0.8rem; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نام شعبه:</label>
+                  <input type="text" id="moghBankBranch" class="form-input" style="height:26px; font-size:0.8rem; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">کد شعبه:</label>
+                  <input type="text" id="moghBankBranchCode" class="form-input" style="height:26px; font-size:0.8rem; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">آدرس شعبه:</label>
+                  <input type="text" id="moghBankBranchAddress" class="form-input" style="height:26px; font-size:0.8rem; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">نوع حساب:</label>
+                  <input type="text" id="moghBankAccountType" class="form-input" style="height:26px; font-size:0.8rem; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">شماره حساب:</label>
+                  <input type="text" id="moghBankAccountNo" class="form-input" style="height:26px; font-size:0.8rem; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">سرفصل حساب:</label>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <span id="lblMoghBankAccText" style="font-size:0.75rem; color:var(--accent-color); font-weight:bold;">-</span>
+                    <button class="btn btn-outline" onclick="openSelectLedgerForMoghayerat()" style="padding:2px 8px; font-size:0.7rem; margin-right:auto; height:24px;">انتخاب سرفصل</button>
+                  </div>
+                </div>
+                
+                <div style="display:flex; gap:6px; margin-top:10px; direction:rtl;">
+                  <button class="btn btn-primary" onclick="saveMoghayeratBank()" style="flex:1; font-size:0.75rem; padding:4px 8px; font-weight:bold; height:28px;">ذخیره بانک</button>
+                  <button class="btn btn-outline" onclick="clearMoghayeratBankForm()" style="font-size:0.75rem; padding:4px 8px; height:28px;">جدید</button>
+                  <button class="btn btn-outline" onclick="deleteMoghayeratBank()" style="font-size:0.75rem; padding:4px 8px; color:red; border-color:red; height:28px;">حذف</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subtab 2: ورود صورتحساب بانک -->
+            <div id="pnlBankSubtabImport" class="bank-subtab-panel" style="display:none; flex-direction:column; border:1px solid var(--border-color); border-radius:4px; padding:15px; background:var(--bg-secondary); direction:rtl;">
+              <div style="display:flex; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:15px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <label class="form-label" style="font-size:0.8rem; font-weight:bold; min-width:80px;">انتخاب بانک:</label>
+                  <select id="cmbMoghImportBank" class="form-select" style="width:200px; height:28px; font-size:0.8rem;" onchange="loadImportedBankState()"></select>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <label class="form-label" style="font-size:0.8rem; font-weight:bold;">ردیف سرستون‌ها:</label>
+                  <input type="number" id="moghImportHeaderRow" class="form-input" value="1" style="width:60px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" />
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <button class="btn btn-outline" onclick="triggerMoghBrowseFile()" style="font-size:0.8rem; height:28px; padding:2px 12px; font-weight:bold;">انتخاب فایل...</button>
+                  <span id="lblMoghFileName" style="font-size:0.75rem; color:var(--text-muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">فایلی انتخاب نشده است</span>
+                  <input type="file" id="fileMoghImport" style="display:none;" onchange="handleMoghFileSelect(event)" />
+                </div>
+                <button class="btn btn-primary" onclick="loadSampleMoghData()" style="font-size:0.8rem; height:28px; padding:2px 12px; background:#047857; font-weight:bold;">بارگذاری نمونه داده</button>
+                <button class="btn btn-primary" onclick="saveMoghImportedTransactions()" style="font-size:0.8rem; height:28px; padding:2px 15px; background:#10b981; font-weight:bold; margin-right:auto;">ذخیره اطلاعات</button>
+              </div>
+              
+              <!-- Mapping Row -->
+              <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:4px; padding:10px; margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تاریخ تراکنش:</label>
+                  <select id="mapColTxDate" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">شماره پیگیری:</label>
+                  <select id="mapColTxNo" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">واریز (بستانکار):</label>
+                  <select id="mapColCredit" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">برداشت (بدهکار):</label>
+                  <select id="mapColDebit" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:150px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">شرح:</label>
+                  <select id="mapColDesc" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:150px;">
+                  <label class="form-label" style="font-size:0.75rem; font-weight:bold;">واریز کننده / ذینفع:</label>
+                  <select id="mapColBeneficiary" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                </div>
+              </div>
+              
+              <!-- Excel Preview Grid -->
+              <div style="border:1px solid var(--border-color); border-radius:4px; height:200px; overflow-y:auto; overflow-x:auto; background:var(--bg-primary);">
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem;" id="tblMoghImportPreview">
+                  <thead style="position:sticky; top:0; background:var(--bg-secondary); z-index:5;">
+                    <!-- Dynamically populated -->
+                  </thead>
+                  <tbody>
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Subtab 3: مغایرت گیری -->
+            <div id="pnlBankSubtabReconcile" class="bank-subtab-panel" style="display:none; flex-direction:column; border:1px solid var(--border-color); border-radius:4px; padding:15px; background:var(--bg-secondary); direction:rtl;">
+              <div style="display:flex; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:15px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <label class="form-label" style="font-size:0.8rem; font-weight:bold;">انتخاب بانک:</label>
+                  <select id="cmbMoghReconcileBank" class="form-select" style="width:200px; height:28px; font-size:0.8rem;"></select>
+                </div>
+                
+                <!-- Date Range Radio selection -->
+                <div style="display:flex; align-items:center; gap:12px; background:var(--bg-primary); padding:4px 12px; border-radius:4px; border:1px solid var(--border-color);">
+                  <span style="font-size:0.8rem; font-weight:bold; color:var(--text-muted);">باره تاریخ مغایرت‌گیری:</span>
+                  <label style="font-size:0.8rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                    <input type="radio" name="moghDateRange" id="rbMoghAll" checked onclick="toggleMoghDateInputs(false)" /> تمام سال‌ها
+                  </label>
+                  <label style="font-size:0.8rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                    <input type="radio" name="moghDateRange" id="rbMoghCurrent" onclick="toggleMoghDateInputs(false)" /> سال جاری
+                  </label>
+                  <label style="font-size:0.8rem; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                    <input type="radio" name="moghDateRange" id="rbMoghCustom" onclick="toggleMoghDateInputs(true)" /> بازه تاریخ
+                  </label>
+                </div>
+                
+                <!-- Custom Dates Inputs -->
+                <div id="divMoghCustomDates" style="display:none; align-items:center; gap:8px;">
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:0.75rem;">از تاریخ:</span>
+                    <input type="text" id="txtMoghFromDate" class="form-input" style="width:80px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" placeholder="1403/01/01" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('txtMoghFromDate', this)">...</button>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:0.75rem;">تا تاریخ:</span>
+                    <input type="text" id="txtMoghToDate" class="form-input" style="width:80px; height:28px; font-size:0.8rem; text-align:center; background:var(--bg-primary);" placeholder="1403/12/29" />
+                    <button class="btn btn-outline" style="padding:2px 6px; height:28px;" onclick="PersianCal.open('txtMoghToDate', this)">...</button>
+                  </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="runMoghReconciliation()" style="font-size:0.85rem; height:32px; padding:2px 20px; background:#0284c7; font-weight:bold; margin-right:auto;">تهیه مغایرت بانکی</button>
+              </div>
+              
+              <!-- Split Tables layout -->
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                
+                <!-- Split 1: Bank Statement Grid -->
+                <div style="border:1px solid var(--border-color); border-radius:4px; padding:8px; background:var(--bg-primary);">
+                  <div style="background:#0284c7; color:#fff; padding:4px 10px; font-weight:bold; font-size:0.75rem; border-radius:4px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>📋 اطلاعات صورت‌حساب بانک (pnlBank)</span>
+                    <span id="lblCountBankTransactions" style="font-size:0.7rem;">تعداد رکورد در این تب: ۰</span>
+                  </div>
+                  
+                  <!-- Subtabs -->
+                  <div style="display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap;">
+                    <button class="btn btn-outline btn-xs active" id="btnBankSubtabAll" onclick="switchBankGridSubtab('all')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">کل ارقام باز بانک</button>
+                    <button class="btn btn-outline btn-xs" id="btnBankSubtabDebit" onclick="switchBankGridSubtab('debit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام باز بدهکار بانک</button>
+                    <button class="btn btn-outline btn-xs" id="btnBankSubtabCredit" onclick="switchBankGridSubtab('credit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام باز بستانکار بانک</button>
+                    <button class="btn btn-outline btn-xs" id="btnBankSubtabClosed" onclick="switchBankGridSubtab('closed')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">کل ارقام بسته بانک</button>
+                    <button class="btn btn-outline btn-xs" id="btnBankSubtabClosedDebit" onclick="switchBankGridSubtab('closedDebit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام بسته بدهکار بانک</button>
+                    <button class="btn btn-outline btn-xs" id="btnBankSubtabClosedCredit" onclick="switchBankGridSubtab('closedCredit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام بسته بستانکار بانک</button>
+                    <button class="btn btn-outline btn-xs" id="btnBankSubtabDup" onclick="switchBankGridSubtab('dup')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام تکراری در بانک</button>
+                  </div>
+                  
+                  <div style="height:100px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;" id="tblMoghBankStatement">
+                      <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                          <th style="padding:4px;">ردیف</th>
+                          <th style="padding:4px;">تاریخ تراکنش</th>
+                          <th style="padding:4px;">شماره پیگیری</th>
+                          <th style="padding:4px;">برداشت (بدهکار)</th>
+                          <th style="padding:4px;">واریز (بستانکار)</th>
+                          <th style="padding:4px;">شرح تراکنش</th>
+                          <th style="padding:4px;">وضعیت</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tblMoghBankStatementBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <!-- Split 2: General Ledger Books Grid -->
+                <div style="border:1px solid var(--border-color); border-radius:4px; padding:8px; background:var(--bg-primary);">
+                  <div style="background:#047857; color:#fff; padding:4px 10px; font-weight:bold; font-size:0.75rem; border-radius:4px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>📋 اطلاعات دفتر کل بانک (pnlAsnad)</span>
+                    <span id="lblCountLedgerTransactions" style="font-size:0.7rem;">تعداد رکورد در این تب: ۰</span>
+                  </div>
+                  
+                  <!-- Subtabs -->
+                  <div style="display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap;">
+                    <button class="btn btn-outline btn-xs active" id="btnLedgerSubtabAll" onclick="switchLedgerGridSubtab('all')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">کل ارقام باز دفتر</button>
+                    <button class="btn btn-outline btn-xs" id="btnLedgerSubtabDebit" onclick="switchLedgerGridSubtab('debit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام باز بدهکار دفتر</button>
+                    <button class="btn btn-outline btn-xs" id="btnLedgerSubtabCredit" onclick="switchLedgerGridSubtab('credit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام باز بستانکار دفتر</button>
+                    <button class="btn btn-outline btn-xs" id="btnLedgerSubtabClosed" onclick="switchLedgerGridSubtab('closed')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">کل ارقام بسته دفتر</button>
+                    <button class="btn btn-outline btn-xs" id="btnLedgerSubtabClosedDebit" onclick="switchLedgerGridSubtab('closedDebit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام بسته بدهکار دفتر</button>
+                    <button class="btn btn-outline btn-xs" id="btnLedgerSubtabClosedCredit" onclick="switchLedgerGridSubtab('closedCredit')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام بسته بستانکار دفتر</button>
+                    <button class="btn btn-outline btn-xs" id="btnLedgerSubtabDup" onclick="switchLedgerGridSubtab('dup')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام تکراری در دفتر</button>
+                  </div>
+                  
+                  <div style="height:100px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;" id="tblMoghLedger">
+                      <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                          <th style="padding:4px;">ردیف</th>
+                          <th style="padding:4px;">تاریخ سند</th>
+                          <th style="padding:4px;">شماره سند</th>
+                          <th style="padding:4px;">بدهکار دفتر</th>
+                          <th style="padding:4px;">بستانکار دفتر</th>
+                          <th style="padding:4px;">شرح ردیف سند</th>
+                          <th style="padding:4px;">وضعیت</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tblMoghLedgerBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+
+            <!-- Subtab 4: پیشنهاد برای رفع مغایرت -->
+            <div id="pnlBankSubtabSuggestions" class="bank-subtab-panel" style="display:none; flex-direction:column; border:1px solid var(--border-color); border-radius:4px; padding:15px; background:var(--bg-secondary); direction:rtl; min-height:380px;">
+              <h3 style="font-size:0.85rem; border-bottom:1px solid var(--border-color); padding-bottom:6px; margin-bottom:12px; font-weight:bold;">💡 موارد پیشنهادی رفع مغایرت</h3>
+              
+              <div style="display:flex; flex-direction:column; gap:10px; overflow-y:auto; max-height:300px;" id="divMoghSuggestionsList">
+                <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:30px;">هیش مغایرت بازی جهت ارائه پیشنهاد یافت نشد. لطفاً ابتدا در تب «مغایرت گیری» دکمه تهیه مغایرت را فشار دهید.</div>
+              </div>
+            </div>
+
+            <!-- Bank Reconciliation Global Footer Buttons -->
+            <div style="display:flex; gap:10px; justify-content:flex-start; margin-top:15px; border-top:1px solid var(--border-color); padding-top:12px; direction:rtl; flex-wrap:wrap;">
+              <button class="btn btn-outline" onclick="exportMoghayeratExcel()" style="background:#047857; color:#fff; border-color:#047857; font-size:0.8rem; font-weight:bold; padding:6px 15px;">خروجی اکسل اقلام مغایرت...</button>
+              <button class="btn btn-outline" onclick="printMoghStatementReport()" style="background:#0284c7; color:#fff; border-color:#0284c7; font-size:0.8rem; font-weight:bold; padding:6px 15px;">گزارش صورتحساب بانکی</button>
+              <button class="btn btn-outline" onclick="transferMoghDescToLedger()" style="background:#7c3aed; color:#fff; border-color:#7c3aed; font-size:0.8rem; font-weight:bold; padding:6px 15px;">انتقال شرح صورت حساب به شرح ردیف دفتر</button>
+            </div>
+
           </div>
 
           <!-- Tab 6: تراز آزمایشی -->
