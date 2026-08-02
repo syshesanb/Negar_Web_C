@@ -1164,34 +1164,18 @@
             <div class="table-wrapper" style="height:282px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-color); border-radius:4px; margin-bottom:12px;">
               <table style="width:100%; border-collapse:collapse; min-width:1200px;">
                 <thead>
-                  <!-- Row of Search Inputs (placed above titles) -->
                   <tr style="position:sticky; top:0; background:var(--bg-secondary); z-index:10; border-bottom:1px solid var(--border-color);">
-                    <th></th>
-                    <th></th>
-                    <th><input type="text" id="searchColAccount" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('account', this.value)" /></th>
-                    <th></th>
-                    <th><input type="text" id="searchColShenavar" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('shenavarCode', this.value)" /></th>
-                    <th><input type="text" id="searchColDesc" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('desc', this.value)" /></th>
-                    <th><input type="text" id="searchColDebit" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('debit', this.value)" /></th>
-                    <th><input type="text" id="searchColCredit" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('credit', this.value)" /></th>
-                    <th><input type="text" id="searchColTxNo" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('txNo', this.value)" /></th>
-                    <th></th>
-                    <th><input type="text" id="searchColTxDate" style="width:100%; height:22px; font-size:0.75rem; padding:2px; background:var(--bg-primary); color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box;" placeholder="جستجو..." oninput="handleColumnSearch('txDate', this.value)" /></th>
-                    <th></th>
-                  </tr>
-                  <!-- Column Titles -->
-                  <tr style="position:sticky; top:30px; background:var(--bg-secondary); z-index:10; border-bottom:1px solid var(--border-color);">
                     <th style="width:50px; text-align:center;">ردیف</th>
                     <th style="width:40px; text-align:center;">SF</th>
-                    <th style="width:120px;">کد سرفصل</th>
+                    <th style="width:120px; padding: 4px;"><input type="text" id="searchColAccount" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="کد سرفصل" oninput="handleColumnSearch('account', this.value)" /></th>
                     <th style="width:40px; text-align:center;">SH</th>
-                    <th style="width:120px;">کد شناور</th>
-                    <th>شرح ردیف</th>
-                    <th style="width:150px;">بدهکار</th>
-                    <th style="width:150px;">بستانکار</th>
-                    <th style="width:130px;">شماره تراکنش</th>
+                    <th style="width:120px; padding: 4px;"><input type="text" id="searchColShenavar" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="کد شناور" oninput="handleColumnSearch('shenavarCode', this.value)" /></th>
+                    <th style="padding: 4px;"><input type="text" id="searchColDesc" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="شرح ردیف" oninput="handleColumnSearch('desc', this.value)" /></th>
+                    <th style="width:150px; padding: 4px;"><input type="text" id="searchColDebit" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="بدهکار" oninput="handleColumnSearch('debit', this.value)" /></th>
+                    <th style="width:150px; padding: 4px;"><input type="text" id="searchColCredit" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="بستانکار" oninput="handleColumnSearch('credit', this.value)" /></th>
+                    <th style="width:130px; padding: 4px;"><input type="text" id="searchColTxNo" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="شماره تراکنش" oninput="handleColumnSearch('txNo', this.value)" /></th>
                     <th style="width:40px; text-align:center;">TT</th>
-                    <th style="width:110px;">تاریخ تراکنش</th>
+                    <th style="width:110px; padding: 4px;"><input type="text" id="searchColTxDate" style="width:100%; height:24px; font-size:0.75rem; padding:2px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:3px; box-sizing:border-box; text-align:center; font-weight:bold;" placeholder="تاریخ تراکنش" oninput="handleColumnSearch('txDate', this.value)" /></th>
                     <th style="width:50px; text-align:center;">عملیات</th>
                   </tr>
                 </thead>
