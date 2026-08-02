@@ -1152,24 +1152,32 @@
               </div>
             </div>
 
-            <!-- Path & Header indicator section (Fills with selected account pathway) -->
-            <div style="background:rgba(16,185,129,0.06); color:#10b981; border:1px solid rgba(16,185,129,0.25); padding:10px 15px; border-radius:4px; margin-bottom:12px; font-size:0.8rem; font-weight:bold; line-height:1.6; direction:rtl;">
-              <!-- Document Details (Number & Date) -->
-              <div style="display:flex; justify-content:flex-start; align-items:center; gap:25px; margin-bottom:10px; border-bottom:1px solid rgba(16,185,129,0.15); padding-bottom:8px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="color:#166534; font-weight:bold; font-size:0.85rem;">شماره سند:</span>
-                  <input type="text" id="sanadNumberInput" class="form-input" style="width:90px; text-align:center; padding:3px 8px; font-weight:bold; height:26px; font-size:0.8rem; border-color:rgba(16,185,129,0.3); background:#f0fdf4;" />
+            <!-- Acoustical Group Box (Voucher Header & Current Line Paths) -->
+            <div style="border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.04); padding: 12px 18px; border-radius: 6px; margin-bottom: 15px; direction: rtl;">
+              
+              <!-- Line 1: Voucher Number & Account Path -->
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px; min-width: 170px;">
+                  <span style="color: #166534; font-weight: bold; font-size: 0.8rem;">شماره سند:</span>
+                  <input type="text" id="sanadNumberInput" class="form-input" style="width: 90px; text-align: center; padding: 2px 6px; font-weight: bold; height: 26px; font-size: 0.8rem; border-color: rgba(16,185,129,0.25); background: var(--bg-primary);" />
                 </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="color:#166534; font-weight:bold; font-size:0.85rem;">تاریخ سند:</span>
-                  <input type="text" id="sanadDateInput" class="form-input date-picker-wrapper" style="width:110px; text-align:center; padding:3px 8px; height:26px; font-size:0.8rem; border-color:rgba(16,185,129,0.3); background:#f0fdf4;" />
-                </div>
+                <div id="focusedAccountPath" style="font-size: 0.8rem; font-weight: bold; color: #166534;">کد و نام حساب سرفصل ردیف جاری: <span style="color: var(--text-muted); font-weight: normal;">-</span></div>
               </div>
 
-              <!-- Pathway details -->
-              <div id="focusedAccountPath">کد و نام حساب سرفصل ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
-              <div id="focusedShenavarPath" style="margin-top:4px;">کد و نام حساب شناور ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
-              <div id="focusedLineDesc" style="margin-top:4px;">متن کامل شرح ردیف جاری: <span style="color:var(--text-muted); font-weight:normal;">-</span></div>
+              <!-- Line 2: Floating Account Path (aligned next to inputs) -->
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 8px; padding-right: 170px;">
+                <div id="focusedShenavarPath" style="font-size: 0.8rem; font-weight: bold; color: #166534;">کد و نام حساب شناور ردیف جاری: <span style="color: var(--text-muted); font-weight: normal;">-</span></div>
+              </div>
+
+              <!-- Line 3: Voucher Date & Narration Path -->
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 6px; min-width: 170px;">
+                  <span style="color: #166534; font-weight: bold; font-size: 0.8rem;">تاریخ سند:</span>
+                  <input type="text" id="sanadDateInput" class="form-input date-picker-wrapper" style="width: 90px; text-align: center; padding: 2px 6px; height: 26px; font-size: 0.8rem; border-color: rgba(16,185,129,0.25); background: var(--bg-primary);" />
+                </div>
+                <div id="focusedLineDesc" style="font-size: 0.8rem; font-weight: bold; color: #166534;">متن کامل شرح ردیف جاری: <span style="color: var(--text-muted); font-weight: normal;">-</span></div>
+              </div>
+
             </div>
 
             <!-- Spreadsheet Grid Container: Scroll only in this datagrid! -->
