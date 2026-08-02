@@ -1549,6 +1549,13 @@ function alignFooterTotals() {
   headers.forEach(th => {
     if (th.textContent.includes('بدهکار')) debitTh = th;
     if (th.textContent.includes('بستانکار')) creditTh = th;
+    
+    const input = th.querySelector('input');
+    if (input) {
+      const placeholder = input.placeholder || '';
+      if (placeholder.includes('بدهکار')) debitTh = th;
+      if (placeholder.includes('بستانکار')) creditTh = th;
+    }
   });
   
   if (!debitTh || !creditTh) return;
