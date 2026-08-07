@@ -238,26 +238,130 @@ const AppState = {
     { id: 3, username: 'storekeeper', fullName: 'رضا حسینی (انباردار)', userType: 'User', isActive: true, ip: '192.168.1.15' }
   ],
   accounts: [
-    { id: 1, code: '01', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parentId: null },
-    { id: 2, code: '02', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
-    { id: 3, code: '03', name: 'حقوق صاحبان سهام', type: 'گروه', nature: 'بستانکار', parentId: null },
-    { id: 4, code: '04', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
-    { id: 5, code: '05', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parentId: null },
-
-    { id: 6, code: '0110', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
-    { id: 7, code: '0111', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
-    { id: 8, code: '0112', name: 'موجودی کالا', type: 'کل', nature: 'بدهکار', parentId: 1 },
-    { id: 9, code: '0220', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parentId: 2 },
-    { id: 10, code: '0330', name: 'سرمایه اول دوره', type: 'کل', nature: 'بستانکار', parentId: 3 },
-    { id: 11, code: '0440', name: 'فروش کالا و خدمات', type: 'کل', nature: 'بستانکار', parentId: 4 },
-    { id: 12, code: '0550', name: 'بهای تمام شده کالای فروش رفته', type: 'کل', nature: 'بدهکار', parentId: 5 },
-    { id: 13, code: '0551', name: 'هزینه‌های عمومی و اداری', type: 'کل', nature: 'بدهکار', parentId: 5 },
-
-    { id: 14, code: '011001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parentId: 6 },
-    { id: 15, code: '011002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parentId: 6 },
-    { id: 16, code: '011101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parentId: 7 },
-    { id: 17, code: '011201', name: 'موجودی انبار مرکزی', type: 'معین', nature: 'بدهکار', parentId: 8 },
-    { id: 18, code: '022001', name: 'فروشندگان و تامین کنندگان', type: 'معین', nature: 'بستانکار', parentId: 9 }
+    { id: 1, code: '11', name: 'دارائیهای جاری', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 2, code: '12', name: 'دارائیهای غیرجاری', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 3, code: '21', name: 'بدهیهای جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 4, code: '22', name: 'بدهیهای غیرجاری', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 5, code: '31', name: 'حقوق صاحبان سهام', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 6, code: '41', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 7, code: '42', name: 'فروش', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 8, code: '51', name: 'بهای تمام شده کالای فروش رفته', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 9, code: '52', name: 'هزینه های عمومی و اداری', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 10, code: '61', name: 'عملکرد و سود و زیان', type: 'گروه', nature: 'مشترک', parentId: null },
+    { id: 11, code: '71', name: 'حسابهای انتظامی', type: 'گروه', nature: 'بدهکار', parentId: null },
+    { id: 12, code: '1101', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 13, code: '1102', name: 'سرمایه‌گذاری‌های کوتاه مدت', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 14, code: '1103', name: 'حساب‌ها و اسناد دریافتنی تجاری', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 15, code: '1104', name: 'سایر حساب‌ها و اسناد دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 16, code: '1105', name: 'موجودی مواد و کالا', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 17, code: '1106', name: 'پیش‌پرداخت‌ها', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 18, code: '1201', name: 'دارایی‌های ثابت مشهود', type: 'کل', nature: 'بدهکار', parentId: 2 },
+    { id: 19, code: '1202', name: 'استهلاک انباشته دارایی‌ها', type: 'کل', nature: 'بستانکار', parentId: 2 },
+    { id: 20, code: '1203', name: 'دارایی‌های نامشهود', type: 'کل', nature: 'بدهکار', parentId: 2 },
+    { id: 21, code: '2101', name: 'حساب‌ها و اسناد پرداختنی تجاری', type: 'کل', nature: 'بستانکار', parentId: 3 },
+    { id: 22, code: '2102', name: 'سایر حساب‌ها و اسناد پرداختنی', type: 'کل', nature: 'بستانکار', parentId: 3 },
+    { id: 23, code: '2103', name: 'پیش‌دریافت‌ها', type: 'کل', nature: 'بستانکار', parentId: 3 },
+    { id: 24, code: '2104', name: 'ذخایر جاری', type: 'کل', nature: 'بستانکار', parentId: 3 },
+    { id: 25, code: '2201', name: 'تسهیلات مالی بلندمدت', type: 'کل', nature: 'بستانکار', parentId: 4 },
+    { id: 26, code: '2202', name: 'ذخیره مزایای پایان خدمت پرسنل', type: 'کل', nature: 'بستانکار', parentId: 4 },
+    { id: 27, code: '3101', name: 'سرمایه', type: 'کل', nature: 'بستانکار', parentId: 5 },
+    { id: 28, code: '3102', name: 'اندوخته‌ها', type: 'کل', nature: 'بستانکار', parentId: 5 },
+    { id: 29, code: '3103', name: 'سود و زیان انباشته', type: 'کل', nature: 'مشترک', parentId: 5 },
+    { id: 30, code: '3104', name: 'برداشت‌ها و تقسیم سود', type: 'کل', nature: 'بدهکار', parentId: 5 },
+    { id: 31, code: '4101', name: 'درآمدهای غیرعملیاتی', type: 'کل', nature: 'بستانکار', parentId: 6 },
+    { id: 32, code: '4201', name: 'فروش کالا و خدمات', type: 'کل', nature: 'بستانکار', parentId: 7 },
+    { id: 33, code: '4202', name: 'برگشت از فروش و تخفیفات', type: 'کل', nature: 'بدهکار', parentId: 7 },
+    { id: 34, code: '5101', name: 'بهای تمام شده کالای فروش رفته', type: 'کل', nature: 'بدهکار', parentId: 8 },
+    { id: 35, code: '5102', name: 'خرید و ملزومات', type: 'کل', nature: 'بدهکار', parentId: 8 },
+    { id: 36, code: '5103', name: 'هزینه‌های مستقیم حمل و نقل', type: 'کل', nature: 'بدهکار', parentId: 8 },
+    { id: 37, code: '5201', name: 'هزینه‌های حقوق و دستمزد', type: 'کل', nature: 'بدهکار', parentId: 9 },
+    { id: 38, code: '5202', name: 'هزینه‌های عمومی و اداری', type: 'کل', nature: 'بدهکار', parentId: 9 },
+    { id: 39, code: '5203', name: 'هزینه‌های توزیع و فروش', type: 'کل', nature: 'بدهکار', parentId: 9 },
+    { id: 40, code: '5204', name: 'هزینه‌های مالی', type: 'کل', nature: 'بدهکار', parentId: 9 },
+    { id: 41, code: '5205', name: 'هزینه استهلاک', type: 'کل', nature: 'بدهکار', parentId: 9 },
+    { id: 42, code: '6101', name: 'حساب خلاصه سود و زیان', type: 'کل', nature: 'مشترک', parentId: 10 },
+    { id: 43, code: '6102', name: 'تعدیلات سنواتی', type: 'کل', nature: 'مشترک', parentId: 10 },
+    { id: 44, code: '7101', name: 'حساب‌های انتظامی به نفع شرکت', type: 'کل', nature: 'بدهکار', parentId: 11 },
+    { id: 45, code: '7102', name: 'حساب‌های انتظامی به عهده شرکت', type: 'کل', nature: 'بدهکار', parentId: 11 },
+    { id: 46, code: '110101', name: 'صندوق‌ها', type: 'معین', nature: 'بدهکار', parentId: 12 },
+    { id: 47, code: '110102', name: 'بانک‌ها', type: 'معین', nature: 'بدهکار', parentId: 12 },
+    { id: 48, code: '110103', name: 'تنخواه‌گردان‌ها', type: 'معین', nature: 'بدهکار', parentId: 12 },
+    { id: 49, code: '110201', name: 'سپرده‌های بانکی کوتاه مدت', type: 'معین', nature: 'بدهکار', parentId: 13 },
+    { id: 50, code: '110202', name: 'سهام و اوراق بهادار کوتاه مدت', type: 'معین', nature: 'بدهکار', parentId: 13 },
+    { id: 51, code: '110301', name: 'حساب‌های دریافتنی (مشتریان)', type: 'معین', nature: 'بدهکار', parentId: 14 },
+    { id: 52, code: '110302', name: 'اسناد دریافتنی نزد صندوق', type: 'معین', nature: 'بدهکار', parentId: 14 },
+    { id: 53, code: '110303', name: 'اسناد دریافتنی درجریان وصول', type: 'معین', nature: 'بدهکار', parentId: 14 },
+    { id: 54, code: '110304', name: 'اسناد واخواست شده', type: 'معین', nature: 'بدهکار', parentId: 14 },
+    { id: 55, code: '110401', name: 'مساعده حقوق و دستمزد', type: 'معین', nature: 'بدهکار', parentId: 15 },
+    { id: 56, code: '110402', name: 'وام و مطالبات پرسنل', type: 'معین', nature: 'بدهکار', parentId: 15 },
+    { id: 57, code: '110403', name: 'سپرده‌های دریافتنی (ودیعه)', type: 'معین', nature: 'بدهکار', parentId: 15 },
+    { id: 58, code: '110501', name: 'موجودی کالا در انبار', type: 'معین', nature: 'بدهکار', parentId: 16 },
+    { id: 59, code: '110502', name: 'موجودی مواد اولیه', type: 'معین', nature: 'بدهکار', parentId: 16 },
+    { id: 60, code: '110503', name: 'موجودی قطعات و ملزومات', type: 'معین', nature: 'بدهکار', parentId: 16 },
+    { id: 61, code: '110504', name: 'کالای درجریان ساخت', type: 'معین', nature: 'بدهکار', parentId: 16 },
+    { id: 62, code: '110601', name: 'پیش‌پرداخت خرید کالا و خدمات', type: 'معین', nature: 'بدهکار', parentId: 17 },
+    { id: 63, code: '110602', name: 'پیش‌پرداخت اجاره', type: 'معین', nature: 'بدهکار', parentId: 17 },
+    { id: 64, code: '110603', name: 'پیش‌پرداخت بیمه', type: 'معین', nature: 'بدهکار', parentId: 17 },
+    { id: 65, code: '110604', name: 'پیش‌پرداخت مالیات و عوارض', type: 'معین', nature: 'بدهکار', parentId: 17 },
+    { id: 66, code: '120101', name: 'زمین', type: 'معین', nature: 'بدهکار', parentId: 18 },
+    { id: 67, code: '120102', name: 'ساختمان و تاسیسات', type: 'معین', nature: 'بدهکار', parentId: 18 },
+    { id: 68, code: '120103', name: 'ماشین‌آلات و تجهیزات', type: 'معین', nature: 'بدهکار', parentId: 18 },
+    { id: 69, code: '120104', name: 'وسایط نقلیه', type: 'معین', nature: 'بدهکار', parentId: 18 },
+    { id: 70, code: '120105', name: 'اثاثه و منصوبات', type: 'معین', nature: 'بدهکار', parentId: 18 },
+    { id: 71, code: '120201', name: 'استهلاک انباشته ساختمان', type: 'معین', nature: 'بستانکار', parentId: 19 },
+    { id: 72, code: '120202', name: 'استهلاک انباشته ماشین‌آلات', type: 'معین', nature: 'بستانکار', parentId: 19 },
+    { id: 73, code: '120203', name: 'استهلاک انباشته وسایط نقلیه', type: 'معین', nature: 'بستانکار', parentId: 19 },
+    { id: 74, code: '120204', name: 'استهلاک انباشته اثاثه', type: 'معین', nature: 'بستانکار', parentId: 19 },
+    { id: 75, code: '120301', name: 'نرم‌افزارهای رایانه‌ای', type: 'معین', nature: 'بدهکار', parentId: 20 },
+    { id: 76, code: '120302', name: 'حق‌الامتیاز و علائم تجاری', type: 'معین', nature: 'بدهکار', parentId: 20 },
+    { id: 77, code: '210101', name: 'حساب‌های پرداختنی (تامین‌کنندگان)', type: 'معین', nature: 'بستانکار', parentId: 21 },
+    { id: 78, code: '210102', name: 'اسناد پرداختنی عهده بانک‌ها', type: 'معین', nature: 'بستانکار', parentId: 21 },
+    { id: 79, code: '210201', name: 'حقوق و دستمزد پرداختنی', type: 'معین', nature: 'بستانکار', parentId: 22 },
+    { id: 80, code: '210202', name: 'بیمه پرداختنی (سازمان تامین اجتماعی)', type: 'معین', nature: 'بستانکار', parentId: 22 },
+    { id: 81, code: '210203', name: 'مالیات تکلیفی و حقوق پرداختنی', type: 'معین', nature: 'بستانکار', parentId: 22 },
+    { id: 82, code: '210204', name: 'مالیات بر ارزش افزوده پرداختنی', type: 'معین', nature: 'بستانکار', parentId: 22 },
+    { id: 83, code: '210301', name: 'پیش‌دریافت از مشتریان', type: 'معین', nature: 'بستانکار', parentId: 23 },
+    { id: 84, code: '210401', name: 'ذخیره مالیات بر درآمد', type: 'معین', nature: 'بستانکار', parentId: 24 },
+    { id: 85, code: '220101', name: 'وام‌ها و تسهیلات بانکی بلندمدت', type: 'معین', nature: 'بستانکار', parentId: 25 },
+    { id: 86, code: '220201', name: 'ذخیره بازخرید سنوات خدمت', type: 'معین', nature: 'بستانکار', parentId: 26 },
+    { id: 87, code: '310101', name: 'سرمایه ثبت شده', type: 'معین', nature: 'بستانکار', parentId: 27 },
+    { id: 88, code: '310201', name: 'اندوخته قانونی', type: 'معین', nature: 'بستانکار', parentId: 28 },
+    { id: 89, code: '310202', name: 'اندوخته عمومی و احتیاطی', type: 'معین', nature: 'بستانکار', parentId: 28 },
+    { id: 90, code: '310301', name: 'سود (زیان) انباشته', type: 'معین', nature: 'مشترک', parentId: 29 },
+    { id: 91, code: '310401', name: 'سود پیشنهادی و مصوب', type: 'معین', nature: 'بدهکار', parentId: 30 },
+    { id: 92, code: '410101', name: 'درآمد حاصل از سود سپرده‌های بانکی', type: 'معین', nature: 'بستانکار', parentId: 31 },
+    { id: 93, code: '410102', name: 'سود (زیان) حاصل از فروش دارایی‌ها', type: 'معین', nature: 'بستانکار', parentId: 31 },
+    { id: 94, code: '410103', name: 'سایر درآمدهای متفرقه', type: 'معین', nature: 'بستانکار', parentId: 31 },
+    { id: 95, code: '420101', name: 'فروش ناخالص کالا', type: 'معین', nature: 'بستانکار', parentId: 32 },
+    { id: 96, code: '420102', name: 'درآمد حاصل از ارائه خدمات', type: 'معین', nature: 'بستانکار', parentId: 32 },
+    { id: 97, code: '420201', name: 'برگشت از فروش و کاهش قیمت', type: 'معین', nature: 'بدهکار', parentId: 33 },
+    { id: 98, code: '420202', name: 'تخفیفات نقدی فروش', type: 'معین', nature: 'بدهکار', parentId: 33 },
+    { id: 99, code: '510101', name: 'بهای تمام شده کالای خریده شده / ساخته شده', type: 'معین', nature: 'بدهکار', parentId: 34 },
+    { id: 100, code: '510201', name: 'خرید ناخالص کالا', type: 'معین', nature: 'بدهکار', parentId: 35 },
+    { id: 101, code: '510202', name: 'برگشت از خرید و تخفیفات', type: 'معین', nature: 'بستانکار', parentId: 35 },
+    { id: 102, code: '510203', name: 'تخفیفات نقدی خرید', type: 'معین', nature: 'بستانکار', parentId: 35 },
+    { id: 103, code: '510301', name: 'هزینه حمل کالای خریداری شده', type: 'معین', nature: 'بدهکار', parentId: 36 },
+    { id: 104, code: '520101', name: 'حقوق پایه و حقوق ماهانه', type: 'معین', nature: 'بدهکار', parentId: 37 },
+    { id: 105, code: '520102', name: 'اضافه‌کاری و پاداش', type: 'معین', nature: 'بدهکار', parentId: 37 },
+    { id: 106, code: '520103', name: 'حق بیمه سهم کارفرما', type: 'معین', nature: 'بدهکار', parentId: 37 },
+    { id: 107, code: '520104', name: 'بن و مسکن و اولاد', type: 'معین', nature: 'بدهکار', parentId: 37 },
+    { id: 108, code: '520105', name: 'عیدی و پاداش پایان سال', type: 'معین', nature: 'بدهکار', parentId: 37 },
+    { id: 109, code: '520201', name: 'هزینه اجاره دفتر و انبار', type: 'معین', nature: 'بدهکار', parentId: 38 },
+    { id: 110, code: '520202', name: 'هزینه آب، برق، گاز و تلفن', type: 'معین', nature: 'بدهکار', parentId: 38 },
+    { id: 111, code: '520203', name: 'هزینه ملزومات و لوازم‌التحریر', type: 'معین', nature: 'بدهکار', parentId: 38 },
+    { id: 112, code: '520204', name: 'هزینه ایاب و ذهاب و پذیرایی', type: 'معین', nature: 'بدهکار', parentId: 38 },
+    { id: 113, code: '520205', name: 'هزینه پست، پیک و ارتباطات', type: 'معین', nature: 'بدهکار', parentId: 38 },
+    { id: 114, code: '520301', name: 'هزینه تبلیغات و بازاریابی', type: 'معین', nature: 'بدهکار', parentId: 39 },
+    { id: 115, code: '520302', name: 'هزینه حمل و نقل فروش', type: 'معین', nature: 'بدهکار', parentId: 39 },
+    { id: 116, code: '520401', name: 'هزینه کارمزد بانکی', type: 'معین', nature: 'بدهکار', parentId: 40 },
+    { id: 117, code: '520402', name: 'هزینه سود و کارمزد تسهیلات بانکی', type: 'معین', nature: 'بدهکار', parentId: 40 },
+    { id: 118, code: '520501', name: 'هزینه استهلاک دارایی‌های ثابت', type: 'معین', nature: 'بدهکار', parentId: 41 },
+    { id: 119, code: '610101', name: 'خلاصه سود و زیان سال جاری', type: 'معین', nature: 'مشترک', parentId: 42 },
+    { id: 120, code: '610201', name: 'تعدیلات سنواتی سود و زیان', type: 'معین', nature: 'مشترک', parentId: 43 },
+    { id: 121, code: '710101', name: 'اسناد وثیقه‌ای و ضمانتی دریافتی', type: 'معین', nature: 'بدهکار', parentId: 44 },
+    { id: 122, code: '710102', name: 'طرف حساب اسناد انتظامی دریافتی', type: 'معین', nature: 'بستانکار', parentId: 44 },
+    { id: 123, code: '710201', name: 'اسناد وثیقه‌ای و ضمانتی پرداختی', type: 'معین', nature: 'بدهکار', parentId: 45 },
+    { id: 124, code: '710202', name: 'طرف حساب اسناد انتظامی پرداختی', type: 'معین', nature: 'بستانکار', parentId: 45 }
   ],
   shenavars: [
     { id: 1, code: 'SH-101', name: 'پروژه احداث شعبه غرب', parentId: null, status: 'فعال' },
@@ -279,8 +383,8 @@ const AppState = {
     { id: 102, date: '1403/05/10', desc: 'فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 125000000, status: 'تایید شده', bakhshId: 2 }
   ],
   sanadLines: [
-    { account: '011001', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
-    { account: '011101', desc: 'تسویه حساب مشتری', debit: 0, credit: 50000000 }
+    { account: '110101', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
+    { account: '110301', desc: 'تسویه حساب مشتری', debit: 0, credit: 50000000 }
   ],
   products: [
     { id: 1, code: 'PRD-101', name: 'لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ', unit: 'دستگاه', price: 450000000, stock: 24, barcode: '690123456789' },
@@ -720,8 +824,8 @@ function suggestNextAccountCode(type, parentId) {
     const parent = AppState.accounts.find(a => a.id === parentId);
     if (parent) {
       if (type === 'کل') return parent.code + '10'; // e.g. '01' -> '0110'
-      if (type === 'معین') return parent.code + '01'; // e.g. '0110' -> '011001'
-      if (type === 'تفصیلی') return parent.code + '01'; // e.g. '011001' -> '01100101'
+      if (type === 'معین') return parent.code + '01'; // e.g. '0110' -> '110101'
+      if (type === 'تفصیلی') return parent.code + '01'; // e.g. '110101' -> '01100101'
     }
   }
   return '';
@@ -1126,8 +1230,8 @@ function editSanad(id) {
 
   // Render lines with the voucher's values
   AppState.sanadLines = [
-    { account: '011001', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
-    { account: '022001', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
+    { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
+    { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
   ];
   renderSanadEditorLines();
 }
@@ -1487,7 +1591,7 @@ function renderSanadEditorLines() {
 
   tbody.innerHTML = AppState.sanadLines.map((line, i) => {
     // Default values for missing properties
-    if (!line.account) line.account = '011001';
+    if (!line.account) line.account = '110101';
     if (!line.shenavarCode) line.shenavarCode = '';
     if (!line.txNo) line.txNo = '';
     if (!line.txDate) line.txDate = '';
@@ -1574,7 +1678,7 @@ function renderSanadEditorLines() {
 }
 
 function addSanadLine() {
-  AppState.sanadLines.push({ account: '011001', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
+  AppState.sanadLines.push({ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
   focusedLineIndex = AppState.sanadLines.length - 1;
   renderSanadEditorLines();
 }
@@ -1582,7 +1686,7 @@ function addSanadLine() {
 function removeSanadLine(i) {
   AppState.sanadLines.splice(i, 1);
   if (AppState.sanadLines.length === 0) {
-    AppState.sanadLines.push({ account: '011001', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
+    AppState.sanadLines.push({ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
   }
   focusedLineIndex = Math.max(0, i - 1);
   renderSanadEditorLines();
@@ -2358,8 +2462,8 @@ function openNewSanadForm() {
   
   focusedLineIndex = 0;
   AppState.sanadLines = [
-    { account: '011001', shenavarCode: '', desc: 'توضیحات ردیف ۱', debit: 0, credit: 0, txNo: '', txDate: '' },
-    { account: '022001', shenavarCode: '', desc: 'توضیحات ردیف ۲', debit: 0, credit: 0, txNo: '', txDate: '' }
+    { account: '110101', shenavarCode: '', desc: 'توضیحات ردیف ۱', debit: 0, credit: 0, txNo: '', txDate: '' },
+    { account: '210101', shenavarCode: '', desc: 'توضیحات ردیف ۲', debit: 0, credit: 0, txNo: '', txDate: '' }
   ];
   renderSanadEditorLines();
 }
@@ -2407,7 +2511,7 @@ function saveSanadEntry() {
     alert(`سند شماره ${no} با موفقیت ثبت شد.`);
   }
 
-  AppState.sanadLines = [{ account: '011001', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' }];
+  AppState.sanadLines = [{ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' }];
   closeSanadEditor();
 }
 
@@ -3942,18 +4046,18 @@ function ensureSanadMockLines() {
     if (!s.lines) {
       if (s.id === 101) {
         s.lines = [
-          { account: '011001', shenavarCode: 'SH-101', desc: 'سند افتتاحیه صندوق مرکزی', debit: 5000000000, credit: 0, txNo: '101', txDate: '1403/01/05' },
-          { account: '022001', shenavarCode: '', desc: 'سند افتتاحیه تامین‌کنندگان', debit: 0, credit: 5000000000, txNo: '101', txDate: '1403/01/05' }
+          { account: '110101', shenavarCode: 'SH-101', desc: 'سند افتتاحیه صندوق مرکزی', debit: 5000000000, credit: 0, txNo: '101', txDate: '1403/01/05' },
+          { account: '210101', shenavarCode: '', desc: 'سند افتتاحیه تامین‌کنندگان', debit: 0, credit: 5000000000, txNo: '101', txDate: '1403/01/05' }
         ];
       } else if (s.id === 102) {
         s.lines = [
-          { account: '011002', shenavarCode: 'SH-102', desc: 'دریافت بانک ملی بابت فروش', debit: 125000000, credit: 0, txNo: '102', txDate: '1403/05/10' },
-          { account: '0440', shenavarCode: '', desc: 'درآمد حاصل از فروش کالا', debit: 0, credit: 125000000, txNo: '102', txDate: '1403/05/10' }
+          { account: '110102', shenavarCode: 'SH-102', desc: 'دریافت بانک ملی بابت فروش', debit: 125000000, credit: 0, txNo: '102', txDate: '1403/05/10' },
+          { account: '420101', shenavarCode: '', desc: 'درآمد حاصل از فروش کالا', debit: 0, credit: 125000000, txNo: '102', txDate: '1403/05/10' }
         ];
       } else {
         s.lines = [
-          { account: '011001', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0, txNo: s.id.toString(), txDate: s.date },
-          { account: '022001', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit, txNo: s.id.toString(), txDate: s.date }
+          { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0, txNo: s.id.toString(), txDate: s.date },
+          { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit, txNo: s.id.toString(), txDate: s.date }
         ];
       }
     }
