@@ -967,3 +967,10 @@ tr.selected-parent-row {
   height: 20px !important;
   line-height: 1.2 !important;
 }
+
+.active-company-tab {
+  background-color: var(--accent-color) !important;
+  color: #0f172a !important;
+  border-color: var(--accent-color) !important;
+  font-weight: bold !important;
+}

@@ -2516,6 +2516,36 @@ function renderCompaniesTable() {
   `).join('');
 }
 
+function switchCompanyFormTab(tabId) {
+  // Hide all sections
+  document.querySelectorAll('.company-form-section-tab').forEach(sec => {
+    sec.style.display = 'none';
+  });
+  // Show target section
+  const target = document.getElementById(`compSec-${tabId}`);
+  if (target) target.style.display = 'block';
+
+  // Manage tab button states
+  const btns = [
+    { id: 'tabBtn-general', key: 'general' },
+    { id: 'tabBtn-location', key: 'location' },
+    { id: 'tabBtn-bank', key: 'bank' },
+    { id: 'tabBtn-tax', key: 'tax' },
+    { id: 'tabBtn-license', key: 'license' },
+    { id: 'tabBtn-sign', key: 'sign' }
+  ];
+  btns.forEach(b => {
+    const btnEl = document.getElementById(b.id);
+    if (btnEl) {
+      if (b.key === tabId) {
+        btnEl.classList.add('active-company-tab');
+      } else {
+        btnEl.classList.remove('active-company-tab');
+      }
+    }
+  });
+}
+
 function openCompanyForm(companyId) {
   const panel = document.getElementById('companyFormPanel');
   const title = document.getElementById('companyFormTitle');
@@ -2539,6 +2569,30 @@ function openCompanyForm(companyId) {
     document.getElementById('compAddress').value = '';
     document.getElementById('compNotes').value = '';
     document.getElementById('compActiveYear').value = '1403';
+    
+    // New fields:
+    document.getElementById('compLegalType').value = 'سهامی خاص';
+    document.getElementById('compRegNo').value = '';
+    document.getElementById('compNationalId').value = '';
+    document.getElementById('compRegDate').value = '';
+    document.getElementById('compActivity').value = '';
+    document.getElementById('compFactoryAddress').value = '';
+    document.getElementById('compBankName').value = '';
+    document.getElementById('compBankAccount').value = '';
+    document.getElementById('compBankShiba').value = '';
+    document.getElementById('compBankCard').value = '';
+    document.getElementById('compCurrency').value = 'ریال';
+    document.getElementById('compModyanUniqueId').value = '';
+    document.getElementById('compInsuranceCode').value = '';
+    document.getElementById('compVatRate').value = '10';
+    document.getElementById('compModyanPrivateKey').value = '';
+    document.getElementById('compLicenseNo').value = '';
+    document.getElementById('compLicenseExpiry').value = '';
+    document.getElementById('compShenaseSenfi').value = '';
+    document.getElementById('compCEO').value = '';
+    document.getElementById('compCeoNationalId').value = '';
+    document.getElementById('compCeoPhone').value = '';
+    document.getElementById('compAuthorizedSignatories').value = '';
   } else {
     // EDIT mode: load existing data
     const company = AppState.companies.find(c => c.id === companyId);
@@ -2556,7 +2610,34 @@ function openCompanyForm(companyId) {
     document.getElementById('compAddress').value = company.address || '';
     document.getElementById('compNotes').value = company.notes || '';
     document.getElementById('compActiveYear').value = company.activeYear || '1403';
+
+    // New fields:
+    document.getElementById('compLegalType').value = company.legalType || 'سهامی خاص';
+    document.getElementById('compRegNo').value = company.regNo || '';
+    document.getElementById('compNationalId').value = company.nationalId || '';
+    document.getElementById('compRegDate').value = company.regDate || '';
+    document.getElementById('compActivity').value = company.activity || '';
+    document.getElementById('compFactoryAddress').value = company.factoryAddress || '';
+    document.getElementById('compBankName').value = company.bankName || '';
+    document.getElementById('compBankAccount').value = company.bankAccount || '';
+    document.getElementById('compBankShiba').value = company.bankShiba || '';
+    document.getElementById('compBankCard').value = company.bankCard || '';
+    document.getElementById('compCurrency').value = company.currency || 'ریال';
+    document.getElementById('compModyanUniqueId').value = company.modyanUniqueId || '';
+    document.getElementById('compInsuranceCode').value = company.insuranceCode || '';
+    document.getElementById('compVatRate').value = company.vatRate || '10';
+    document.getElementById('compModyanPrivateKey').value = company.modyanPrivateKey || '';
+    document.getElementById('compLicenseNo').value = company.licenseNo || '';
+    document.getElementById('compLicenseExpiry').value = company.licenseExpiry || '';
+    document.getElementById('compShenaseSenfi').value = company.shenaseSenfi || '';
+    document.getElementById('compCEO').value = company.ceo || '';
+    document.getElementById('compCeoNationalId').value = company.ceoNationalId || '';
+    document.getElementById('compCeoPhone').value = company.ceoPhone || '';
+    document.getElementById('compAuthorizedSignatories').value = company.authorizedSignatories || '';
   }
+
+  // Reset active tab to General when opening
+  switchCompanyFormTab('general');
 
   // Scroll panel into view smoothly
   setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
@@ -2582,15 +2663,46 @@ function saveCompany() {
   const notes = document.getElementById('compNotes')?.value?.trim();
   const activeYear = document.getElementById('compActiveYear')?.value;
 
+  // New fields:
+  const legalType = document.getElementById('compLegalType')?.value;
+  const regNo = document.getElementById('compRegNo')?.value?.trim();
+  const nationalId = document.getElementById('compNationalId')?.value?.trim();
+  const regDate = document.getElementById('compRegDate')?.value?.trim();
+  const activity = document.getElementById('compActivity')?.value?.trim();
+  const factoryAddress = document.getElementById('compFactoryAddress')?.value?.trim();
+  const bankName = document.getElementById('compBankName')?.value?.trim();
+  const bankAccount = document.getElementById('compBankAccount')?.value?.trim();
+  const bankShiba = document.getElementById('compBankShiba')?.value?.trim();
+  const bankCard = document.getElementById('compBankCard')?.value?.trim();
+  const currency = document.getElementById('compCurrency')?.value;
+  const modyanUniqueId = document.getElementById('compModyanUniqueId')?.value?.trim();
+  const insuranceCode = document.getElementById('compInsuranceCode')?.value?.trim();
+  const vatRate = document.getElementById('compVatRate')?.value?.trim();
+  const modyanPrivateKey = document.getElementById('compModyanPrivateKey')?.value?.trim();
+  const licenseNo = document.getElementById('compLicenseNo')?.value?.trim();
+  const licenseExpiry = document.getElementById('compLicenseExpiry')?.value?.trim();
+  const shenaseSenfi = document.getElementById('compShenaseSenfi')?.value?.trim();
+  const ceo = document.getElementById('compCEO')?.value?.trim();
+  const ceoNationalId = document.getElementById('compCeoNationalId')?.value?.trim();
+  const ceoPhone = document.getElementById('compCeoPhone')?.value?.trim();
+  const authorizedSignatories = document.getElementById('compAuthorizedSignatories')?.value?.trim();
+
   // Validation
   if (!code) { alert('کد شرکت الزامی است.'); document.getElementById('compCode').focus(); return; }
   if (!name) { alert('نام شرکت الزامی است.'); document.getElementById('compName').focus(); return; }
+
+  const newCompanyData = {
+    code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear,
+    legalType, regNo, nationalId, regDate, activity, factoryAddress, bankName, bankAccount,
+    bankShiba, bankCard, currency, modyanUniqueId, insuranceCode, vatRate, modyanPrivateKey,
+    licenseNo, licenseExpiry, shenaseSenfi, ceo, ceoNationalId, ceoPhone, authorizedSignatories
+  };
 
   if (editingId) {
     // UPDATE existing company
     const idx = AppState.companies.findIndex(c => c.id === Number(editingId));
     if (idx !== -1) {
-      AppState.companies[idx] = { ...AppState.companies[idx], code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear };
+      AppState.companies[idx] = { ...AppState.companies[idx], ...newCompanyData };
       alert(`شرکت "${name}" با موفقیت بروزرسانی شد.`);
     }
   } else {
@@ -2603,7 +2715,7 @@ function saveCompany() {
     // CREATE new company
     AppState.companies.push({
       id: Date.now(),
-      code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear
+      ...newCompanyData
     });
     alert(`شرکت جدید "${name}" با موفقیت ثبت شد.`);
   }
