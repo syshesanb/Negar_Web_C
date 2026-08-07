@@ -150,14 +150,15 @@ function logout() {
 }
 
 let dbAccounts = [];
+let pristineAccountsTemplate = [];
 const expandedAccountIds = new Set();
 
 function initializeCompanyAccounts(newCompanyCode) {
-  const templateAccounts = dbAccounts.filter(a => !a.companyCode || a.companyCode === '1001');
+  // Always clone from the pristine, unmodified template
   const idMap = {};
   let counter = Date.now();
   
-  const copies = templateAccounts.map(a => {
+  const copies = pristineAccountsTemplate.map(a => {
     const newId = ++counter;
     idMap[a.id] = newId;
     return {
@@ -3273,6 +3274,8 @@ function updateSystemClock() {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize dbAccounts with default accounts mapped to company 1001
   dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
+  // Save a pristine template of default accounts before any user modification
+  pristineAccountsTemplate = AppState.accounts.map(a => ({ ...a }));
   // Expand default accounts on load
   AppState.accounts.forEach(a => {
     expandedAccountIds.add(a.id);
@@ -3411,6 +3414,8 @@ AppState.selectedMoghBankId = 1;
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize dbAccounts with default accounts mapped to company 1001
   dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
+  // Save a pristine template of default accounts before any user modification
+  pristineAccountsTemplate = AppState.accounts.map(a => ({ ...a }));
   // Expand default accounts on load
   AppState.accounts.forEach(a => {
     expandedAccountIds.add(a.id);
