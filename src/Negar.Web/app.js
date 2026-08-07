@@ -150,6 +150,7 @@ function logout() {
 }
 
 let dbAccounts = [];
+const expandedAccountIds = new Set();
 
 function initializeCompanyAccounts(newCompanyCode) {
   const templateAccounts = dbAccounts.filter(a => !a.companyCode || a.companyCode === '1001');
@@ -197,6 +198,11 @@ function switchActiveCompany(newCompany) {
     initializeCompanyAccounts(newCode);
     AppState.accounts = dbAccounts.filter(a => a.companyCode === newCode);
   }
+
+  // Auto-expand all accounts so they are fully displayed by default
+  AppState.accounts.forEach(a => {
+    expandedAccountIds.add(a.id);
+  });
 }
 
 // ---- App State ----
@@ -569,8 +575,7 @@ function sortTreePreOrder(list) {
   return result;
 }
 
-// Set of expanded account IDs for treeview datagrid
-const expandedAccountIds = new Set();
+// Set of expanded account IDs for treeview datagrid (declared at top level)
 let currentParentIdForNewAccount = null;
 
 function toggleAccountExpand(accId) {
@@ -3158,6 +3163,10 @@ function updateSystemClock() {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize dbAccounts with default accounts mapped to company 1001
   dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
+  // Expand default accounts on load
+  AppState.accounts.forEach(a => {
+    expandedAccountIds.add(a.id);
+  });
 
   // Check if form parameter is present in URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -3292,6 +3301,10 @@ AppState.selectedMoghBankId = 1;
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize dbAccounts with default accounts mapped to company 1001
   dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
+  // Expand default accounts on load
+  AppState.accounts.forEach(a => {
+    expandedAccountIds.add(a.id);
+  });
 
   populateMoghCombos();
   renderMoghayeratBanksTable();
