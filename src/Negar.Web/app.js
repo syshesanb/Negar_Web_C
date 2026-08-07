@@ -69,7 +69,7 @@ function doLogin() {
 
         // Initialize session: default to first company and its active (or latest) fiscal year
         if (AppState.companies.length > 0) {
-          SessionState.company = AppState.companies[0];
+          switchActiveCompany(AppState.companies[0]);
           const activeYears = AppState.fiscalYears
             .filter(fy => fy.company === SessionState.company.code)
             .sort((a, b) => Number(b.year) - Number(a.year));
@@ -147,6 +147,56 @@ function logout() {
   if (overlay)  { overlay.style.display = 'flex'; overlay.classList.remove('login-fade-out'); }
   // Focus username field
   setTimeout(() => { if (u) u.focus(); }, 100);
+}
+
+let dbAccounts = [];
+
+function initializeCompanyAccounts(newCompanyCode) {
+  const templateAccounts = dbAccounts.filter(a => !a.companyCode || a.companyCode === '1001');
+  const idMap = {};
+  let counter = Date.now();
+  
+  const copies = templateAccounts.map(a => {
+    const newId = ++counter;
+    idMap[a.id] = newId;
+    return {
+      ...a,
+      id: newId,
+      companyCode: newCompanyCode
+    };
+  });
+  
+  copies.forEach(copy => {
+    if (copy.parentId !== null && copy.parentId !== undefined) {
+      copy.parentId = idMap[copy.parentId] || null;
+    }
+  });
+  
+  dbAccounts.push(...copies);
+}
+
+function switchActiveCompany(newCompany) {
+  if (!newCompany) return;
+  
+  // Save current accounts first
+  if (SessionState.company) {
+    const oldCode = SessionState.company.code;
+    dbAccounts = dbAccounts.filter(a => a.companyCode !== oldCode && (a.companyCode || oldCode !== '1001'));
+    AppState.accounts.forEach(a => {
+      a.companyCode = oldCode;
+    });
+    dbAccounts.push(...AppState.accounts);
+  }
+  
+  SessionState.company = newCompany;
+  
+  const newCode = newCompany.code;
+  AppState.accounts = dbAccounts.filter(a => a.companyCode === newCode || (!a.companyCode && newCode === '1001'));
+  
+  if (AppState.accounts.length === 0) {
+    initializeCompanyAccounts(newCode);
+    AppState.accounts = dbAccounts.filter(a => a.companyCode === newCode);
+  }
 }
 
 // ---- App State ----
@@ -3019,7 +3069,7 @@ function applyCompanySwitch() {
   if (!company) return;
 
   // Update session
-  SessionState.company = company;
+  switchActiveCompany(company);
   SessionState.year    = selectedYear;
 
   // Update header
@@ -3106,6 +3156,9 @@ function updateSystemClock() {
 // Init on page load
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize dbAccounts with default accounts mapped to company 1001
+  dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
+
   // Check if form parameter is present in URL
   const urlParams = new URLSearchParams(window.location.search);
   const formParam = urlParams.get('form');
@@ -3136,7 +3189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (headerUser) headerUser.textContent = currentUser.fullName + ' (' + currentUser.username + ')';
 
     if (AppState.companies.length > 0) {
-      SessionState.company = AppState.companies[0];
+      switchActiveCompany(AppState.companies[0]);
       const activeYears = AppState.fiscalYears
         .filter(fy => fy.company === SessionState.company.code)
         .sort((a, b) => Number(b.year) - Number(a.year));
@@ -3237,6 +3290,9 @@ AppState.selectedMoghBankId = 1;
 
 // بارگذاری اولیه مقادیر کامبوها به صورت پیش‌فرض
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize dbAccounts with default accounts mapped to company 1001
+  dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
+
   populateMoghCombos();
   renderMoghayeratBanksTable();
 });
