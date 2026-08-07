@@ -2915,6 +2915,7 @@ function saveFiscalYear() {
   const endDate = document.getElementById('fyEndDate')?.value?.trim();
   const company = document.getElementById('fyCompany')?.value;
   const notes = document.getElementById('fyNotes')?.value?.trim();
+  const status = document.getElementById('fyStatus')?.value;
 
   // Validation
   if (!year) { alert('سال مالی الزامی است.'); document.getElementById('fyYear').focus(); return; }
@@ -2926,23 +2927,22 @@ function saveFiscalYear() {
     // UPDATE
     const idx = AppState.fiscalYears.findIndex(f => f.id === Number(editingId));
     if (idx !== -1) {
-      AppState.fiscalYears[idx] = { ...AppState.fiscalYears[idx], year, startDate, endDate, company, notes };
-      alert(`سال مالی ${year} با موفقیت بروزرسانی شد.`);
+      AppState.fiscalYears[idx] = { ...AppState.fiscalYears[idx], year, startDate, endDate, company, notes, status };
+      alert(`سال مالی \${year} با موفقیت بروزرسانی شد.`);
     }
   } else {
     // Check duplicate year for same company
     if (AppState.fiscalYears.find(f => f.year === year && f.company === company)) {
-      alert(`سال مالی "${year}" قبلاً برای این شرکت تعریف شده است.`);
+      alert(`سال مالی "\${year}" قبلاً برای این شرکت تعریف شده است.`);
       document.getElementById('fyYear').focus();
       return;
     }
     // CREATE
     AppState.fiscalYears.push({
       id: Date.now(),
-      year, startDate, endDate, company, notes,
-      status: 'بسته'  // New fiscal years start as closed until activated
+      year, startDate, endDate, company, notes, status
     });
-    alert(`سال مالی ${year} با موفقیت تعریف شد.`);
+    alert(`سال مالی \${year} با موفقیت تعریف شد.`);
   }
 
   closeFiscalYearForm();
