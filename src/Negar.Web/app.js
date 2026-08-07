@@ -239,19 +239,25 @@ const AppState = {
   ],
   accounts: [
     { id: 1, code: '01', name: 'دارایی‌های جاری', type: 'گروه', nature: 'بدهکار', parentId: null },
-    { id: 2, code: '0110', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
-    { id: 3, code: '011001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
-    { id: 4, code: '011002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parentId: 2 },
-    { id: 14, code: '011003', name: 'بانک ملت شعبه ۲۲', type: 'معین', nature: 'بدهکار', parentId: 2 },
-    { id: 5, code: '0111', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
-    { id: 6, code: '011101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parentId: 5 },
-    { id: 7, code: '02', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
-    { id: 8, code: '0220', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parentId: 7 },
-    { id: 9, code: '022001', name: 'تامین‌کنندگان', type: 'معین', nature: 'بستانکار', parentId: 8 },
-    { id: 10, code: '04', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
-    { id: 11, code: '0440', name: 'فروش کالا', type: 'کل', nature: 'بستانکار', parentId: 10 },
-    { id: 12, code: '05', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parentId: null },
-    { id: 13, code: '0550', name: 'هزینه اداری', type: 'کل', nature: 'بدهکار', parentId: 12 },
+    { id: 2, code: '02', name: 'بدهی‌های جاری', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 3, code: '03', name: 'حقوق صاحبان سهام', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 4, code: '04', name: 'درآمدها', type: 'گروه', nature: 'بستانکار', parentId: null },
+    { id: 5, code: '05', name: 'هزینه‌ها', type: 'گروه', nature: 'بدهکار', parentId: null },
+
+    { id: 6, code: '0110', name: 'موجودی نقد و بانک', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 7, code: '0111', name: 'حساب‌های دریافتنی', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 8, code: '0112', name: 'موجودی کالا', type: 'کل', nature: 'بدهکار', parentId: 1 },
+    { id: 9, code: '0220', name: 'حساب‌های پرداختنی', type: 'کل', nature: 'بستانکار', parentId: 2 },
+    { id: 10, code: '0330', name: 'سرمایه اول دوره', type: 'کل', nature: 'بستانکار', parentId: 3 },
+    { id: 11, code: '0440', name: 'فروش کالا و خدمات', type: 'کل', nature: 'بستانکار', parentId: 4 },
+    { id: 12, code: '0550', name: 'بهای تمام شده کالای فروش رفته', type: 'کل', nature: 'بدهکار', parentId: 5 },
+    { id: 13, code: '0551', name: 'هزینه‌های عمومی و اداری', type: 'کل', nature: 'بدهکار', parentId: 5 },
+
+    { id: 14, code: '011001', name: 'صندوق مرکزی', type: 'معین', nature: 'بدهکار', parentId: 6 },
+    { id: 15, code: '011002', name: 'بانک ملی شعبه مرکزی', type: 'معین', nature: 'بدهکار', parentId: 6 },
+    { id: 16, code: '011101', name: 'مشتریان تجاری', type: 'معین', nature: 'بدهکار', parentId: 7 },
+    { id: 17, code: '011201', name: 'موجودی انبار مرکزی', type: 'معین', nature: 'بدهکار', parentId: 8 },
+    { id: 18, code: '022001', name: 'فروشندگان و تامین کنندگان', type: 'معین', nature: 'بستانکار', parentId: 9 }
   ],
   shenavars: [
     { id: 1, code: 'SH-101', name: 'پروژه احداث شعبه غرب', parentId: null, status: 'فعال' },
@@ -273,8 +279,8 @@ const AppState = {
     { id: 102, date: '1403/05/10', desc: 'فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 125000000, status: 'تایید شده', bakhshId: 2 }
   ],
   sanadLines: [
-    { account: '1001', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
-    { account: '1101', desc: 'تسویه حساب مشتری', debit: 0, credit: 50000000 }
+    { account: '011001', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
+    { account: '011101', desc: 'تسویه حساب مشتری', debit: 0, credit: 50000000 }
   ],
   products: [
     { id: 1, code: 'PRD-101', name: 'لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ', unit: 'دستگاه', price: 450000000, stock: 24, barcode: '690123456789' },
