@@ -827,24 +827,6 @@
               <div id="compSec-bank" class="company-form-section-tab" style="display:none;">
                 <div class="form-row">
                   <div class="form-group">
-                    <label class="form-label">نام بانک و شعبه:</label>
-                    <input type="text" id="compBankName" class="form-input" placeholder="مثال: بانک ملی - شعبه مرکزی" />
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">شماره حساب جاری:</label>
-                    <input type="text" id="compBankAccount" class="form-input" placeholder="شماره حساب..." />
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">شماره شبا (IBAN):</label>
-                    <input type="text" id="compBankShiba" class="form-input" placeholder="IRXXXXXXXXXXXXXXXXXXXXXXXX" />
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">شماره کارت بانکی:</label>
-                    <input type="text" id="compBankCard" class="form-input" placeholder="۶۰۳۷-XXXX-XXXX-XXXX" />
-                  </div>
-                  <div class="form-group">
                     <label class="form-label">ارز پایه گزارش‌دهی:</label>
                     <select id="compCurrency" class="form-select">
                       <option value="ریال">ریال</option>
@@ -852,6 +834,30 @@
                       <option value="دلار">دلار (USD)</option>
                     </select>
                   </div>
+                </div>
+                
+                <h4 style="margin-top:20px; margin-bottom:10px; color:var(--accent-color); border-bottom:1px dashed var(--border-color); padding-bottom:6px;">🏦 مشخصات حساب‌های بانکی شرکت</h4>
+                <div class="table-wrapper">
+                  <table style="font-size: 0.85rem;">
+                    <thead>
+                      <tr>
+                        <th>نام بانک</th>
+                        <th>نام شعبه</th>
+                        <th>نوع حساب</th>
+                        <th>شماره حساب</th>
+                        <th>شماره شبا (IBAN)</th>
+                        <th>شماره کارت</th>
+                        <th>آدرس شعبه</th>
+                        <th style="width:50px; text-align:center;">عملیات</th>
+                      </tr>
+                    </thead>
+                    <tbody id="compBankAccountsTableBody">
+                      <!-- Dynamic rows -->
+                    </tbody>
+                  </table>
+                </div>
+                <div style="margin-top:10px;">
+                  <button type="button" class="btn btn-outline" style="font-size:0.8rem; padding:4px 10px;" onclick="addCompBankAccountRow()">+ افزودن حساب بانکی جدید</button>
                 </div>
               </div>
 
@@ -911,9 +917,41 @@
                     <input type="text" id="compCeoPhone" class="form-input" placeholder="09XXXXXXXXX" />
                   </div>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">صاحبان امضای مجاز:</label>
-                  <textarea id="compAuthorizedSignatories" class="form-input" rows="2" placeholder="نام افراد مجاز جهت امضای اسناد به همراه سمت..."></textarea>
+
+                <div class="form-row" style="align-items: center; margin-top: 15px; margin-bottom: 20px;">
+                  <div class="form-group">
+                    <label class="form-label">آرم و مهر شرکت:</label>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                      <div id="compLogoPreview" style="width:80px; height:80px; border:1px solid var(--border-color); border-radius:6px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); overflow:hidden;">
+                        <span style="font-size:1.5rem; color:var(--text-muted);">🏢</span>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <input type="file" id="compLogoInput" accept="image/*" style="display:none;" onchange="handleCompLogoUpload(event)" />
+                        <button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:4px 8px;" onclick="document.getElementById('compLogoInput').click()">📸 انتخاب تصویر</button>
+                        <button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:4px 8px; color:var(--danger-color); border-color:var(--danger-color);" onclick="clearCompLogo()">❌ حذف تصویر</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h4 style="margin-top:20px; margin-bottom:10px; color:var(--accent-color); border-bottom:1px dashed var(--border-color); padding-bottom:6px;">🖋️ لیست صاحبان امضای مجاز</h4>
+                <div class="table-wrapper">
+                  <table style="font-size: 0.85rem;">
+                    <thead>
+                      <tr>
+                        <th>نام و نام خانوادگی</th>
+                        <th>سمت</th>
+                        <th style="width:140px; text-align:center;">صاحب امضاء فعال</th>
+                        <th style="width:50px; text-align:center;">عملیات</th>
+                      </tr>
+                    </thead>
+                    <tbody id="compSignatoriesTableBody">
+                      <!-- Dynamic rows -->
+                    </tbody>
+                  </table>
+                </div>
+                <div style="margin-top:10px;">
+                  <button type="button" class="btn btn-outline" style="font-size:0.8rem; padding:4px 10px;" onclick="addCompSignatoryRow()">+ افزودن صاحب امضاء جدید</button>
                 </div>
               </div>
 

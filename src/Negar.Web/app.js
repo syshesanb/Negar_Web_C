@@ -2546,6 +2546,69 @@ function switchCompanyFormTab(tabId) {
   });
 }
 
+function addCompBankAccountRow(data = {}) {
+  const tbody = document.getElementById('compBankAccountsTableBody');
+  if (!tbody) return;
+
+  const row = document.createElement('tr');
+  row.className = 'comp-bank-account-row';
+  row.innerHTML = `
+    <td><input type="text" class="form-input comp-bank-name" style="padding:4px 8px; font-size:0.8rem; background:var(--bg-primary);" value="${data.bankName || ''}" placeholder="مثال: ملی" /></td>
+    <td><input type="text" class="form-input comp-bank-branch" style="padding:4px 8px; font-size:0.8rem; background:var(--bg-primary);" value="${data.branchName || ''}" placeholder="مثال: مرکزی" /></td>
+    <td><input type="text" class="form-input comp-bank-type" style="padding:4px 8px; font-size:0.8rem; background:var(--bg-primary);" value="${data.accountType || ''}" placeholder="مثال: جاری" /></td>
+    <td><input type="text" class="form-input comp-bank-no" style="padding:4px 8px; font-size:0.8rem; font-family:monospace; background:var(--bg-primary);" value="${data.accountNo || ''}" /></td>
+    <td><input type="text" class="form-input comp-bank-shiba" style="padding:4px 8px; font-size:0.8rem; font-family:monospace; background:var(--bg-primary);" value="${data.shiba || ''}" placeholder="IR..." /></td>
+    <td><input type="text" class="form-input comp-bank-card" style="padding:4px 8px; font-size:0.8rem; font-family:monospace; background:var(--bg-primary);" value="${data.cardNo || ''}" /></td>
+    <td><input type="text" class="form-input comp-bank-address" style="padding:4px 8px; font-size:0.8rem; background:var(--bg-primary);" value="${data.address || ''}" /></td>
+    <td style="text-align:center;"><button type="button" class="btn btn-outline" style="color:var(--danger-color); border-color:var(--danger-color); padding:2px 6px;" onclick="this.closest('tr').remove()">❌</button></td>
+  `;
+  tbody.appendChild(row);
+}
+
+function addCompSignatoryRow(data = {}) {
+  const tbody = document.getElementById('compSignatoriesTableBody');
+  if (!tbody) return;
+
+  const activeChecked = data.isActive ? 'checked' : '';
+
+  const row = document.createElement('tr');
+  row.className = 'comp-signatory-row';
+  row.innerHTML = `
+    <td><input type="text" class="form-input comp-sign-name" style="padding:4px 8px; font-size:0.8rem; background:var(--bg-primary);" value="${data.name || ''}" /></td>
+    <td><input type="text" class="form-input comp-sign-role" style="padding:4px 8px; font-size:0.8rem; background:var(--bg-primary);" value="${data.role || ''}" /></td>
+    <td style="text-align:center;"><input type="checkbox" class="comp-sign-active" style="width:18px; height:18px; cursor:pointer;" ${activeChecked} /></td>
+    <td style="text-align:center;"><button type="button" class="btn btn-outline" style="color:var(--danger-color); border-color:var(--danger-color); padding:2px 6px;" onclick="this.closest('tr').remove()">❌</button></td>
+  `;
+  tbody.appendChild(row);
+}
+
+let currentCompLogoBase64 = '';
+
+function handleCompLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    currentCompLogoBase64 = e.target.result;
+    const preview = document.getElementById('compLogoPreview');
+    if (preview) {
+      preview.innerHTML = `<img src="${currentCompLogoBase64}" style="width:100%; height:100%; object-fit:contain;" />`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCompLogo() {
+  currentCompLogoBase64 = '';
+  const preview = document.getElementById('compLogoPreview');
+  if (preview) {
+    preview.innerHTML = `<span style="font-size:1.5rem; color:var(--text-muted);">🏢</span>`;
+  }
+  const fileInput = document.getElementById('compLogoInput');
+  if (fileInput) fileInput.value = '';
+}
+
 function openCompanyForm(companyId) {
   const panel = document.getElementById('companyFormPanel');
   const title = document.getElementById('companyFormTitle');
@@ -2670,10 +2733,6 @@ function saveCompany() {
   const regDate = document.getElementById('compRegDate')?.value?.trim();
   const activity = document.getElementById('compActivity')?.value?.trim();
   const factoryAddress = document.getElementById('compFactoryAddress')?.value?.trim();
-  const bankName = document.getElementById('compBankName')?.value?.trim();
-  const bankAccount = document.getElementById('compBankAccount')?.value?.trim();
-  const bankShiba = document.getElementById('compBankShiba')?.value?.trim();
-  const bankCard = document.getElementById('compBankCard')?.value?.trim();
   const currency = document.getElementById('compCurrency')?.value;
   const modyanUniqueId = document.getElementById('compModyanUniqueId')?.value?.trim();
   const insuranceCode = document.getElementById('compInsuranceCode')?.value?.trim();
@@ -2685,7 +2744,37 @@ function saveCompany() {
   const ceo = document.getElementById('compCEO')?.value?.trim();
   const ceoNationalId = document.getElementById('compCeoNationalId')?.value?.trim();
   const ceoPhone = document.getElementById('compCeoPhone')?.value?.trim();
-  const authorizedSignatories = document.getElementById('compAuthorizedSignatories')?.value?.trim();
+
+  // Get logo
+  const logo = currentCompLogoBase64;
+
+  // Get bank accounts from rows
+  const bankAccounts = [];
+  document.querySelectorAll('.comp-bank-account-row').forEach(row => {
+    const bankName = row.querySelector('.comp-bank-name')?.value?.trim();
+    const branchName = row.querySelector('.comp-bank-branch')?.value?.trim();
+    const accountType = row.querySelector('.comp-bank-type')?.value?.trim();
+    const accountNo = row.querySelector('.comp-bank-no')?.value?.trim();
+    const shiba = row.querySelector('.comp-bank-shiba')?.value?.trim();
+    const cardNo = row.querySelector('.comp-bank-card')?.value?.trim();
+    const address = row.querySelector('.comp-bank-address')?.value?.trim();
+
+    if (bankName || accountNo) {
+      bankAccounts.push({ bankName, branchName, accountType, accountNo, shiba, cardNo, address });
+    }
+  });
+
+  // Get signatories from rows
+  const signatories = [];
+  document.querySelectorAll('.comp-signatory-row').forEach(row => {
+    const name = row.querySelector('.comp-sign-name')?.value?.trim();
+    const role = row.querySelector('.comp-sign-role')?.value?.trim();
+    const isActive = row.querySelector('.comp-sign-active')?.checked || false;
+
+    if (name) {
+      signatories.push({ name, role, isActive });
+    }
+  });
 
   // Validation
   if (!code) { alert('کد شرکت الزامی است.'); document.getElementById('compCode').focus(); return; }
@@ -2693,9 +2782,10 @@ function saveCompany() {
 
   const newCompanyData = {
     code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear,
-    legalType, regNo, nationalId, regDate, activity, factoryAddress, bankName, bankAccount,
-    bankShiba, bankCard, currency, modyanUniqueId, insuranceCode, vatRate, modyanPrivateKey,
-    licenseNo, licenseExpiry, shenaseSenfi, ceo, ceoNationalId, ceoPhone, authorizedSignatories
+    legalType, regNo, nationalId, regDate, activity, factoryAddress, currency, 
+    modyanUniqueId, insuranceCode, vatRate, modyanPrivateKey,
+    licenseNo, licenseExpiry, shenaseSenfi, ceo, ceoNationalId, ceoPhone,
+    logo, bankAccounts, signatories
   };
 
   if (editingId) {
