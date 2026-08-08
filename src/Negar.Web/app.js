@@ -1947,12 +1947,14 @@ function addSanadLine() {
 }
 
 function removeSanadLine(i) {
-  AppState.sanadLines.splice(i, 1);
-  if (AppState.sanadLines.length === 0) {
-    AppState.sanadLines.push({ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
+  if (confirm(`آیا از حذف ردیف ${i + 1} سند حسابداری اطمینان دارید؟`)) {
+    AppState.sanadLines.splice(i, 1);
+    if (AppState.sanadLines.length === 0) {
+      AppState.sanadLines.push({ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' });
+    }
+    focusedLineIndex = Math.max(0, i - 1);
+    renderSanadEditorLines();
   }
-  focusedLineIndex = Math.max(0, i - 1);
-  renderSanadEditorLines();
 }
 
 function copyFocusedSanadLine(direction) {
