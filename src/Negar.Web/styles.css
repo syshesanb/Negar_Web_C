@@ -1028,16 +1028,16 @@ body.accounts-mode #form-hesabdari-main {
 body.accounts-mode #form-hesabdari-main .hesabdari-subtabs-bar {
   flex-shrink: 0;
 }
-body.accounts-mode #tab-panel-accounts,
-body.accounts-mode #tab-panel-shenavar {
+body.accounts-mode #tab-panel-accounts.active,
+body.accounts-mode #tab-panel-shenavar.active {
   display: flex !important;
   flex-direction: column;
   flex: 1 1 0;
   min-height: 0;
   overflow: hidden;
 }
-body.accounts-mode #tab-panel-accounts > .card.form-card,
-body.accounts-mode #tab-panel-shenavar > .card.form-card {
+body.accounts-mode #tab-panel-accounts.active > .card.form-card,
+body.accounts-mode #tab-panel-shenavar.active > .card.form-card {
   display: flex !important;
   flex-direction: column;
   flex: 1 1 0;
@@ -1045,8 +1045,8 @@ body.accounts-mode #tab-panel-shenavar > .card.form-card {
   overflow: hidden;
   margin-bottom: 0;
 }
-body.accounts-mode #tab-panel-accounts .table-wrapper,
-body.accounts-mode #tab-panel-shenavar .table-wrapper {
+body.accounts-mode #tab-panel-accounts.active .table-wrapper,
+body.accounts-mode #tab-panel-shenavar.active .table-wrapper {
   flex: 1 1 0;
   overflow-y: auto;
   overflow-x: auto;
