@@ -436,13 +436,7 @@
            ================================================================ -->
       <div id="formsArea" style="display:none;">
 
-        <!-- BACK BUTTON (always shown when a form is active) -->
-        <div class="back-bar">
-          <button class="btn-back" onclick="goBack()">
-            ← بازگشت به منوی اصلی
-          </button>
-          <span id="currentFormTitle" class="back-bar-title"></span>
-        </div>
+        <!-- Back bar hidden; back button moved into module toolbars -->
 
         <!-- ---- SYSTEM FORMS ---- -->
 
@@ -1165,7 +1159,8 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
                   <button class="btn btn-outline" style="border-color:var(--accent-color);color:var(--accent-color);" onclick="clearAccountSearch()">جستجوی جدید</button>
-                  <button class="btn btn-outline" onclick="openAddAccountRow()">+ حساب جدید</button>
+                  <button class="btn btn-primary" onclick="openAddAccountRow()">+ حساب جدید</button>
+                  <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.2);color:var(--text-muted);" onclick="goBack()">← بازگشت به منوی اصلی</button>
                 </div>
               </div>
 
@@ -1204,34 +1199,7 @@
                   <tbody id="accountsTableBody"></tbody>
                 </table>
               </div>
-              <div id="addAccountRow" style="display:none;" class="inline-form">
-                <h4 id="addAccountRowTitle">افزودن حساب جدید</h4>
-                <input type="hidden" id="newAccEditId" value="" />
-                <div class="form-row">
-                  <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newAccCode" class="form-input" /></div>
-                  <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newAccName" class="form-input" /></div>
-                  <div class="form-group" style="display:none;"><label class="form-label">سطح:</label>
-                    <select id="newAccType" class="form-select">
-                      <option>گروه</option>
-                      <option>کل</option>
-                      <option>معین</option>
-                      <option>تفصیلی ۱</option>
-                      <option>تفصیلی ۲</option>
-                      <option>تفصیلی ۳</option>
-                    </select>
-                  </div>
-                  <div class="form-group"><label class="form-label">ماهیت:</label>
-                    <select id="newAccNature" class="form-select"><option>بدهکار</option><option>بستانکار</option><option>خنثی</option></select>
-                  </div>
-                  <div class="form-group" style="display:none;"><label class="form-label">حساب والد:</label>
-                    <select id="newAccParentId" class="form-select"><option value="">بدون والد (حساب اصلی/گروه)</option></select>
-                  </div>
-                  <div class="form-group" style="align-self:flex-end;">
-                    <button class="btn btn-primary" onclick="saveNewAccount()">ذخیره</button>
-                    <button class="btn btn-outline" onclick="document.getElementById('addAccountRow').style.display='none'">لغو</button>
-                  </div>
-                </div>
-              </div>
+              <!-- inline form removed – now a popup modal -->
             </div>
           </div>
 
@@ -2841,6 +2809,111 @@
 
     </div>
   </div>
+
+
+  <!-- ===== ACCOUNT ADD/EDIT MODAL POPUP ===== -->
+  <div id="accountModalOverlay" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    backdrop-filter:blur(6px);
+    z-index:9000;
+    align-items:center;
+    justify-content:center;
+    direction:rtl;
+  ">
+    <div id="accountModalBox" style="
+      background:linear-gradient(145deg, #1e2535, #151b27);
+      border:1px solid rgba(56,189,248,0.25);
+      border-radius:18px;
+      width:520px;
+      max-width:95vw;
+      box-shadow:0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(56,189,248,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+      padding:32px 36px;
+      position:relative;
+      animation: accountModalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    ">
+      <!-- Close X -->
+      <button onclick="closeAccountModal()" style="
+        position:absolute;
+        top:14px;
+        left:14px;
+        background:rgba(255,255,255,0.06);
+        border:1px solid rgba(255,255,255,0.12);
+        border-radius:8px;
+        color:var(--text-muted);
+        width:32px;
+        height:32px;
+        font-size:1rem;
+        cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        transition:all 0.2s;
+      " onmouseover="this.style.background='rgba(239,68,68,0.18)';this.style.color='#ef4444';"
+         onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='var(--text-muted)';">✕</button>
+
+      <!-- Modal title bar -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+        <div style="width:4px;height:32px;background:linear-gradient(to bottom,#38bdf8,#6366f1);border-radius:3px;flex-shrink:0;"></div>
+        <h3 id="accountModalTitle" style="margin:0;font-size:1.1rem;font-weight:700;color:var(--text-primary);">افزودن سرفصل حساب</h3>
+      </div>
+
+      <input type="hidden" id="newAccEditId" value="" />
+
+      <!-- Row 1: Code + Level -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">کد سرفصل:</label>
+          <input type="text" id="newAccCode" class="form-input" style="width:100%;font-size:1rem;font-weight:700;letter-spacing:2px;" placeholder="مثال: 110101" />
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">سطح:</label>
+          <select id="newAccType" class="form-select" style="width:100%;">
+            <option>گروه</option><option>کل</option><option>معین</option>
+            <option>تفصیلی ۱</option><option>تفصیلی ۲</option><option>تفصیلی ۳</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Name -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">عنوان سرفصل:</label>
+        <input type="text" id="newAccName" class="form-input" style="width:100%;" placeholder="نام سرفصل را وارد کنید..." />
+      </div>
+
+      <!-- Row 3: Nature + Parent -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">ماهیت:</label>
+          <select id="newAccNature" class="form-select" style="width:100%;">
+            <option>بدهکار</option><option>بستانکار</option><option>خنثی</option>
+          </select>
+        </div>
+        <div style="display:none;" id="parentIdGroup">
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">حساب والد:</label>
+          <select id="newAccParentId" class="form-select" style="width:100%;">
+            <option value="">بدون والد (گروه اصلی)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeAccountModal()" class="btn btn-outline" style="padding:10px 24px;">لغو</button>
+        <button onclick="saveNewAccount()" class="btn btn-primary" style="padding:10px 28px;font-weight:700;font-size:0.95rem;">
+          💾 ذخیره سرفصل
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes accountModalIn {
+      from { opacity:0; transform:scale(0.88) translateY(-20px); }
+      to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    #accountModalOverlay.active { display:flex !important; }
+  </style>
 
 </body>
 </html>
