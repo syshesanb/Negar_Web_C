@@ -1087,7 +1087,7 @@ function resetParentSelectionForNewAccount(e) {
 
 function saveNewAccount() {
   const editIdStr = document.getElementById('newAccEditId')?.value;
-  const code = document.getElementById('newAccCode')?.value?.trim();
+  let code = document.getElementById('newAccCode')?.value?.trim();
   const name = document.getElementById('newAccName')?.value?.trim();
   const type = document.getElementById('newAccType')?.value;
   const nature = document.getElementById('newAccNature')?.value;
@@ -1114,8 +1114,10 @@ function saveNewAccount() {
   else if (type === 'تفصیلی ۲') expectedLen = settings.tafsili2Length;
   else if (type === 'تفصیلی ۳') expectedLen = settings.tafsili3Length;
   
-  if (code.length !== expectedLen) {
-    alert(`خطا: طول کد حساب برای سطح "${type}" باید دقیقاً ${expectedLen} رقم باشد (کد وارد شده: ${code.length} رقم).`);
+  if (code.length < expectedLen) {
+    code = code.padStart(expectedLen, '0');
+  } else if (code.length > expectedLen) {
+    alert(`خطا: طول کد حساب برای سطح "${type}" نمی‌تواند بیشتر از ${expectedLen} رقم باشد (کد وارد شده: ${code.length} رقم).`);
     return;
   }
   
