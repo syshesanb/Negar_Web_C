@@ -449,6 +449,7 @@ function switchRibbon(moduleId, tabEl) {
 }
 
 function showTiles(moduleId) {
+  document.body.classList.remove('accounts-mode');
   // Hide forms area
   document.getElementById('formsArea').style.display = 'none';
 
@@ -480,7 +481,9 @@ function showForm(formId) {
 
   AppState.currentForm = formId;
 
-  // Hide all tile containers
+  if (formId !== 'form-hesabdari-main') {
+    document.body.classList.remove('accounts-mode');
+  }
   document.querySelectorAll('.tiles-container').forEach(t => {
     t.classList.remove('active');
     t.style.display = 'none';

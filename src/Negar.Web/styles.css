@@ -975,7 +975,6 @@ tr.selected-parent-row {
   font-weight: bold !important;
 }
 
-
 /* ======================================================
    ACCOUNTS PAGE - FIXED LAYOUT (class-scoped)
    Only active when body has class .accounts-mode.
@@ -983,42 +982,66 @@ tr.selected-parent-row {
    Header rows (search + column titles) are sticky.
 ====================================================== */
 
-/* When accounts tab is active, lock full viewport */
 body.accounts-mode {
   overflow: hidden;
   height: 100vh;
 }
-body.accounts-mode #formsArea {
-  flex: 1 1 0;
-  display: flex;
+body.accounts-mode #mainApp {
+  display: flex !important;
   flex-direction: column;
+  height: 100vh;
   overflow: hidden;
+}
+body.accounts-mode .desktop-header {
+  flex-shrink: 0;
+}
+body.accounts-mode .app-container {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: hidden;
+}
+body.accounts-mode .main-content {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+body.accounts-mode #formsArea {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
 }
 body.accounts-mode #form-hesabdari-main {
-  flex: 1 1 0;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
-  overflow: hidden;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: hidden;
 }
 body.accounts-mode #form-hesabdari-main .hesabdari-subtabs-bar {
   flex-shrink: 0;
 }
 body.accounts-mode #tab-panel-accounts {
-  flex: 1 1 0;
   display: flex !important;
   flex-direction: column;
-  overflow: hidden;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: hidden;
 }
 body.accounts-mode #tab-panel-accounts > .card.form-card {
-  flex: 1 1 0;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
   overflow: hidden;
   margin-bottom: 0;
-  min-height: 0;
 }
 body.accounts-mode #tab-panel-accounts .table-wrapper {
   flex: 1 1 0;
