@@ -1124,6 +1124,10 @@ function saveNewAccount() {
   if (editIdStr) {
     // Edit Mode
     const id = Number(editIdStr);
+    if (AppState.accounts.some(a => a.id !== id && a.code === code && a.type === type)) {
+      alert(`این کد حساب قبلاً در سطح "${type}" ثبت شده است.`);
+      return;
+    }
     const acc = AppState.accounts.find(a => a.id === id);
     if (acc) {
       acc.code = code;
@@ -1134,7 +1138,10 @@ function saveNewAccount() {
     }
   } else {
     // Insert Mode
-    if (AppState.accounts.find(a => a.code === code)) { alert('این کد حساب قبلاً ثبت شده است.'); return; }
+    if (AppState.accounts.some(a => a.code === code && a.type === type)) {
+      alert(`این کد حساب قبلاً در سطح "${type}" ثبت شده است.`);
+      return;
+    }
     AppState.accounts.push({ id: Date.now(), code, name, type, nature, parentId });
   }
 
