@@ -1467,9 +1467,9 @@ function renderSanadListTable() {
         <td>${s.debit.toLocaleString()}</td>
         <td>${s.credit.toLocaleString()}</td>
         <td>
-          ${(s.debit === s.credit && s.status !== 'نامتوازن')
+          ${(s.debit === s.credit && s.status !== 'نامتوازن' && s.status !== 'بدهکار' && s.status !== 'بستانکار')
             ? `<span class="badge badge-success">متوازن ✅</span>`
-            : `<span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); font-weight:bold;">نامتوازن ❌</span>`
+            : `<span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); font-weight:bold;">${(s.debit > s.credit || s.status === 'بدهکار') ? 'بدهکار' : 'بستانکار'} ❌</span>`
           }
         </td>
         <td><span class="badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);font-weight:bold;">${bakhshName}</span></td>
@@ -2076,18 +2076,33 @@ function updateSanadTotals() {
   if (debitEl) debitEl.value = td.toLocaleString();
   if (creditEl) creditEl.value = tc.toLocaleString();
 
-  if (diffDebitEl) diffDebitEl.value = diff > 0 ? diff.toLocaleString() : '0';
-  if (diffCreditEl) diffCreditEl.value = diff < 0 ? Math.abs(diff).toLocaleString() : '0';
+  // If Debits > Credits, the deficit is on the Credit side (footerDiffCredit)
+  // If Debits < Credits, the deficit is on the Debit side (footerDiffDebit)
+  if (diff > 0) {
+    if (diffCreditEl) diffCreditEl.value = diff.toLocaleString();
+    if (diffDebitEl) diffDebitEl.value = '0';
+  } else if (diff < 0) {
+    if (diffDebitEl) diffDebitEl.value = Math.abs(diff).toLocaleString();
+    if (diffCreditEl) diffCreditEl.value = '0';
+  } else {
+    if (diffDebitEl) diffDebitEl.value = '0';
+    if (diffCreditEl) diffCreditEl.value = '0';
+  }
 
   if (badgeEl) {
-    if (diff === 0 && td > 0) {
+    if (diff === 0) {
       badgeEl.className = 'badge badge-success';
       badgeEl.textContent = 'تراز';
       badgeEl.style.background = 'rgba(16,185,129,0.15)';
       badgeEl.style.color = '#10b981';
+    } else if (diff > 0) {
+      badgeEl.className = 'badge badge-danger';
+      badgeEl.textContent = 'بدهکار';
+      badgeEl.style.background = 'rgba(239,68,68,0.15)';
+      badgeEl.style.color = '#ef4444';
     } else {
       badgeEl.className = 'badge badge-danger';
-      badgeEl.textContent = 'نامتوازن';
+      badgeEl.textContent = 'بستانکار';
       badgeEl.style.background = 'rgba(239,68,68,0.15)';
       badgeEl.style.color = '#ef4444';
     }
@@ -3029,7 +3044,7 @@ function saveSanadEntry() {
       desc,
       debit: td,
       credit: tc,
-      status: isUnbalanced ? 'نامتوازن' : (s.status === 'نامتوازن' ? 'موقت' : s.status),
+      status: isUnbalanced ? ((td > tc) ? 'بدهکار' : 'بستانکار') : ((s.status === 'بدهکار' || s.status === 'بستانکار' || s.status === 'نامتوازن') ? 'موقت' : s.status),
       dayOfYear: getJalaliDayOfYear(date)
     };
     alert(`سند شماره ${no} با موفقیت ویرایش شد.`);
@@ -3040,7 +3055,7 @@ function saveSanadEntry() {
       desc, 
       debit: td, 
       credit: tc, 
-      status: isUnbalanced ? 'نامتوازن' : 'موقت', 
+      status: isUnbalanced ? ((td > tc) ? 'بدهکار' : 'بستانکار') : 'موقت', 
       bakhshId: getCurrentBakhshId(),
       dayOfYear: getJalaliDayOfYear(date)
     });
