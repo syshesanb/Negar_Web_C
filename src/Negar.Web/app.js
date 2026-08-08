@@ -422,6 +422,17 @@ AppState.voucherDetails = {
   ]
 };
 
+// Default Coding/Level settings
+AppState.codingSettings = {
+  detailLevelsCount: 3,
+  groupCodeLength: 2,
+  klCodeLength: 4,
+  moeinCodeLength: 6,
+  tafsili1Length: 6,
+  tafsili2Length: 6,
+  tafsili3Length: 6
+};
+
 // ============================
 // Navigation: Ribbon Tab Switch
 // ============================
@@ -539,6 +550,7 @@ function showForm(formId) {
   if (formId === 'form-fiscal-years') renderFiscalYearsTable();
   if (formId === 'form-switch-company') renderSwitchCompanyForm();
   if (formId === 'form-switch-year') renderSwitchYearOnlyForm();
+  if (formId === 'form-account-levels') loadCodingSettings();
   if (formId === 'form-hesabdari-main') {
     const activeSub = document.querySelector('.hesabdari-subtabs-bar .subtab-item.active');
     const tabId = activeSub ? activeSub.getAttribute('data-tab') : 'accounts';
@@ -714,6 +726,31 @@ function toggleAccountExpand(accId) {
   renderAccountsTable();
 }
 
+function canAddChildOf(parentAcc) {
+  const settings = AppState.codingSettings || { detailLevelsCount: 3 };
+  if (parentAcc.type === 'گروه') return true;
+  if (parentAcc.type === 'کل') return true;
+  if (parentAcc.type === 'معین') {
+    return settings.detailLevelsCount >= 1;
+  }
+  if (parentAcc.type === 'تفصیلی ۱') {
+    return settings.detailLevelsCount >= 2;
+  }
+  if (parentAcc.type === 'تفصیلی ۲') {
+    return settings.detailLevelsCount >= 3;
+  }
+  return false; // تفصیلی ۳ has no sub-level
+}
+
+function getChildType(parentAcc) {
+  if (parentAcc.type === 'گروه') return 'کل';
+  if (parentAcc.type === 'کل') return 'معین';
+  if (parentAcc.type === 'معین') return 'تفصیلی ۱';
+  if (parentAcc.type === 'تفصیلی ۱') return 'تفصیلی ۲';
+  if (parentAcc.type === 'تفصیلی ۲') return 'تفصیلی ۳';
+  return null;
+}
+
 function handleTreeButtonClick(accId) {
   const account = AppState.accounts.find(a => a.id === accId);
   if (!account) return;
@@ -726,15 +763,21 @@ function handleTreeButtonClick(accId) {
     // Normal expand/collapse toggle
     toggleAccountExpand(accId);
   } else {
-    // No children: Prompt to create a child account
-    const nextLevelMap = {
-      'گروه': 'کل',
-      'کل': 'معین',
-      'معین': 'تفصیلی',
-      'تفصیلی': 'تفصیلی'
-    };
+    // Check if sub-level is allowed
+    if (!canAddChildOf(account)) {
+      const settings = AppState.codingSettings || { detailLevelsCount: 3 };
+      let limitName = 'تفصیلی ۳';
+      if (settings.detailLevelsCount === 1) limitName = 'تفصیلی ۱';
+      if (settings.detailLevelsCount === 2) limitName = 'تفصیلی ۲';
+      
+      alert(`خطا: بر اساس تنظیمات سطوح حساب‌ها، امکان ایجاد حساب در سطح پایین‌تر وجود ندارد. حداکثر سطح مجاز فرزند: "${limitName}" می‌باشد.`);
+      currentParentIdForNewAccount = null;
+      renderAccountsTable();
+      return;
+    }
+    
     const parentLevel = account.type;
-    const childLevel = nextLevelMap[parentLevel] || 'تفصیلی';
+    const childLevel = getChildType(account);
     
     const msg = `تا کنون برای این سرفصل "${parentLevel}" ، حساب "${childLevel}" ، ایجاد نشده است ، آیا مایلید برای آن حساب "${childLevel}" ایجاد کنید؟`;
     if (confirm(msg)) {
@@ -897,36 +940,60 @@ function renderAccountsTable() {
 }
 
 function suggestNextAccountCode(type, parentId) {
-  // Find sibling accounts under the same parent
   const siblings = AppState.accounts.filter(a => a.type === type && a.parentId === parentId);
   if (siblings.length > 0) {
     const codes = siblings.map(s => parseInt(s.code, 10)).filter(num => !isNaN(num));
     if (codes.length > 0) {
       const maxCodeVal = Math.max(...codes);
       const nextVal = maxCodeVal + 1;
-      
       const sampleCode = siblings[0].code;
       return String(nextVal).padStart(sampleCode.length, '0');
     }
   }
   
-  // If no siblings exist, construct the starting code based on type/parent
+  const settings = AppState.codingSettings || {
+    detailLevelsCount: 3,
+    groupCodeLength: 2,
+    klCodeLength: 4,
+    moeinCodeLength: 6,
+    tafsili1Length: 6,
+    tafsili2Length: 6,
+    tafsili3Length: 6
+  };
+
   if (type === 'گروه') {
     const rootGroups = AppState.accounts.filter(a => a.parentId === null);
     if (rootGroups.length > 0) {
       const codes = rootGroups.map(s => parseInt(s.code, 10)).filter(num => !isNaN(num));
       const maxCodeVal = Math.max(...codes);
-      return String(maxCodeVal + 1).padStart(2, '0');
+      return String(maxCodeVal + 1).padStart(settings.groupCodeLength, '0');
     }
-    return '01';
+    return String(1).padStart(settings.groupCodeLength, '0');
   }
   
   if (parentId) {
     const parent = AppState.accounts.find(a => a.id === parentId);
     if (parent) {
-      if (type === 'کل') return parent.code + '10'; // e.g. '01' -> '0110'
-      if (type === 'معین') return parent.code + '01'; // e.g. '0110' -> '110101'
-      if (type === 'تفصیلی') return parent.code + '01'; // e.g. '110101' -> '01100101'
+      if (type === 'کل') {
+        const gap = settings.klCodeLength - parent.code.length;
+        return parent.code + String(1).padStart(gap > 0 ? gap : 2, '0');
+      }
+      if (type === 'معین') {
+        const gap = settings.moeinCodeLength - parent.code.length;
+        return parent.code + String(1).padStart(gap > 0 ? gap : 2, '0');
+      }
+      if (type === 'تفصیلی ۱') {
+        const gap = settings.tafsili1Length - parent.code.length;
+        return parent.code + String(1).padStart(gap > 0 ? gap : 2, '0');
+      }
+      if (type === 'تفصیلی ۲') {
+        const gap = settings.tafsili2Length - parent.code.length;
+        return parent.code + String(1).padStart(gap > 0 ? gap : 2, '0');
+      }
+      if (type === 'تفصیلی ۳') {
+        const gap = settings.tafsili3Length - parent.code.length;
+        return parent.code + String(1).padStart(gap > 0 ? gap : 2, '0');
+      }
     }
   }
   return '';
@@ -948,14 +1015,20 @@ function openAddAccountRow() {
   if (currentParentIdForNewAccount !== null) {
     const parentAcc = AppState.accounts.find(a => a.id === currentParentIdForNewAccount);
     if (parentAcc) {
+      // Validate sub-level limits
+      if (!canAddChildOf(parentAcc)) {
+        const settings = AppState.codingSettings || { detailLevelsCount: 3 };
+        let limitName = 'تفصیلی ۳';
+        if (settings.detailLevelsCount === 1) limitName = 'تفصیلی ۱';
+        if (settings.detailLevelsCount === 2) limitName = 'تفصیلی ۲';
+        
+        alert(`خطا: بر اساس تنظیمات سطوح حساب‌ها، امکان ایجاد حساب در سطح پایین‌تر وجود ندارد. حداکثر سطح مجاز فرزند: "${limitName}" می‌باشد.`);
+        currentParentIdForNewAccount = null;
+        renderAccountsTable();
+        return;
+      }
       targetParentId = parentAcc.id;
-      const nextLevelMap = {
-        'گروه': 'کل',
-        'کل': 'معین',
-        'معین': 'تفصیلی',
-        'تفصیلی': 'تفصیلی'
-      };
-      targetType = nextLevelMap[parentAcc.type] || 'تفصیلی';
+      targetType = getChildType(parentAcc);
     }
   }
   
@@ -1022,6 +1095,29 @@ function saveNewAccount() {
   const parentId = parentVal ? Number(parentVal) : null;
 
   if (!code || !name) { alert('کد حساب و عنوان الزامی است.'); return; }
+  
+  const settings = AppState.codingSettings || {
+    detailLevelsCount: 3,
+    groupCodeLength: 2,
+    klCodeLength: 4,
+    moeinCodeLength: 6,
+    tafsili1Length: 6,
+    tafsili2Length: 6,
+    tafsili3Length: 6
+  };
+  
+  let expectedLen = 0;
+  if (type === 'گروه') expectedLen = settings.groupCodeLength;
+  else if (type === 'کل') expectedLen = settings.klCodeLength;
+  else if (type === 'معین') expectedLen = settings.moeinCodeLength;
+  else if (type === 'تفصیلی ۱') expectedLen = settings.tafsili1Length;
+  else if (type === 'تفصیلی ۲') expectedLen = settings.tafsili2Length;
+  else if (type === 'تفصیلی ۳') expectedLen = settings.tafsili3Length;
+  
+  if (code.length !== expectedLen) {
+    alert(`خطا: طول کد حساب برای سطح "${type}" باید دقیقاً ${expectedLen} رقم باشد (کد وارد شده: ${code.length} رقم).`);
+    return;
+  }
   
   if (editIdStr) {
     // Edit Mode
@@ -6338,3 +6434,79 @@ window.addEventListener('beforeunload', function(e) {
     }
   }
 });
+
+
+// ==========================================
+//   Initial Accounts coding levels Settings module
+// ==========================================
+function toggleDetailSettingsDisplay() {
+  const levelsCount = Number(document.getElementById('settingDetailLevels')?.value || 3);
+  
+  const t1Group = document.getElementById('groupTafsili1');
+  const t2Group = document.getElementById('groupTafsili2');
+  const t3Group = document.getElementById('groupTafsili3');
+  
+  if (t1Group) t1Group.style.display = (levelsCount >= 1) ? 'block' : 'none';
+  if (t2Group) t2Group.style.display = (levelsCount >= 2) ? 'block' : 'none';
+  if (t3Group) t3Group.style.display = (levelsCount >= 3) ? 'block' : 'none';
+}
+
+function loadCodingSettings() {
+  AppState.codingSettings = AppState.codingSettings || {
+    detailLevelsCount: 3,
+    groupCodeLength: 2,
+    klCodeLength: 4,
+    moeinCodeLength: 6,
+    tafsili1Length: 6,
+    tafsili2Length: 6,
+    tafsili3Length: 6
+  };
+  
+  const s = AppState.codingSettings;
+  const selectLevels = document.getElementById('settingDetailLevels');
+  const inputGroup = document.getElementById('settingGroupLen');
+  const inputKl = document.getElementById('settingKlLen');
+  const inputMoein = document.getElementById('settingMoeinLen');
+  const inputT1 = document.getElementById('settingTafsili1Len');
+  const inputT2 = document.getElementById('settingTafsili2Len');
+  const inputT3 = document.getElementById('settingTafsili3Len');
+  
+  if (selectLevels) selectLevels.value = s.detailLevelsCount;
+  if (inputGroup) inputGroup.value = s.groupCodeLength;
+  if (inputKl) inputKl.value = s.klCodeLength;
+  if (inputMoein) inputMoein.value = s.moeinCodeLength;
+  if (inputT1) inputT1.value = s.tafsili1Length;
+  if (inputT2) inputT2.value = s.tafsili2Length;
+  if (inputT3) inputT3.value = s.tafsili3Length;
+  
+  toggleDetailSettingsDisplay();
+}
+
+function saveCodingSettings() {
+  const selectLevels = Number(document.getElementById('settingDetailLevels')?.value || 3);
+  const groupLen = Number(document.getElementById('settingGroupLen')?.value || 2);
+  const klLen = Number(document.getElementById('settingKlLen')?.value || 4);
+  const moeinLen = Number(document.getElementById('settingMoeinLen')?.value || 6);
+  const t1Len = Number(document.getElementById('settingTafsili1Len')?.value || 6);
+  const t2Len = Number(document.getElementById('settingTafsili2Len')?.value || 6);
+  const t3Len = Number(document.getElementById('settingTafsili3Len')?.value || 6);
+  
+  if (groupLen < 1 || groupLen > 3) { alert('طول کد گروه باید بین ۱ تا ۳ رقم باشد.'); return; }
+  if (klLen < 1 || klLen > 6) { alert('طول کد کل باید بین ۱ تا ۶ رقم باشد.'); return; }
+  if (moeinLen < 1 || moeinLen > 6) { alert('طول کد معین باید بین ۱ تا ۶ رقم باشد.'); return; }
+  if (selectLevels >= 1 && (t1Len < 1 || t1Len > 6)) { alert('طول کد تفصیلی ۱ باید بین ۱ تا ۶ رقم باشد.'); return; }
+  if (selectLevels >= 2 && (t2Len < 1 || t2Len > 6)) { alert('طول کد تفصیلی ۲ باید بین ۱ تا ۶ رقم باشد.'); return; }
+  if (selectLevels >= 3 && (t3Len < 1 || t3Len > 6)) { alert('طول کد تفصیلی ۳ باید بین ۱ تا ۶ رقم باشد.'); return; }
+  
+  AppState.codingSettings = {
+    detailLevelsCount: selectLevels,
+    groupCodeLength: groupLen,
+    klCodeLength: klLen,
+    moeinCodeLength: moeinLen,
+    tafsili1Length: t1Len,
+    tafsili2Length: t2Len,
+    tafsili3Length: t3Len
+  };
+  
+  alert('تنظیمات کدینگ حسابداری با موفقیت ذخیره شد.');
+}

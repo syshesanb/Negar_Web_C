@@ -1084,28 +1084,43 @@
         <div id="form-account-levels" class="form-section">
           <h2 class="form-heading">⚙️ تنظیمات اولیه کدینگ و سطوح حساب‌ها (HesabdaryInitialSettingsForm)</h2>
           <div class="card form-card" style="max-width:580px;margin:auto;">
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">تعداد سطوح:</label><input type="number" class="form-input" value="5" /></div>
-              <div class="form-group"><label class="form-label">طول کد گروه:</label><input type="number" class="form-input" value="2" /></div>
-              <div class="form-group"><label class="form-label">طول کد کل:</label><input type="number" class="form-input" value="4" /></div>
-            </div>
-            <div class="form-row">
-              <div class="form-group"><label class="form-label">طول کد معین:</label><input type="number" class="form-input" value="6" /></div>
-              <div class="form-group"><label class="form-label">طول تفصیلی ۱:</label><input type="number" class="form-input" value="6" /></div>
-              <div class="form-group"><label class="form-label">طول تفصیلی ۲:</label><input type="number" class="form-input" value="2" /></div>
-            </div>
             <div class="form-group">
-              <label class="form-label">نوع سرفصل مورد استفاده:</label>
-              <select class="form-select">
-                <option>سرفصل‌های پیش‌فرض برنامه</option>
-                <option>سرفصل سفارشی کاربر</option>
+              <label class="form-label">تعداد سطوح تفصیلی حساب‌ها:</label>
+              <select id="settingDetailLevels" class="form-select" onchange="toggleDetailSettingsDisplay()">
+                <option value="1">۱ سطح (تفصیلی ۱)</option>
+                <option value="2">۲ سطح (تفصیلی ۱ و تفصیلی ۲)</option>
+                <option value="3" selected>۳ سطح (تفصیلی ۱، تفصیلی ۲ و تفصیلی ۳)</option>
               </select>
             </div>
             <div class="form-row">
-              <div class="form-group"><label class="form-label">کد اقتصادی:</label><input type="text" class="form-input" placeholder="کد اقتصادی..." /></div>
-              <div class="form-group"><label class="form-label">شناسه ملی:</label><input type="text" class="form-input" placeholder="شناسه ملی..." /></div>
+              <div class="form-group">
+                <label class="form-label">طول کد گروه (حداکثر ۳ رقم):</label>
+                <input type="number" id="settingGroupLen" class="form-input" min="1" max="3" value="2" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">طول کد کل (حداکثر ۶ رقم):</label>
+                <input type="number" id="settingKlLen" class="form-input" min="1" max="6" value="4" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">طول کد معین (حداکثر ۶ رقم):</label>
+                <input type="number" id="settingMoeinLen" class="form-input" min="1" max="6" value="6" />
+              </div>
             </div>
-            <div class="form-actions"><button class="btn btn-primary" onclick="alert('تنظیمات کدینگ حسابداری با موفقیت ذخیره شد.')">💾 ذخیره تنظیمات</button></div>
+            <div class="form-row" id="detailLengthsRow">
+              <div class="form-group" id="groupTafsili1">
+                <label class="form-label">طول تفصیلی ۱ (حداکثر ۶ رقم):</label>
+                <input type="number" id="settingTafsili1Len" class="form-input" min="1" max="6" value="6" />
+              </div>
+              <div class="form-group" id="groupTafsili2">
+                <label class="form-label">طول تفصیلی ۲ (حداکثر ۶ رقم):</label>
+                <input type="number" id="settingTafsili2Len" class="form-input" min="1" max="6" value="6" />
+              </div>
+              <div class="form-group" id="groupTafsili3">
+                <label class="form-label">طول تفصیلی ۳ (حداکثر ۶ رقم):</label>
+                <input type="number" id="settingTafsili3Len" class="form-input" min="1" max="6" value="6" />
+              </div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" onclick="saveCodingSettings()">💾 ذخیره تنظیمات</button></div>
           </div>
         </div>
 
@@ -1144,6 +1159,7 @@
                       <option value="auxiliary" selected>معین</option>
                       <option value="detail1">تفصیلی ۱</option>
                       <option value="detail2">تفصیلی ۲</option>
+                      <option value="detail3">تفصیلی ۳</option>
                     </select>
                   </div>
                 </div>
@@ -1195,7 +1211,14 @@
                   <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newAccCode" class="form-input" /></div>
                   <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newAccName" class="form-input" /></div>
                   <div class="form-group" style="display:none;"><label class="form-label">سطح:</label>
-                    <select id="newAccType" class="form-select"><option>معین</option><option>تفصیلی</option><option>کل</option><option>گروه</option></select>
+                    <select id="newAccType" class="form-select">
+                      <option>گروه</option>
+                      <option>کل</option>
+                      <option>معین</option>
+                      <option>تفصیلی ۱</option>
+                      <option>تفصیلی ۲</option>
+                      <option>تفصیلی ۳</option>
+                    </select>
                   </div>
                   <div class="form-group"><label class="form-label">ماهیت:</label>
                     <select id="newAccNature" class="form-select"><option>بدهکار</option><option>بستانکار</option><option>خنثی</option></select>
