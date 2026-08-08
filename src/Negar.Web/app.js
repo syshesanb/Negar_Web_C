@@ -1286,7 +1286,13 @@ function handleShenavarTreeButtonClick(shenId) {
     // Normal expand/collapse toggle
     toggleShenavarExpand(shenId);
   } else {
-    // No children: Prompt to create a child floating account
+    // No children: Check level limit (max 3 levels)
+    if (getShenavarLevel(s) >= 2) {
+      alert('خطا: حداکثر تعداد سطوح مجاز برای حساب‌های شناور، ۳ سطح می‌باشد. امکان ایجاد سطح پایین‌تر از سطح ۳ وجود ندارد.');
+      currentShenavarParentIdForNewAccount = null;
+      renderShenavaarTable();
+      return;
+    }
     const parentLevelText = s.parentId ? 'فرعی' : 'اصلی';
     const childLevelText = s.parentId ? 'زیرمجموعه' : 'فرعی';
 
@@ -1514,6 +1520,13 @@ function openAddShenavarRow() {
   if (currentShenavarParentIdForNewAccount !== null) {
     const parentShen = AppState.shenavars.find(s => s.id === currentShenavarParentIdForNewAccount);
     if (parentShen) {
+      // Enforce 3-level max hierarchy for floating accounts
+      if (getShenavarLevel(parentShen) >= 2) {
+        alert('خطا: حداکثر تعداد سطوح مجاز برای حساب‌های شناور، ۳ سطح می‌باشد. امکان ایجاد سطح پایین‌تر از سطح ۳ وجود ندارد.');
+        currentShenavarParentIdForNewAccount = null;
+        renderShenavaarTable();
+        return;
+      }
       targetParentId = parentShen.id;
     }
   }
@@ -1621,6 +1634,13 @@ function saveNewShenavar() {
     }
   } else {
     // Insert Mode
+    if (parentId !== null) {
+      const parentShen = AppState.shenavars.find(s => s.id === parentId);
+      if (parentShen && getShenavarLevel(parentShen) >= 2) {
+        alert('خطا: حداکثر تعداد سطوح مجاز برای حساب‌های شناور، ۳ سطح می‌باشد. امکان ایجاد سطح پایین‌تر از سطح ۳ وجود ندارد.');
+        return;
+      }
+    }
     if (AppState.shenavars.find(s => s.code === code)) { alert('این کد شناور قبلاً ثبت شده است.'); return; }
     AppState.shenavars.push({ id: Date.now(), code, name, parentId, status: 'فعال' });
   }
