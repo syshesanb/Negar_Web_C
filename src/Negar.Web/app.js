@@ -1918,7 +1918,7 @@ function renderSanadEditorLines() {
         
         <!-- Description -->
         <td>
-          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.desc || ''}" onfocus="updateFocusedPaths(${i})" onchange="updateSanadLineField(${i}, 'desc', this.value)" />
+          <input type="text" class="form-input" style="width:100%; border:none; padding:4px; font-size:0.8rem; background:transparent;" value="${line.desc || ''}" onfocus="updateFocusedPaths(${i})" oninput="updateSanadLineField(${i}, 'desc', this.value)" />
         </td>
         
         <!-- Debit -->
@@ -2727,6 +2727,31 @@ function deleteShenavarInPopup(id) {
   }
 }
 
+function isValidJalaliDate(dateStr) {
+  if (!dateStr) return false;
+  const regex = /^\d{4}\/\d{2}\/\d{2}$/;
+  if (!regex.test(dateStr)) return false;
+  
+  const parts = dateStr.split('/');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  const d = parseInt(parts[2], 10);
+  
+  if (isNaN(y) || isNaN(m) || isNaN(d)) return false;
+  if (y < 1300 || y > 1500) return false;
+  if (m < 1 || m > 12) return false;
+  if (d < 1) return false;
+  
+  if (m >= 1 && m <= 6) {
+    if (d > 31) return false;
+  } else if (m >= 7 && m <= 11) {
+    if (d > 30) return false;
+  } else if (m === 12) {
+    if (d > 30) return false;
+  }
+  return true;
+}
+
 function openNewSanadForm() {
   AppState.tempAttachments = null; // Clear attachments draft
   initVoucherAttachments(); // Guarantees AppState.sanadAttachments is initialized
@@ -2798,16 +2823,36 @@ function getSanadUnsavedChanges() {
         const shenavarChanged = (line.shenavarCode && line.shenavarCode !== origLine.shenavarCode);
         
         if (accChanged || descChanged || debitChanged || creditChanged || txNoChanged || txDateChanged || shenavarChanged) {
-          lineDetails.push(`در ردیف ${i + 1} اطلاعات وارد شده است (سرفصل: ${line.account}، بدهکار: ${line.debit}، بستانکار: ${line.credit}).`);
+          let parts = [];
+          if (accChanged) parts.push(`سرفصل: ${line.account}`);
+          if (debitChanged) parts.push(`بدهکار: ${line.debit}`);
+          if (creditChanged) parts.push(`بستانکار: ${line.credit}`);
+          if (descChanged) parts.push(`شرح ردیف: ${line.desc}`);
+          if (txNoChanged) parts.push(`شماره تراکنش: ${line.txNo}`);
+          if (txDateChanged) parts.push(`تاریخ تراکنش: ${line.txDate}`);
+          if (shenavarChanged) parts.push(`شناور: ${line.shenavarCode}`);
+          
+          lineDetails.push(`در ردیف ${i + 1} اطلاعات وارد شده است (${parts.join('، ')}).`);
+          linesModified = true;
+        }
+        
+        if (line.txDate && !isValidJalaliDate(line.txDate)) {
+          lineDetails.push(`⚠️ فرمت تاریخ تراکنش در ردیف ${i + 1} نامعتبر است (${line.txDate}).`);
           linesModified = true;
         }
       }
     });
     
     const hasAttachments = (currentAttachments.length > 0);
+    const dateInvalid = (currentDate && !isValidJalaliDate(currentDate));
     
-    if (dateChanged || descEntered || linesLengthChanged || linesModified || hasAttachments) {
-      if (dateChanged) changes.push(`- تاریخ سند به "${currentDate}" تغییر یافته است.`);
+    if (dateChanged || descEntered || linesLengthChanged || linesModified || hasAttachments || dateInvalid) {
+      if (dateChanged) {
+        changes.push(`- تاریخ سند به "${currentDate}" تغییر یافته است.`);
+      }
+      if (dateInvalid) {
+        changes.push(`- ⚠️ تاریخ سند وارد شده نامعتبر است (${currentDate}).`);
+      }
       if (descEntered) changes.push(`- شرح سند به "${currentDesc}" تغییر یافته است.`);
       if (hasAttachments) changes.push(`- ضمائم جدید به سند اضافه شده است.`);
       lineDetails.forEach(det => changes.push(`- ${det}`));
@@ -2815,6 +2860,9 @@ function getSanadUnsavedChanges() {
   } else {
     if (currentDate !== orig.date) {
       changes.push(`- تاریخ سند از "${orig.date}" به "${currentDate}" تغییر یافته است.`);
+    }
+    if (currentDate && !isValidJalaliDate(currentDate)) {
+      changes.push(`- ⚠️ فرمت تاریخ سند جدید نامعتبر است (${currentDate}).`);
     }
     if (currentDesc !== orig.desc) {
       changes.push(`- شرح سند از "${orig.desc}" به "${currentDesc}" تغییر یافته است.`);
@@ -2831,11 +2879,19 @@ function getSanadUnsavedChanges() {
         changes.push(`- ردیف شماره ${i + 1} جدید به سند اضافه شده است.`);
       } else if (origLine && curLine) {
         const diffs = [];
-        if (curLine.account !== origLine.account) diffs.push(`سرفصل از ${origLine.account} به ${curLine.account}`);
+        if (curLine.account !== origLine.account) diffs.push(`سرفصل از "${origLine.account}" به "${curLine.account}"`);
         if (Number(curLine.debit || 0) !== Number(origLine.debit || 0)) diffs.push(`بدهکار از ${Number(origLine.debit || 0).toLocaleString()} به ${Number(curLine.debit || 0).toLocaleString()}`);
         if (Number(curLine.credit || 0) !== Number(origLine.credit || 0)) diffs.push(`بستانکار از ${Number(origLine.credit || 0).toLocaleString()} به ${Number(curLine.credit || 0).toLocaleString()}`);
-        if (curLine.desc !== origLine.desc) diffs.push(`شرح ردیف`);
-        if (curLine.shenavarCode !== origLine.shenavarCode) diffs.push(`کد شناور`);
+        if ((curLine.desc || '') !== (origLine.desc || '')) diffs.push(`شرح ردیف از "${origLine.desc || ''}" به "${curLine.desc || ''}"`);
+        if ((curLine.shenavarCode || '') !== (origLine.shenavarCode || '')) diffs.push(`شناور از "${origLine.shenavarCode || ''}" به "${curLine.shenavarCode || ''}"`);
+        if ((curLine.txNo || '') !== (origLine.txNo || '')) diffs.push(`شماره تراکنش از "${origLine.txNo || ''}" به "${curLine.txNo || ''}"`);
+        
+        if ((curLine.txDate || '') !== (origLine.txDate || '')) {
+          diffs.push(`تاریخ تراکنش از "${origLine.txDate || ''}" به "${curLine.txDate || ''}"`);
+        }
+        if (curLine.txDate && !isValidJalaliDate(curLine.txDate)) {
+          diffs.push(`⚠️ فرمت تاریخ تراکنش نامعتبر است (${curLine.txDate})`);
+        }
         
         if (diffs.length > 0) {
           changes.push(`- ردیف شماره ${i + 1} تغییر کرده است (${diffs.join('، ')}).`);
@@ -2888,6 +2944,20 @@ function saveSanadEntry() {
   const desc = document.getElementById('sanadDescInput')?.value || 'سند حسابداری';
 
   if (isNaN(no) || no <= 0) { alert('شماره سند نامعتبر است.'); return; }
+
+  // Strictly validate date formats
+  if (!isValidJalaliDate(date)) {
+    alert(`خطا: فرمت تاریخ سند نامعتبر است (${date}). تاریخ باید به فرمت معتبر yyyy/mm/dd وارد شود.`);
+    return;
+  }
+
+  for (let i = 0; i < AppState.sanadLines.length; i++) {
+    const line = AppState.sanadLines[i];
+    if (line.txDate && !isValidJalaliDate(line.txDate)) {
+      alert(`خطا: فرمت تاریخ تراکنش در ردیف ${i + 1} نامعتبر است (${line.txDate}). تاریخ باید به فرمت معتبر yyyy/mm/dd وارد شود.`);
+      return;
+    }
+  }
 
   const existingIdx = AppState.sanads.findIndex(x => x.id === no);
   
