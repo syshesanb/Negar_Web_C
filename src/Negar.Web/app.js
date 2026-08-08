@@ -587,6 +587,10 @@ function switchHesabdariTab(tabId) {
 // Back Button
 // ============================
 function goBack() {
+  if (AppState.currentForm === 'form-sanad2' || AppState.currentForm === 'form-sanad-attachments') {
+    closeSanadEditor();
+    return;
+  }
   if (AppState.isTabMode) {
     window.close();
     return;
