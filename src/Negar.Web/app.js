@@ -755,29 +755,130 @@ function isAccountVisible(a) {
   return true;
 }
 
+let accountSearchCode = '';
+let accountSearchName = '';
+let selectedAccountId = null;
+
+function filterAccountsGrid() {
+  accountSearchCode = (document.getElementById('searchAccountCode')?.value || '').trim();
+  accountSearchName = (document.getElementById('searchAccountName')?.value || '').trim();
+  renderAccountsTable();
+}
+
+function clearAccountSearch() {
+  const codeIn = document.getElementById('searchAccountCode');
+  const nameIn = document.getElementById('searchAccountName');
+  if (codeIn) codeIn.value = '';
+  if (nameIn) nameIn.value = '';
+  accountSearchCode = '';
+  accountSearchName = '';
+  renderAccountsTable();
+}
+
+function handleAccountsExpandLevelChange(level) {
+  expandedAccountIds.clear();
+  
+  if (level === 'group') {
+    // Collapsed all
+  } else if (level === 'general') {
+    AppState.accounts.forEach(a => {
+      if (a.type === 'گروه') expandedAccountIds.add(a.id);
+    });
+  } else if (level === 'auxiliary') {
+    AppState.accounts.forEach(a => {
+      if (a.type === 'گروه' || a.type === 'کل') expandedAccountIds.add(a.id);
+    });
+  } else {
+    // Expand everything
+    AppState.accounts.forEach(a => {
+      expandedAccountIds.add(a.id);
+    });
+  }
+  
+  renderAccountsTable();
+}
+
+function selectAccountRow(id) {
+  selectedAccountId = id;
+  currentParentIdForNewAccount = id;
+  
+  const acc = AppState.accounts.find(x => x.id === id);
+  updateAccountHierarchyLabel(acc);
+  
+  renderAccountsTable();
+}
+
+function updateAccountHierarchyLabel(a) {
+  const label = document.getElementById('accountHierarchyLabel');
+  if (!label) return;
+  
+  if (!a) {
+    label.innerHTML = `سطح سرفصل جاری: - / زنجیره: -`;
+    return;
+  }
+  
+  const chain = [];
+  let curr = a;
+  while (curr) {
+    chain.unshift(`${curr.code} (${curr.name})`);
+    curr = AppState.accounts.find(x => x.id === curr.parentId);
+  }
+  
+  const chainStr = chain.join(' / ');
+  label.innerHTML = `سطح سرفصل جاری: <span style="color:var(--accent-color);">${a.type}</span> / زنجیره: <span style="color:var(--primary-color);">${chainStr}</span>`;
+}
+
+function isAccountVisibleWithFilter(a, sortedAccounts) {
+  if (!accountSearchCode && !accountSearchName) {
+    return isAccountVisible(a);
+  }
+  
+  const matchesSearch = (acc) => {
+    const codeMatch = !accountSearchCode || (acc.code && acc.code.toLowerCase().includes(accountSearchCode.toLowerCase()));
+    const nameMatch = !accountSearchName || (acc.name && acc.name.toLowerCase().includes(accountSearchName.toLowerCase()));
+    return codeMatch && nameMatch;
+  };
+  
+  if (matchesSearch(a)) return true;
+  
+  const hasMatchingDescendant = (parent) => {
+    const children = sortedAccounts.filter(child => child.parentId === parent.id);
+    for (const child of children) {
+      if (matchesSearch(child) || hasMatchingDescendant(child)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  if (hasMatchingDescendant(a)) return true;
+  
+  return false;
+}
+
 function renderAccountsTable() {
   const tbody = document.getElementById('accountsTableBody');
   if (!tbody) return;
 
   const sortedAccounts = sortTreePreOrder(AppState.accounts);
-  const visibleAccounts = sortedAccounts.filter(isAccountVisible);
+  const visibleAccounts = sortedAccounts.filter(a => isAccountVisibleWithFilter(a, sortedAccounts));
 
   tbody.innerHTML = visibleAccounts.map(a => {
     const level = getAccountLevel(a);
     const hasChildren = AppState.accounts.some(child => child.parentId === a.id);
     const isExpanded = expandedAccountIds.has(a.id);
-    const isSelected = (a.id === currentParentIdForNewAccount);
+    const isSelected = (a.id === selectedAccountId);
     const selectedClass = isSelected ? 'selected-parent-row' : '';
 
     // Show tree toggle button for all rows
     const toggleBtnHtml = hasChildren
-      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="handleTreeButtonClick(${a.id})">${isExpanded ? '-' : '+'}</button>`
-      : `<button class="tree-toggle-btn" onclick="handleTreeButtonClick(${a.id})">+</button>`;
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); handleTreeButtonClick(${a.id})">${isExpanded ? '-' : '+'}</button>`
+      : `<button class="tree-toggle-btn" onclick="event.stopPropagation(); handleTreeButtonClick(${a.id})">+</button>`;
 
     const indentPx = level * 22;
 
     return `
-      <tr class="tree-level-${Math.min(level, 3)} ${selectedClass}">
+      <tr class="tree-level-${Math.min(level, 3)} ${selectedClass}" onclick="selectAccountRow(${a.id})" style="cursor:pointer;">
         <td style="text-align:center;vertical-align:middle;">${toggleBtnHtml}</td>
         <td><b>${a.code}</b></td>
         <td style="padding-right:${indentPx + 10}px;">
@@ -788,8 +889,8 @@ function renderAccountsTable() {
         <td>${a.nature}</td>
         <td><span class="badge badge-success">فعال</span></td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 8px;">✏️ ویرایش</button>
-          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteAccount(${a.id})">🗑️ حذف</button>
+          <button class="btn btn-outline" style="padding:3px 8px;" onclick="event.stopPropagation(); openEditAccountRow(${a.id})">✏️ ویرایش</button>
+          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="event.stopPropagation(); deleteAccount(${a.id})">🗑️ حذف</button>
         </td>
       </tr>
     `;
@@ -833,6 +934,11 @@ function suggestNextAccountCode(type, parentId) {
 }
 
 function openAddAccountRow() {
+  const editIdIn = document.getElementById('newAccEditId');
+  if (editIdIn) editIdIn.value = '';
+  const titleEl = document.getElementById('addAccountRowTitle');
+  if (titleEl) titleEl.textContent = 'افزودن حساب جدید';
+
   const selectType = document.getElementById('newAccType');
   const selectParent = document.getElementById('newAccParentId');
   const inputCode = document.getElementById('newAccCode');
@@ -884,6 +990,23 @@ function openAddAccountRow() {
   document.getElementById('newAccName').focus();
 }
 
+function openEditAccountRow(id) {
+  const acc = AppState.accounts.find(x => x.id === id);
+  if (!acc) return;
+  
+  document.getElementById('addAccountRow').style.display = 'block';
+  document.getElementById('addAccountRowTitle').innerHTML = `ویرایش سرفصل حساب <span style="font-size:0.85rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(کد: ${acc.code})</span>`;
+  
+  document.getElementById('newAccEditId').value = acc.id;
+  document.getElementById('newAccCode').value = acc.code;
+  document.getElementById('newAccName').value = acc.name;
+  document.getElementById('newAccNature').value = acc.nature;
+  document.getElementById('newAccType').value = acc.type;
+  document.getElementById('newAccParentId').value = acc.parentId || '';
+  
+  document.getElementById('newAccName').focus();
+}
+
 function resetParentSelectionForNewAccount(e) {
   if (e) e.preventDefault();
   currentParentIdForNewAccount = null;
@@ -891,6 +1014,7 @@ function resetParentSelectionForNewAccount(e) {
 }
 
 function saveNewAccount() {
+  const editIdStr = document.getElementById('newAccEditId')?.value;
   const code = document.getElementById('newAccCode')?.value?.trim();
   const name = document.getElementById('newAccName')?.value?.trim();
   const type = document.getElementById('newAccType')?.value;
@@ -899,9 +1023,25 @@ function saveNewAccount() {
   const parentId = parentVal ? Number(parentVal) : null;
 
   if (!code || !name) { alert('کد حساب و عنوان الزامی است.'); return; }
-  if (AppState.accounts.find(a => a.code === code)) { alert('این کد حساب قبلاً ثبت شده است.'); return; }
+  
+  if (editIdStr) {
+    // Edit Mode
+    const id = Number(editIdStr);
+    const acc = AppState.accounts.find(a => a.id === id);
+    if (acc) {
+      acc.code = code;
+      acc.name = name;
+      acc.type = type;
+      acc.nature = nature;
+      acc.parentId = parentId;
+    }
+  } else {
+    // Insert Mode
+    if (AppState.accounts.find(a => a.code === code)) { alert('این کد حساب قبلاً ثبت شده است.'); return; }
+    AppState.accounts.push({ id: Date.now(), code, name, type, nature, parentId });
+  }
 
-  AppState.accounts.push({ id: Date.now(), code, name, type, nature, parentId });
+  document.getElementById('newAccEditId').value = '';
   document.getElementById('newAccCode').value = '';
   document.getElementById('newAccName').value = '';
   document.getElementById('addAccountRow').style.display = 'none';
@@ -915,7 +1055,7 @@ function saveNewAccount() {
   currentParentIdForNewAccount = null;
 
   renderAccountsTable();
-  alert(`حساب "${code} - ${name}" با موفقیت ثبت شد.`);
+  alert(`حساب "${code} - ${name}" با موفقیت ذخیره شد.`);
 }
 
 function deleteAccount(id) {

@@ -1133,16 +1133,64 @@
           <!-- Tab 2: سرفصل حساب‌ها -->
           <div id="tab-panel-accounts" class="hesabdari-tab-panel active" style="display:block;">
             <div class="card form-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                <div style="font-weight:700;font-size:0.95rem;">📑 نمایش درختی و ساختار سلسله‌مراتبی سرفصل‌های حساب</div>
-                <button class="btn btn-outline" onclick="openAddAccountRow()">+ حساب جدید</button>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                  <div style="font-weight:700;font-size:0.95rem;">📑 نمایش درختی و ساختار سلسله‌مراتبی سرفصل‌های حساب</div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <label class="form-label" style="margin-bottom:0;font-size:0.85rem;font-weight:bold;">نمایش سرفصل‌ها تا سطح:</label>
+                    <select id="accountsExpandLevel" class="form-select" style="padding:2px 8px;font-size:0.85rem;width:150px;height:auto;" onchange="handleAccountsExpandLevelChange(this.value)">
+                      <option value="group">گروه (بستن همه)</option>
+                      <option value="general">کل</option>
+                      <option value="auxiliary" selected>معین</option>
+                      <option value="detail1">تفصیلی ۱</option>
+                      <option value="detail2">تفصیلی ۲</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <button class="btn btn-outline" style="border-color:var(--accent-color);color:var(--accent-color);" onclick="clearAccountSearch()">جستجوی جدید</button>
+                  <button class="btn btn-outline" onclick="openAddAccountRow()">+ حساب جدید</button>
+                </div>
               </div>
+
+              <!-- Hierarchy Breadcrumb Label -->
+              <div id="accountHierarchyLabel" style="color:var(--primary-color);font-weight:bold;font-size:0.85rem;margin-bottom:12px;padding:6px 12px;background:rgba(var(--accent-color-rgb, 120, 150, 200), 0.08);border-radius:6px;border-right:4px solid var(--accent-color);min-height:32px;display:flex;align-items:center;">
+                سطح سرفصل جاری: - / زنجیره: -
+              </div>
+
               <div class="table-wrapper">
-                <table><thead><tr><th style="width:36px;text-align:center;"></th><th>کد حساب</th><th>عنوان حساب</th><th>سطح</th><th>ماهیت</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-                <tbody id="accountsTableBody"></tbody></table>
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width:36px;text-align:center;"></th>
+                      <th>کد حساب</th>
+                      <th>عنوان حساب</th>
+                      <th>سطح</th>
+                      <th>ماهیت</th>
+                      <th>وضعیت</th>
+                      <th>عملیات</th>
+                    </tr>
+                    <!-- Search Input Row -->
+                    <tr class="search-filter-row" style="background:var(--bg-light);">
+                      <th></th>
+                      <th>
+                        <input type="text" id="searchAccountCode" class="form-input search-input" placeholder="جستجوی کد..." oninput="filterAccountsGrid()" style="width:100%;padding:4px 8px;font-size:0.8rem;height:auto;border:1px solid var(--border-color);border-radius:4px;" />
+                      </th>
+                      <th>
+                        <input type="text" id="searchAccountName" class="form-input search-input" placeholder="جستجوی عنوان..." oninput="filterAccountsGrid()" style="width:100%;padding:4px 8px;font-size:0.8rem;height:auto;border:1px solid var(--border-color);border-radius:4px;" />
+                      </th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="accountsTableBody"></tbody>
+                </table>
               </div>
               <div id="addAccountRow" style="display:none;" class="inline-form">
-                <h4>افزودن حساب جدید</h4>
+                <h4 id="addAccountRowTitle">افزودن حساب جدید</h4>
+                <input type="hidden" id="newAccEditId" value="" />
                 <div class="form-row">
                   <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newAccCode" class="form-input" /></div>
                   <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newAccName" class="form-input" /></div>
