@@ -5610,3 +5610,412 @@ function showCardex() {
   tbody.innerHTML = html;
 }
 
+
+
+// ==========================================
+#   Voucher Attachments Module (ضمائم سند)
+// ==========================================
+function generateMockSalesInvoiceDataUrl() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 800;
+  const ctx = canvas.getContext('2d');
+  
+  // Fill white background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw header border
+  ctx.strokeStyle = '#1e3a8a';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+  
+  // Header title
+  ctx.fillStyle = '#1e3a8a';
+  ctx.font = 'bold 20px Tahoma';
+  ctx.textAlign = 'center';
+  ctx.fillText('فاکتور فروش کالا و خدمات - سیستم نگار تحت وب', canvas.width / 2, 50);
+  
+  ctx.font = '12px Tahoma';
+  ctx.fillStyle = '#333333';
+  ctx.fillText('شرکت نمونه نگار (سهامی خاص)', canvas.width / 2, 75);
+  
+  // Invoice details
+  ctx.textAlign = 'right';
+  ctx.fillText('شماره فاکتور: INV-8001', canvas.width - 40, 110);
+  ctx.fillText('تاریخ فاکتور: 1403/05/10', canvas.width - 40, 130);
+  ctx.fillText('خریدار: فروشگاه مرکزی', canvas.width - 40, 150);
+  
+  // Table Header
+  ctx.fillStyle = '#f3f4f6';
+  ctx.fillRect(30, 180, canvas.width - 60, 30);
+  ctx.strokeStyle = '#cccccc';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(30, 180, canvas.width - 60, 30);
+  
+  ctx.fillStyle = '#1e3a8a';
+  ctx.font = 'bold 11px Tahoma';
+  ctx.fillText('ردیف', 70, 200);
+  ctx.fillText('شرح کالا / خدمات', 220, 200);
+  ctx.fillText('تعداد', 370, 200);
+  ctx.fillText('مبلغ کل (ریال)', 520, 200);
+  
+  // Table rows
+  ctx.fillStyle = '#000000';
+  ctx.font = '11px Tahoma';
+  
+  // Row 1
+  ctx.fillText('۱', 70, 240);
+  ctx.fillText('لپ‌تاپ گیمینگ ایسوس ۱۵ اینچ', 220, 240);
+  ctx.fillText('۲ دستگاه', 370, 240);
+  ctx.fillText('۹۰۰,۰۰۰,۰۰۰', 520, 240);
+  ctx.strokeRect(30, 220, canvas.width - 60, 30);
+  
+  // Row 2
+  ctx.fillText('۲', 70, 270);
+  ctx.fillText('مانیتور ۲۷ اینچ 4K سامسونگ', 220, 270);
+  ctx.fillText('۱ عدد', 370, 270);
+  ctx.fillText('۱۸۰,۰۰۰,۰۰۰', 520, 270);
+  ctx.strokeRect(30, 250, canvas.width - 60, 30);
+  
+  // Total
+  ctx.fillStyle = '#f3f4f6';
+  ctx.fillRect(30, 310, canvas.width - 60, 30);
+  ctx.strokeRect(30, 310, canvas.width - 60, 30);
+  ctx.fillStyle = '#1e3a8a';
+  ctx.font = 'bold 12px Tahoma';
+  ctx.fillText('جمع کل فاکتور:', 300, 330);
+  ctx.fillText('۱,۰۸۰,۰۰۰,۰۰۰ ریال', 520, 330);
+  
+  // Signatures
+  ctx.fillStyle = '#777777';
+  ctx.font = 'italic 11px Tahoma';
+  ctx.fillText('مهر و امضای فروشنده', 150, 450);
+  ctx.fillText('مهر و امضای خریدار', 450, 450);
+  
+  // Draw stamp
+  ctx.strokeStyle = 'rgba(30, 58, 138, 0.4)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(120, 480, 40, 0, 2 * Math.PI);
+  ctx.stroke();
+  ctx.font = 'bold 9px Tahoma';
+  ctx.fillStyle = 'rgba(30, 58, 138, 0.4)';
+  ctx.fillText('سیستم نگار', 140, 480);
+  
+  return canvas.toDataURL('image/png');
+}
+
+function initVoucherAttachments() {
+  if (!AppState.sanadAttachments) {
+    AppState.sanadAttachments = {};
+  }
+  
+  // Voucher 102 (sales invoice voucher, automatic) auto populated with sales invoice representation
+  if (!AppState.sanadAttachments[102]) {
+    const mockInvoice = generateMockSalesInvoiceDataUrl();
+    AppState.sanadAttachments[102] = [
+      {
+        rowNo: 1, // first line
+        images: [mockInvoice]
+      }
+    ];
+  }
+}
+
+function openSanadAttachments() {
+  if (!selectedSanadId) {
+    alert('لطفاً ابتدا یک سند را از جدول انتخاب (کلیک) کنید.');
+    return;
+  }
+  
+  initVoucherAttachments();
+  
+  // Open Form
+  showForm('form-sanad-attachments');
+  
+  // Update header label
+  document.getElementById('attachSanadIdLabel').textContent = selectedSanadId;
+  
+  // Update select target row options
+  const select = document.getElementById('attachTargetSelect');
+  if (select) {
+    let options = '<option value="0">کل سند (عمومی)</option>';
+    AppState.sanadLines.forEach((line, i) => {
+      const acc = AppState.accounts.find(a => a.code === line.account);
+      const accName = acc ? acc.name : '';
+      options += `<option value="${i + 1}">ردیف ${i + 1} (${line.account} - ${accName})</option>`;
+    });
+    select.innerHTML = options;
+    select.value = "0";
+  }
+  
+  renderAttachmentsGrid();
+}
+
+function renderAttachmentsGrid() {
+  const tbody = document.getElementById('attachGridTableBody');
+  if (!tbody) return;
+  
+  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  
+  // Render general voucher attachments row
+  const generalItem = attachments.find(x => x.rowNo === 0);
+  const generalCount = generalItem ? generalItem.images.length : 0;
+  
+  let rowsHtml = `
+    <tr style="border-bottom:1px solid var(--border-color);">
+      <td><b>کل سند</b></td>
+      <td>-</td>
+      <td style="text-align:right;"><b>عمومی / فاقد سرفصل خاص</b></td>
+      <td style="text-align:right;">ضمائم متفرقه و عمومی مربوط به کل سند</td>
+      <td><span class="badge ${generalCount > 0 ? 'badge-primary' : 'badge-secondary'}">${generalCount} تصویر</span></td>
+      <td>
+        <button class="btn btn-outline" style="padding:3px 8px;" onclick="openRowAttachmentsViewer(0)">👁️ نمایش ضمائم</button>
+      </td>
+    </tr>
+  `;
+  
+  // Render voucher line attachments rows
+  AppState.sanadLines.forEach((line, i) => {
+    const rowNo = i + 1;
+    const acc = AppState.accounts.find(a => a.code === line.account);
+    const accName = acc ? acc.name : 'سرفصل نامشخص';
+    const rowItem = attachments.find(x => x.rowNo === rowNo);
+    const count = rowItem ? rowItem.images.length : 0;
+    
+    rowsHtml += `
+      <tr style="border-bottom:1px solid var(--border-color);">
+        <td><b>ردیف ${rowNo}</b></td>
+        <td><b>${line.account}</b></td>
+        <td style="text-align:right;"><b>${accName}</b></td>
+        <td style="text-align:right;">${line.desc || '-'}</td>
+        <td><span class="badge ${count > 0 ? 'badge-primary' : 'badge-secondary'}">${count} تصویر</span></td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 8px;" onclick="openRowAttachmentsViewer(${rowNo})">👁️ نمایش ضمائم</button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  tbody.innerHTML = rowsHtml;
+}
+
+function handleAttachmentUpload(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+  
+  const targetRowNo = Number(document.getElementById('attachTargetSelect')?.value || 0);
+  
+  if (!AppState.sanadAttachments[selectedSanadId]) {
+    AppState.sanadAttachments[selectedSanadId] = [];
+  }
+  
+  let rowItem = AppState.sanadAttachments[selectedSanadId].find(x => x.rowNo === targetRowNo);
+  if (!rowItem) {
+    rowItem = { rowNo: targetRowNo, images: [] };
+    AppState.sanadAttachments[selectedSanadId].push(rowItem);
+  }
+  
+  let processedCount = 0;
+  for (let i = 0; i < files.length; i++) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      rowItem.images.push(e.target.result);
+      processedCount++;
+      if (processedCount === files.length) {
+        renderAttachmentsGrid();
+        alert(`${files.length} تصویر با موفقیت به عنوان ضمیمه افزوده شد.`);
+      }
+    };
+    reader.readAsDataURL(files[i]);
+  }
+  
+  event.target.value = '';
+}
+
+function simulateScannerInput() {
+  const targetRowNo = Number(document.getElementById('attachTargetSelect')?.value || 0);
+  
+  if (!AppState.sanadAttachments[selectedSanadId]) {
+    AppState.sanadAttachments[selectedSanadId] = [];
+  }
+  
+  let rowItem = AppState.sanadAttachments[selectedSanadId].find(x => x.rowNo === targetRowNo);
+  if (!rowItem) {
+    rowItem = { rowNo: targetRowNo, images: [] };
+    AppState.sanadAttachments[selectedSanadId].push(rowItem);
+  }
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = 600;
+  canvas.height = 800;
+  const ctx = canvas.getContext('2d');
+  
+  // Paper/scanner background
+  ctx.fillStyle = '#fbfbf9';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Scanner border
+  ctx.strokeStyle = '#333333';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+  
+  // Red stamp
+  ctx.strokeStyle = 'rgba(220, 38, 38, 0.5)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(400, 50, 150, 60);
+  ctx.fillStyle = 'rgba(220, 38, 38, 0.5)';
+  ctx.font = 'bold 12px Tahoma';
+  ctx.textAlign = 'center';
+  ctx.fillText('اسکن شده - بایگانی سند', 475, 75);
+  ctx.fillText('سیستم نگار تحت وب', 475, 95);
+  
+  // Document Text
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#222222';
+  ctx.font = 'bold 16px Tahoma';
+  ctx.fillText('رسید دریافت / پرداخت پیوست سند', canvas.width - 50, 160);
+  
+  ctx.font = '11px Tahoma';
+  ctx.fillText(`تاریخ اسکن: ${new Date().toLocaleDateString('fa-IR')}`, canvas.width - 50, 200);
+  ctx.fillText(`ضمیمه مربوط به: ${targetRowNo === 0 ? 'کل سند' : 'ردیف ' + targetRowNo}`, canvas.width - 50, 220);
+  ctx.fillText(`شماره سند مالی: #${selectedSanadId}`, canvas.width - 50, 240);
+  
+  // Main Border
+  ctx.strokeStyle = '#cccccc';
+  ctx.strokeRect(50, 280, 500, 450);
+  
+  ctx.fillText('توضیحات مدرک اسکن شده:', 520, 310);
+  ctx.font = '10px Tahoma';
+  ctx.fillStyle = '#555555';
+  ctx.fillText('این مدرک به عنوان تاییدیه رسمی پرداخت/دریافت آرتیکل مربوطه توسط', 520, 340);
+  ctx.fillText('اسکنر سخت‌افزاری متصل به پایانه حسابداری اسکن شده و تصویر سند پیوست است.', 520, 360);
+  
+  // Signatures
+  ctx.beginPath();
+  ctx.moveTo(100, 650);
+  ctx.lineTo(250, 650);
+  ctx.moveTo(350, 650);
+  ctx.lineTo(500, 650);
+  ctx.stroke();
+  
+  ctx.fillText('امضای مسئول بایگانی', 175, 675);
+  ctx.fillText('امضای مدیر مالی', 425, 675);
+  
+  const dataUrl = canvas.toDataURL('image/png');
+  rowItem.images.push(dataUrl);
+  
+  renderAttachmentsGrid();
+  alert(`یک مدرک جدید با موفقیت توسط اسکنر شبیه‌سازی و به عنوان ضمیمه ذخیره گردید.`);
+}
+
+let viewerActiveRowNo = 0;
+let viewerActiveIndex = 0;
+
+function openRowAttachmentsViewer(rowNo) {
+  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const rowItem = attachments.find(x => x.rowNo === rowNo);
+  
+  if (!rowItem || rowItem.images.length === 0) {
+    alert('هیچ تصویری برای این ردیف ضمیمه نشده است.');
+    return;
+  }
+  
+  viewerActiveRowNo = rowNo;
+  viewerActiveIndex = 0;
+  
+  showActiveAttachmentInViewer();
+  
+  document.getElementById('attachmentsViewerModal').style.display = 'flex';
+}
+
+function closeAttachmentsViewer() {
+  document.getElementById('attachmentsViewerModal').style.display = 'none';
+}
+
+function showActiveAttachmentInViewer() {
+  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
+  if (!rowItem || rowItem.images.length === 0) {
+    closeAttachmentsViewer();
+    renderAttachmentsGrid();
+    return;
+  }
+  
+  if (viewerActiveIndex < 0) viewerActiveIndex = 0;
+  if (viewerActiveIndex >= rowItem.images.length) viewerActiveIndex = rowItem.images.length - 1;
+  
+  const imageSrc = rowItem.images[viewerActiveIndex];
+  document.getElementById('attachViewerImage').src = imageSrc;
+  document.getElementById('attachViewerTitle').textContent = `نمایش ضمائم ${viewerActiveRowNo === 0 ? 'کل سند' : 'ردیف ' + viewerActiveRowNo}`;
+  document.getElementById('attachViewerIndexLabel').textContent = `تصویر ${viewerActiveIndex + 1} از ${rowItem.images.length}`;
+}
+
+function showNextAttachment() {
+  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
+  if (!rowItem) return;
+  
+  if (viewerActiveIndex < rowItem.images.length - 1) {
+    viewerActiveIndex++;
+  } else {
+    viewerActiveIndex = 0;
+  }
+  showActiveAttachmentInViewer();
+}
+
+function showPrevAttachment() {
+  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
+  if (!rowItem) return;
+  
+  if (viewerActiveIndex > 0) {
+    viewerActiveIndex--;
+  } else {
+    viewerActiveIndex = rowItem.images.length - 1;
+  }
+  showActiveAttachmentInViewer();
+}
+
+function printActiveAttachment() {
+  const imageSrc = document.getElementById('attachViewerImage').src;
+  if (!imageSrc) return;
+  
+  const printWin = window.open('', '_blank');
+  printWin.document.write(`
+    <html>
+    <head>
+      <title>چاپ ضمیمه سند</title>
+      <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        @media print {
+          img { max-width: 100vw; max-height: 100vh; }
+        }
+      </style>
+    </head>
+    <body onload="window.print(); window.close();">
+      <img src="${imageSrc}" />
+    </body>
+    </html>
+  `);
+  printWin.document.close();
+}
+
+function deleteActiveAttachment() {
+  if (confirm('آیا از حذف این ضمیمه اطمینان دارید؟')) {
+    const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+    const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
+    if (!rowItem) return;
+    
+    rowItem.images.splice(viewerActiveIndex, 1);
+    
+    if (rowItem.images.length === 0) {
+      AppState.sanadAttachments[selectedSanadId] = attachments.filter(x => x.rowNo !== viewerActiveRowNo);
+    }
+    
+    showActiveAttachmentInViewer();
+    renderAttachmentsGrid();
+  }
+}

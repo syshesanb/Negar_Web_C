@@ -1983,7 +1983,7 @@
               <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
                 <!-- Tabs -->
                 <button class="btn btn-outline active" style="padding:4px 10px; font-size:0.75rem; background:rgba(56,189,248,0.1); border-color:var(--accent-color);">سطرهای سند</button>
-                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش ضمائم سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">ضمائم</button>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="openSanadAttachments()">ضمائم</button>
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem; color:var(--text-muted);" onclick="alert('بخش یادداشت برای سند دسکتاپ در نسخه وب در حال راه‌اندازی است.')">یادداشت</button>
                 
                 <!-- Separator -->
@@ -1999,6 +1999,56 @@
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="clearColumnSearches()">🧹 پاک کردن جستجوها</button>
                 <button class="btn btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="closeSanadEditor()">🔙 خروج</button>
               </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 4.5: ضمائم سند حسابداری -->
+        <div id="form-sanad-attachments" class="form-section" style="padding: 10px; display:none;">
+          <h2 class="form-heading" style="display:none;">📎 ضمائم سند حسابداری</h2>
+          <div class="card form-card">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
+              <h3 style="margin:0; font-size:1.1rem; color:var(--primary-color);">📎 مدیریت ضمائم سند شماره #<span id="attachSanadIdLabel"></span></h3>
+              <button class="btn btn-outline" onclick="showForm('form-sanad2')" style="font-size:0.8rem; padding:6px 15px; font-weight:bold;">🔙 بازگشت به سند</button>
+            </div>
+
+            <!-- Upload Panel -->
+            <div style="background:rgba(255,255,255,0.03); border:1px dashed var(--border-color); padding:15px; border-radius:6px; margin-bottom:15px; text-align:center; direction:rtl;">
+              <div style="font-weight:bold; font-size:0.9rem; margin-bottom:10px; color:var(--text-main);">➕ افزودن ضمیمه جدید برای کل سند یا ردیف انتخاب شده:</div>
+              <div style="display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
+                
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <label class="form-label" style="margin-bottom:0; font-size:0.8rem;">هدف ضمیمه:</label>
+                  <select id="attachTargetSelect" class="form-select" style="padding:4px 8px; font-size:0.8rem; height:auto; width:180px;"></select>
+                </div>
+
+                <div style="position:relative; display:inline-block;">
+                  <button class="btn btn-primary" style="padding:6px 15px; font-size:0.8rem; font-weight:bold;">📂 انتخاب فایل تصویر...</button>
+                  <input type="file" id="attachFileInput" multiple accept="image/*" onchange="handleAttachmentUpload(event)" style="position:absolute; left:0; top:0; opacity:0; width:100%; height:100%; cursor:pointer;" />
+                </div>
+
+                <button class="btn btn-outline" onclick="simulateScannerInput()" style="padding:6px 15px; font-size:0.8rem; border-color:#eab308; color:#eab308; font-weight:bold;">🖨️ اسکن تصویر جدید (شبیه‌ساز)</button>
+              </div>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">فرمت‌های مجاز: PNG, JPG, JPEG (امکان انتخاب همزمان چند تصویر)</div>
+            </div>
+
+            <!-- Attachments DataGrid -->
+            <div class="table-wrapper">
+              <table style="width:100%; border-collapse:collapse; text-align:center;">
+                <thead>
+                  <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                    <th style="width:100px;">ردیف سند</th>
+                    <th style="width:120px;">کد سرفصل</th>
+                    <th>عنوان سرفصل</th>
+                    <th>شرح ردیف</th>
+                    <th style="width:120px;">تعداد ضمائم</th>
+                    <th style="width:180px;">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="attachGridTableBody"></tbody>
+              </table>
             </div>
 
           </div>
@@ -2739,5 +2789,35 @@
   <script src="persian-calendar.js"></script>
   <script src="app.js"></script>
   </div><!-- end mainApp -->
+  <!-- Attachments Lightbox Viewer -->
+  <div id="attachmentsViewerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; direction:rtl;">
+    <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:8px; padding:20px; width:90%; max-width:700px; max-height:90%; display:flex; flex-direction:column; gap:15px; position:relative; box-sizing:border-box;">
+      
+      <!-- Close button -->
+      <button onclick="closeAttachmentsViewer()" style="position:absolute; top:12px; left:12px; background:transparent; border:none; color:var(--text-main); font-size:1.5rem; cursor:pointer;">❌</button>
+      
+      <div style="font-weight:bold; font-size:1rem; color:var(--primary-color); text-align:right;" id="attachViewerTitle">نمایش ضمائم ردیف</div>
+
+      <!-- Image Area -->
+      <div style="flex:1; display:flex; justify-content:center; align-items:center; background:#000; border-radius:4px; padding:10px; overflow:hidden; min-height:300px; max-height:500px;">
+        <img id="attachViewerImage" src="" style="max-width:100%; max-height:100%; object-fit:contain;" />
+      </div>
+
+      <!-- Controls -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-outline" onclick="showPrevAttachment()" style="font-size:0.9rem; padding:6px 12px; font-weight:bold;">▶️ قبلی</button>
+          <span style="font-size:0.8rem; color:var(--text-muted);" id="attachViewerIndexLabel">تصویر ۱ از ۱</span>
+          <button class="btn btn-outline" onclick="showNextAttachment()" style="font-size:0.9rem; padding:6px 12px; font-weight:bold;">◀️ بعدی</button>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline" onclick="printActiveAttachment()" style="padding:6px 15px; font-size:0.8rem; font-weight:bold;">🖨️ چاپ تصویر</button>
+          <button class="btn btn-outline" onclick="deleteActiveAttachment()" style="padding:6px 15px; font-size:0.8rem; color:red; font-weight:bold;">🗑️ حذف ضمیمه</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </body>
 </html>
