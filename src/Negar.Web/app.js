@@ -1003,8 +1003,6 @@ function suggestNextAccountCode(type, parentId) {
 function openAddAccountRow() {
   const editIdIn = document.getElementById('newAccEditId');
   if (editIdIn) editIdIn.value = '';
-  const titleEl = document.getElementById('addAccountRowTitle');
-  if (titleEl) titleEl.textContent = 'افزودن حساب جدید';
 
   const selectType = document.getElementById('newAccType');
   const selectParent = document.getElementById('newAccParentId');
@@ -1060,15 +1058,15 @@ function openAddAccountRow() {
   renderAccountsTable();
 
   openAccountModal();
-  document.getElementById('newAccName').focus();
+  setTimeout(() => { if (document.getElementById('newAccName')) document.getElementById('newAccName').focus(); }, 200);
 }
 
 function openEditAccountRow(id) {
   const acc = AppState.accounts.find(x => x.id === id);
   if (!acc) return;
   
-  openAccountModal();
-  document.getElementById('addAccountRowTitle').innerHTML = `ویرایش سرفصل حساب <span style="font-size:0.85rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(کد: ${acc.code})</span>`;
+  const titleEl = document.getElementById('accountModalTitle');
+  if (titleEl) titleEl.innerHTML = `✏️ ویرایش سرفصل <span style="color:var(--accent-color);">${acc.type}</span> (کد: ${acc.code})`;
   
   document.getElementById('newAccEditId').value = acc.id;
   document.getElementById('newAccCode').value = acc.code;
@@ -1077,7 +1075,8 @@ function openEditAccountRow(id) {
   document.getElementById('newAccType').value = acc.type;
   document.getElementById('newAccParentId').value = acc.parentId || '';
   
-  document.getElementById('newAccName').focus();
+  openAccountModal();
+  setTimeout(() => { const n = document.getElementById('newAccName'); if(n) n.focus(); }, 200);
 }
 
 function openSameLevelNewAccount(id) {
