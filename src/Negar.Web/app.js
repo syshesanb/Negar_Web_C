@@ -5613,7 +5613,7 @@ function showCardex() {
 
 
 // ==========================================
-#   Voucher Attachments Module (ضمائم سند)
+//   Voucher Attachments Module (ضمائم سند)
 // ==========================================
 function generateMockSalesInvoiceDataUrl() {
   const canvas = document.createElement('canvas');
