@@ -5724,10 +5724,15 @@ function initVoucherAttachments() {
 }
 
 function openSanadAttachments() {
-  if (!selectedSanadId) {
-    alert('لطفاً ابتدا یک سند را از جدول انتخاب (کلیک) کنید.');
+  const numInput = document.getElementById('sanadNumberInput');
+  const voucherId = numInput ? Number(numInput.value) : null;
+  
+  if (!voucherId || isNaN(voucherId)) {
+    alert('شماره سند نامعتبر است.');
     return;
   }
+  
+  selectedSanadId = voucherId;
   
   initVoucherAttachments();
   
