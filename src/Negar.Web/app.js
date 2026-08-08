@@ -2890,6 +2890,14 @@ function saveSanadEntry() {
   if (isNaN(no) || no <= 0) { alert('شماره سند نامعتبر است.'); return; }
 
   const existingIdx = AppState.sanads.findIndex(x => x.id === no);
+  
+  if (originalSanadState && originalSanadState.isNew) {
+    if (existingIdx !== -1) {
+      alert(`خطا: سند شماره ${no} قبلاً در سیستم ثبت شده است. لطفاً از شماره دیگری استفاده کنید.`);
+      return;
+    }
+  }
+
   if (existingIdx !== -1) {
     const s = AppState.sanads[existingIdx];
     if (s.bakhshId && s.bakhshId !== getCurrentBakhshId()) {
