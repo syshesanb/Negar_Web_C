@@ -410,6 +410,18 @@ const AppState = {
   ]
 };
 
+// Initial vouchers detail database (سندهای پیش‌فرض سیستم)
+AppState.voucherDetails = {
+  101: [
+    { account: '110101', desc: 'آرتیکل بدهکار - بابت سند افتتاحیه سال مالی', debit: 5000000000, credit: 0, txNo: '', txDate: '' },
+    { account: '210101', desc: 'آرتیکل بستانکار - بابت سند افتتاحیه سال مالی', debit: 0, credit: 5000000000, txNo: '', txDate: '' }
+  ],
+  102: [
+    { account: '110101', desc: 'آرتیکل بدهکار - بابت فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 0, txNo: '', txDate: '' },
+    { account: '210101', desc: 'آرتیکل بستانکار - بابت فاکتور فروش فروشگاه مرکزی', debit: 0, credit: 125000000, txNo: '', txDate: '' }
+  ]
+};
+
 // ============================
 // Navigation: Ribbon Tab Switch
 // ============================
@@ -1454,7 +1466,12 @@ function renderSanadListTable() {
         <td>${s.desc}</td>
         <td>${s.debit.toLocaleString()}</td>
         <td>${s.credit.toLocaleString()}</td>
-        <td><span class="badge badge-success">متوازن ✅</span></td>
+        <td>
+          ${(s.debit === s.credit && s.status !== 'نامتوازن')
+            ? `<span class="badge badge-success">متوازن ✅</span>`
+            : `<span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); font-weight:bold;">نامتوازن ❌</span>`
+          }
+        </td>
         <td><span class="badge" style="background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);font-weight:bold;">${bakhshName}</span></td>
         <td><span class="badge badge-primary">${s.status}</span></td>
         <td>
@@ -1497,11 +1514,16 @@ function editSanad(id) {
   document.getElementById('sanadDateInput').value = s.date;
   document.getElementById('sanadDescInput').value = s.desc;
 
-  // Render lines with the voucher's values
-  AppState.sanadLines = [
-    { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
-    { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
-  ];
+  // Render lines with the voucher's values from details database
+  AppState.voucherDetails = AppState.voucherDetails || {};
+  if (AppState.voucherDetails[id]) {
+    AppState.sanadLines = JSON.parse(JSON.stringify(AppState.voucherDetails[id]));
+  } else {
+    AppState.sanadLines = [
+      { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0, txNo: '', txDate: '' },
+      { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit, txNo: '', txDate: '' }
+    ];
+  }
 
   // Store original state for edited voucher
   originalSanadState = {
@@ -1525,17 +1547,27 @@ function printVouchers() {
   if (!s) return;
 
   const printWindow = window.open('', '_blank');
-  // Use dummy/default lines if no specific ones exist for this draft
-  const linesHtml = AppState.sanadLines.map((line, idx) => `
-    <tr>
-      <td>${idx + 1}</td>
-      <td>${line.account}</td>
-      <td>حساب معین ${line.account}</td>
-      <td>${line.desc}</td>
-      <td style="text-align:left;">${line.debit.toLocaleString()}</td>
-      <td style="text-align:left;">${line.credit.toLocaleString()}</td>
-    </tr>
-  `).join('');
+  // Load lines from the detailed database for printing
+  AppState.voucherDetails = AppState.voucherDetails || {};
+  const targetLines = AppState.voucherDetails[s.id] || [
+    { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
+    { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
+  ];
+
+  const linesHtml = targetLines.map((line, idx) => {
+    const acc = AppState.accounts.find(a => a.code === line.account);
+    const accName = acc ? acc.name : `حساب معین ${line.account}`;
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${line.account}</td>
+        <td>${accName}</td>
+        <td>${line.desc || ''}</td>
+        <td style="text-align:left;">${Number(line.debit || 0).toLocaleString()}</td>
+        <td style="text-align:left;">${Number(line.credit || 0).toLocaleString()}</td>
+      </tr>
+    `;
+  }).join('');
 
   printWindow.document.write(`
     <html dir="rtl">
@@ -2945,7 +2977,13 @@ function closeSanadEditor() {
 function saveSanadEntry() {
   const td = AppState.sanadLines.reduce((s, l) => s + Number(l.debit || 0), 0);
   const tc = AppState.sanadLines.reduce((s, l) => s + Number(l.credit || 0), 0);
-  if (td !== tc) { alert('امکان ثبت سند نامتوازن وجود ندارد.'); return; }
+  
+  const isUnbalanced = (td !== tc);
+  if (isUnbalanced) {
+    const confirmSave = confirm("توجه: این سند نامتوازن است (جمع بدهکار و بستانکار برابر نیست). آیا می‌خواهید سند را به صورت نامتوازن ذخیره کنید تا بعداً آن را ویرایش و تکمیل کنید؟");
+    if (!confirmSave) return;
+  }
+
   const no = Number(document.getElementById('sanadNumberInput')?.value);
   const date = document.getElementById('sanadDateInput')?.value;
   const desc = document.getElementById('sanadDescInput')?.value || 'سند حسابداری';
@@ -2991,6 +3029,7 @@ function saveSanadEntry() {
       desc,
       debit: td,
       credit: tc,
+      status: isUnbalanced ? 'نامتوازن' : (s.status === 'نامتوازن' ? 'موقت' : s.status),
       dayOfYear: getJalaliDayOfYear(date)
     };
     alert(`سند شماره ${no} با موفقیت ویرایش شد.`);
@@ -3001,12 +3040,16 @@ function saveSanadEntry() {
       desc, 
       debit: td, 
       credit: tc, 
-      status: 'موقت', 
+      status: isUnbalanced ? 'نامتوازن' : 'موقت', 
       bakhshId: getCurrentBakhshId(),
       dayOfYear: getJalaliDayOfYear(date)
     });
     alert(`سند شماره ${no} با موفقیت ثبت شد.`);
   }
+
+  // Save detailed lines in detailed database
+  AppState.voucherDetails = AppState.voucherDetails || {};
+  AppState.voucherDetails[no] = JSON.parse(JSON.stringify(AppState.sanadLines));
 
   // COMMIT ATTACHMENTS TRANSACTION
   if (AppState.tempAttachments) {
