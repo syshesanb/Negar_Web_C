@@ -1112,29 +1112,105 @@ function isShenavarVisible(s) {
   return true;
 }
 
+let shenavarSearchCode = '';
+let shenavarSearchName = '';
+let selectedShenavarId = null;
+
+function filterShenavarGrid() {
+  shenavarSearchCode = (document.getElementById('searchShenavarCode')?.value || '').trim();
+  shenavarSearchName = (document.getElementById('searchShenavarName')?.value || '').trim();
+  renderShenavaarTable();
+}
+
+function clearShenavarSearch() {
+  const codeIn = document.getElementById('searchShenavarCode');
+  const nameIn = document.getElementById('searchShenavarName');
+  if (codeIn) codeIn.value = '';
+  if (nameIn) nameIn.value = '';
+  shenavarSearchCode = '';
+  shenavarSearchName = '';
+  renderShenavaarTable();
+}
+
+function handleShenavarExpandLevelChange(level) {
+  expandedShenavarIds.clear();
+  
+  if (level === 'root') {
+    // Collapsed all
+  } else {
+    // Expand all levels
+    AppState.shenavars.forEach(s => {
+      expandedShenavarIds.add(s.id);
+    });
+  }
+  
+  renderShenavaarTable();
+}
+
+function selectShenavarRow(id) {
+  selectedShenavarId = id;
+  currentShenavarParentIdForNewAccount = id;
+  
+  const s = AppState.shenavars.find(x => x.id === id);
+  updateShenavarHierarchyLabel(s);
+  
+  renderShenavaarTable();
+}
+
+function updateShenavarHierarchyLabel(s) {
+  const label = document.getElementById('shenavarHierarchyLabel');
+  if (!label) return;
+  
+  if (!s) {
+    label.innerHTML = `سطح شناور جاری: - / زنجیره: -`;
+    return;
+  }
+  
+  const chain = [];
+  let curr = s;
+  while (curr) {
+    chain.unshift(`${curr.code} (${curr.name})`);
+    curr = AppState.shenavars.find(x => x.id === curr.parentId);
+  }
+  
+  const levelName = s.parentId ? 'زیرمجموعه' : 'شناور اصلی';
+  const chainStr = chain.join(' / ');
+  label.innerHTML = `سطح شناور جاری: <span style="color:var(--accent-color);">${levelName}</span> / زنجیره: <span style="color:var(--primary-color);">${chainStr}</span>`;
+}
+
+function isShenavarVisibleWithFilter(s, sortedShenavars) {
+  if (!shenavarSearchCode && !shenavarSearchName) {
+    return isShenavarVisible(s);
+  }
+  
+  const codeMatch = !shenavarSearchCode || (s.code && s.code.toLowerCase().includes(shenavarSearchCode.toLowerCase()));
+  const nameMatch = !shenavarSearchName || (s.name && s.name.toLowerCase().includes(shenavarSearchName.toLowerCase()));
+  return codeMatch && nameMatch;
+}
+
 function renderShenavaarTable() {
   const tbody = document.getElementById('shenavaarTableBody');
   if (!tbody) return;
 
   const sortedShenavars = sortTreePreOrder(AppState.shenavars);
-  const visibleShenavars = sortedShenavars.filter(isShenavarVisible);
+  const visibleShenavars = sortedShenavars.filter(s => isShenavarVisibleWithFilter(s, sortedShenavars));
 
   tbody.innerHTML = visibleShenavars.map(s => {
     const level = getShenavarLevel(s);
     const hasChildren = AppState.shenavars.some(child => child.parentId === s.id);
     const isExpanded = expandedShenavarIds.has(s.id);
-    const isSelected = (s.id === currentShenavarParentIdForNewAccount);
+    const isSelected = (s.id === selectedShenavarId);
     const selectedClass = isSelected ? 'selected-parent-row' : '';
 
-    // Show tree toggle button for all rows (even those without children)
+    // Show tree toggle button
     const toggleBtnHtml = hasChildren
-      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="handleShenavarTreeButtonClick(${s.id})">${isExpanded ? '-' : '+'}</button>`
-      : `<button class="tree-toggle-btn" onclick="handleShenavarTreeButtonClick(${s.id})">+</button>`;
+      ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); handleShenavarTreeButtonClick(${s.id})">${isExpanded ? '-' : '+'}</button>`
+      : `<button class="tree-toggle-btn" onclick="event.stopPropagation(); handleShenavarTreeButtonClick(${s.id})">+</button>`;
 
     const indentPx = level * 22;
 
     return `
-      <tr class="tree-level-${Math.min(level, 3)} ${selectedClass}">
+      <tr class="tree-level-${Math.min(level, 3)} ${selectedClass}" onclick="selectShenavarRow(${s.id})" style="cursor:pointer;">
         <td style="text-align:center;vertical-align:middle;">${toggleBtnHtml}</td>
         <td><b>${s.code}</b></td>
         <td style="padding-right:${indentPx + 10}px;">
@@ -1143,8 +1219,8 @@ function renderShenavaarTable() {
         </td>
         <td><span class="badge badge-success">${s.status}</span></td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 8px;">✏️</button>
-          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="deleteShenavar(${s.id})">🗑️</button>
+          <button class="btn btn-outline" style="padding:3px 8px;" onclick="event.stopPropagation(); openEditShenavarRow(${s.id})">✏️ ویرایش</button>
+          <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="event.stopPropagation(); deleteShenavar(${s.id})">🗑️ حذف</button>
         </td>
       </tr>
     `;
@@ -1195,6 +1271,11 @@ function suggestNextShenavarCode(parentId) {
 }
 
 function openAddShenavarRow() {
+  const editIdIn = document.getElementById('newShenEditId');
+  if (editIdIn) editIdIn.value = '';
+  const titleEl = document.getElementById('addShenavarRowTitle');
+  if (titleEl) titleEl.textContent = 'افزودن حساب شناور جدید';
+
   const selectParent = document.getElementById('newShenParentId');
   const inputCode = document.getElementById('newShenCode');
   
@@ -1236,6 +1317,21 @@ function openAddShenavarRow() {
   document.getElementById('newShenName').focus();
 }
 
+function openEditShenavarRow(id) {
+  const s = AppState.shenavars.find(x => x.id === id);
+  if (!s) return;
+  
+  document.getElementById('addShenavarRow').style.display = 'block';
+  document.getElementById('addShenavarRowTitle').innerHTML = `ویرایش حساب شناور <span style="font-size:0.85rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(کد: ${s.code})</span>`;
+  
+  document.getElementById('newShenEditId').value = s.id;
+  document.getElementById('newShenCode').value = s.code;
+  document.getElementById('newShenName').value = s.name;
+  document.getElementById('newShenParentId').value = s.parentId || '';
+  
+  document.getElementById('newShenName').focus();
+}
+
 function resetShenavarParentSelectionForNewAccount(e) {
   if (e) e.preventDefault();
   currentShenavarParentIdForNewAccount = null;
@@ -1243,15 +1339,30 @@ function resetShenavarParentSelectionForNewAccount(e) {
 }
 
 function saveNewShenavar() {
+  const editIdStr = document.getElementById('newShenEditId')?.value;
   const code = document.getElementById('newShenCode')?.value?.trim();
   const name = document.getElementById('newShenName')?.value?.trim();
   const parentVal = document.getElementById('newShenParentId')?.value;
   const parentId = parentVal ? Number(parentVal) : null;
 
   if (!code || !name) { alert('کد و عنوان شناور الزامی است.'); return; }
-  if (AppState.shenavars.find(s => s.code === code)) { alert('این کد شناور قبلاً ثبت شده است.'); return; }
+  
+  if (editIdStr) {
+    // Edit Mode
+    const id = Number(editIdStr);
+    const s = AppState.shenavars.find(x => x.id === id);
+    if (s) {
+      s.code = code;
+      s.name = name;
+      s.parentId = parentId;
+    }
+  } else {
+    // Insert Mode
+    if (AppState.shenavars.find(s => s.code === code)) { alert('این کد شناور قبلاً ثبت شده است.'); return; }
+    AppState.shenavars.push({ id: Date.now(), code, name, parentId, status: 'فعال' });
+  }
 
-  AppState.shenavars.push({ id: Date.now(), code, name, parentId, status: 'فعال' });
+  document.getElementById('newShenEditId').value = '';
   document.getElementById('newShenCode').value = '';
   document.getElementById('newShenName').value = '';
   document.getElementById('addShenavarRow').style.display = 'none';
@@ -1265,11 +1376,11 @@ function saveNewShenavar() {
   currentShenavarParentIdForNewAccount = null;
 
   renderShenavaarTable();
-  alert(`حساب شناور "${code} - ${name}" ثبت شد.`);
+  alert(`حساب شناور "${code} - ${name}" با موفقیت ذخیره شد.`);
 }
 
 function deleteShenavar(id) {
-  if (confirm('حذف این حساب شناور؟')) {
+  if (confirm('آیا از حذف این حساب شناور اطمینان دارید؟')) {
     AppState.shenavars = AppState.shenavars.filter(s => s.id !== id);
     renderShenavaarTable();
   }

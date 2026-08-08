@@ -1215,16 +1215,57 @@
           <!-- Tab 3: حساب‌های شناور -->
           <div id="tab-panel-shenavar" class="hesabdari-tab-panel">
             <div class="card form-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                <div style="font-weight:700;font-size:0.95rem;">🌊 نمایش درختی و ساختار سلسله‌مراتبی حساب‌های شناور</div>
-                <button class="btn btn-outline" onclick="openAddShenavarRow()">+ شناور جدید</button>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                  <div style="font-weight:700;font-size:0.95rem;">🌊 نمایش درختی و ساختار سلسله‌مراتبی حساب‌های شناور</div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <label class="form-label" style="margin-bottom:0;font-size:0.85rem;font-weight:bold;">نمایش شناورها تا سطح:</label>
+                    <select id="shenavarExpandLevel" class="form-select" style="padding:2px 8px;font-size:0.85rem;width:160px;height:auto;" onchange="handleShenavarExpandLevelChange(this.value)">
+                      <option value="root">شناور اصلی (بستن همه)</option>
+                      <option value="all" selected>همه سطوح</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <button class="btn btn-outline" style="border-color:var(--accent-color);color:var(--accent-color);" onclick="clearShenavarSearch()">جستجوی جدید</button>
+                  <button class="btn btn-outline" onclick="openAddShenavarRow()">+ شناور جدید</button>
+                </div>
               </div>
+
+              <!-- Hierarchy Breadcrumb Label -->
+              <div id="shenavarHierarchyLabel" style="color:var(--primary-color);font-weight:bold;font-size:0.85rem;margin-bottom:12px;padding:6px 12px;background:rgba(var(--accent-color-rgb, 120, 150, 200), 0.08);border-radius:6px;border-right:4px solid var(--accent-color);min-height:32px;display:flex;align-items:center;">
+                سطح شناور جاری: - / زنجیره: -
+              </div>
+
               <div class="table-wrapper">
-                <table><thead><tr><th style="width:36px;text-align:center;"></th><th>کد شناور</th><th>عنوان شناور</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-                <tbody id="shenavaarTableBody"></tbody></table>
+                <table>
+                  <thead>
+                    <!-- Search Input Row ABOVE Column Titles -->
+                    <tr class="search-filter-row" style="background:var(--bg-light); border-bottom:1px solid var(--border-color);">
+                      <th style="width:36px;text-align:center;"></th>
+                      <th style="padding:4px;">
+                        <input type="text" id="searchShenavarCode" class="form-input search-input" placeholder="جستجوی کد..." oninput="filterShenavarGrid()" style="width:100%; box-sizing:border-box; padding:4px 8px; font-size:0.8rem; height:auto; border:1px solid var(--border-color); border-radius:4px; font-weight:normal;" />
+                      </th>
+                      <th style="padding:4px;">
+                        <input type="text" id="searchShenavarName" class="form-input search-input" placeholder="جستجوی عنوان..." oninput="filterShenavarGrid()" style="width:100%; box-sizing:border-box; padding:4px 8px; font-size:0.8rem; height:auto; border:1px solid var(--border-color); border-radius:4px; font-weight:normal;" />
+                      </th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                    <tr>
+                      <th style="width:36px;text-align:center;"></th>
+                      <th>کد شناور</th>
+                      <th>عنوان شناور</th>
+                      <th>وضعیت</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="shenavaarTableBody"></tbody>
+                </table>
               </div>
               <div id="addShenavarRow" style="display:none;" class="inline-form">
-                <h4>افزودن حساب شناور جدید</h4>
+                <h4 id="addShenavarRowTitle">افزودن حساب شناور جدید</h4>
+                <input type="hidden" id="newShenEditId" value="" />
                 <div class="form-row">
                   <div class="form-group"><label class="form-label">کد:</label><input type="text" id="newShenCode" class="form-input" /></div>
                   <div class="form-group"><label class="form-label">عنوان:</label><input type="text" id="newShenName" class="form-input" /></div>
