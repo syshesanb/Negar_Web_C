@@ -920,7 +920,7 @@ function renderAccountsTable() {
     const indentPx = level * 22;
 
     return `
-      <tr class="tree-level-${Math.min(level, 3)} ${selectedClass}" onclick="selectAccountRow(${a.id})" style="cursor:pointer;">
+      <tr id="acc-row-${a.id}" class="tree-level-${Math.min(level, 3)} ${selectedClass}" onclick="selectAccountRow(${a.id})" style="cursor:pointer;">
         <td style="text-align:center;vertical-align:middle;">${toggleBtnHtml}</td>
         <td><b>${a.code}</b></td>
         <td style="padding-right:${indentPx + 10}px;">
@@ -1121,6 +1121,7 @@ function saveNewAccount() {
     return;
   }
   
+  let savedId = null;
   if (editIdStr) {
     // Edit Mode
     const id = Number(editIdStr);
@@ -1135,6 +1136,7 @@ function saveNewAccount() {
       acc.type = type;
       acc.nature = nature;
       acc.parentId = parentId;
+      savedId = id;
     }
   } else {
     // Insert Mode
@@ -1142,7 +1144,9 @@ function saveNewAccount() {
       alert(`این کد حساب قبلاً در سطح "${type}" ثبت شده است.`);
       return;
     }
-    AppState.accounts.push({ id: Date.now(), code, name, type, nature, parentId });
+    const newId = Date.now();
+    AppState.accounts.push({ id: newId, code, name, type, nature, parentId });
+    savedId = newId;
   }
 
   document.getElementById('newAccEditId').value = '';
@@ -1150,15 +1154,37 @@ function saveNewAccount() {
   document.getElementById('newAccName').value = '';
   document.getElementById('addAccountRow').style.display = 'none';
   
-  // Auto-expand parent so the new child is visible
-  if (parentId) {
-    expandedAccountIds.add(parentId);
+  if (savedId) {
+    selectedAccountId = savedId;
+    
+    // Auto-expand all ancestors to make sure it's visible in the tree
+    let current = AppState.accounts.find(a => a.id === savedId);
+    while (current && current.parentId !== null) {
+      expandedAccountIds.add(current.parentId);
+      current = AppState.accounts.find(a => a.id === current.parentId);
+    }
   }
   
   // Clear selection after save
   currentParentIdForNewAccount = null;
 
   renderAccountsTable();
+  
+  // Focus & smooth scroll to the newly created/edited account row
+  if (savedId) {
+    setTimeout(() => {
+      const rowEl = document.getElementById(`acc-row-${savedId}`);
+      if (rowEl) {
+        rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        rowEl.style.transition = 'background-color 0.5s ease';
+        rowEl.style.backgroundColor = 'rgba(56,189,248,0.25)';
+        setTimeout(() => {
+          rowEl.style.backgroundColor = '';
+        }, 2000);
+      }
+    }, 150);
+  }
+  
   alert(`حساب "${code} - ${name}" با موفقیت ذخیره شد.`);
 }
 
