@@ -1483,6 +1483,7 @@ function deleteSanad(id) {
 
 function editSanad(id) {
   AppState.tempAttachments = null; // Clear attachments draft
+  initVoucherAttachments(); // Guarantees AppState.sanadAttachments is initialized
   const s = AppState.sanads.find(x => x.id === id);
   if (s && s.bakhshId && s.bakhshId !== getCurrentBakhshId()) {
     const creatorBakhsh = AppState.bakhsh.find(b => b.id === s.bakhshId);
@@ -2728,6 +2729,7 @@ function deleteShenavarInPopup(id) {
 
 function openNewSanadForm() {
   AppState.tempAttachments = null; // Clear attachments draft
+  initVoucherAttachments(); // Guarantees AppState.sanadAttachments is initialized
   const nextNo = AppState.sanads.length > 0 ? Math.max(...AppState.sanads.map(s => Number(s.id))) + 1 : 101;
   showForm('form-sanad2');
   
@@ -2830,8 +2832,8 @@ function getSanadUnsavedChanges() {
       } else if (origLine && curLine) {
         const diffs = [];
         if (curLine.account !== origLine.account) diffs.push(`سرفصل از ${origLine.account} به ${curLine.account}`);
-        if (Number(curLine.debit || 0) !== Number(origLine.debit || 0)) diffs.push(`بدهکار از ${origLine.debit.toLocaleString()} به ${Number(curLine.debit).toLocaleString()}`);
-        if (Number(curLine.credit || 0) !== Number(origLine.credit || 0)) diffs.push(`بستانکار از ${origLine.credit.toLocaleString()} به ${Number(curLine.credit).toLocaleString()}`);
+        if (Number(curLine.debit || 0) !== Number(origLine.debit || 0)) diffs.push(`بدهکار از ${Number(origLine.debit || 0).toLocaleString()} به ${Number(curLine.debit || 0).toLocaleString()}`);
+        if (Number(curLine.credit || 0) !== Number(origLine.credit || 0)) diffs.push(`بستانکار از ${Number(origLine.credit || 0).toLocaleString()} به ${Number(curLine.credit || 0).toLocaleString()}`);
         if (curLine.desc !== origLine.desc) diffs.push(`شرح ردیف`);
         if (curLine.shenavarCode !== origLine.shenavarCode) diffs.push(`کد شناور`);
         
