@@ -593,16 +593,16 @@ function switchHesabdariTab(tabId) {
   panels.forEach(panel => {
     if (panel.id === 'tab-panel-' + tabId) {
       panel.classList.add('active');
-      // accounts panel needs flex for fixed-height layout; others use block
-      panel.style.display = (tabId === 'accounts') ? 'flex' : 'block';
+      // accounts & shenavar panels need flex for fixed-height layout; others use block
+      panel.style.display = (tabId === 'accounts' || tabId === 'shenavar') ? 'flex' : 'block';
     } else {
       panel.classList.remove('active');
       panel.style.display = 'none';
     }
   });
 
-  // Toggle body class so accounts fixed-layout CSS applies only on that tab
-  if (tabId === 'accounts') {
+  // Toggle body class so accounts & shenavar fixed-layout CSS applies only on those tabs
+  if (tabId === 'accounts' || tabId === 'shenavar') {
     document.body.classList.add('accounts-mode');
   } else {
     document.body.classList.remove('accounts-mode');
@@ -1432,6 +1432,7 @@ function renderShenavaarTable() {
         </td>
         <td><span class="badge badge-success">${s.status}</span></td>
         <td>
+          <button class="btn btn-outline" style="padding:3px 8px;color:var(--success-color);border-color:var(--success-color);" onclick="event.stopPropagation(); openSameLevelNewShenavar(${s.id})">➕ جدید</button>
           <button class="btn btn-outline" style="padding:3px 8px;" onclick="event.stopPropagation(); openEditShenavarRow(${s.id})">✏️ ویرایش</button>
           <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="event.stopPropagation(); deleteShenavar(${s.id})">🗑️ حذف</button>
         </td>
@@ -1483,14 +1484,30 @@ function suggestNextShenavarCode(parentId) {
   return 'SH-101';
 }
 
+function openShenavarModal() {
+  const overlay = document.getElementById('shenavarModalOverlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.classList.add('active'), 10);
+  }
+}
+
+function closeShenavarModal() {
+  const overlay = document.getElementById('shenavarModalOverlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+    overlay.style.display = 'none';
+  }
+}
+
 function openAddShenavarRow() {
   const editIdIn = document.getElementById('newShenEditId');
   if (editIdIn) editIdIn.value = '';
-  const titleEl = document.getElementById('addShenavarRowTitle');
-  if (titleEl) titleEl.textContent = 'افزودن حساب شناور جدید';
 
   const selectParent = document.getElementById('newShenParentId');
   const inputCode = document.getElementById('newShenCode');
+  const inputName = document.getElementById('newShenName');
+  if (inputName) inputName.value = '';
   
   let targetParentId = null;
   
@@ -1510,39 +1527,72 @@ function openAddShenavarRow() {
     inputCode.value = suggestNextShenavarCode(targetParentId);
   }
   
-  // Dynamically update the floating account form heading with reset option
-  const heading = document.querySelector('#addShenavarRow h4');
-  if (heading) {
+  const titleEl = document.getElementById('shenavarModalTitle');
+  if (titleEl) {
     if (currentShenavarParentIdForNewAccount !== null) {
       const parentShen = AppState.shenavars.find(s => s.id === currentShenavarParentIdForNewAccount);
       const parentName = parentShen ? parentShen.name : '';
-      heading.innerHTML = `افزودن حساب شناور جدید <span style="font-size:0.85rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(به عنوان فرزندِ "${parentName}")</span> 
-        <button class="btn btn-outline" style="padding:2px 8px;font-size:0.75rem;margin-right:12px;color:var(--text-muted);border-color:rgba(255,255,255,0.15);" onclick="resetShenavarParentSelectionForNewAccount(event)">🔄 ایجاد به عنوان شناور اصلی</button>`;
+      titleEl.innerHTML = `➕ افزودن حساب شناور فرزند <span style="color:var(--primary-color);">"${parentName}"</span>`;
     } else {
-      heading.innerHTML = `افزودن حساب شناور جدید <span style="font-size:0.85rem;color:var(--text-muted);font-weight:normal;margin-right:6px;">(به عنوان شناور اصلی)</span>`;
+      titleEl.textContent = '➕ افزودن حساب شناور جدید (شناور اصلی)';
     }
   }
 
-  // Highlight the table to show current selection
+  renderShenavaarTable();
+  openShenavarModal();
+  setTimeout(() => { if (document.getElementById('newShenName')) document.getElementById('newShenName').focus(); }, 200);
+}
+
+function openSameLevelNewShenavar(id) {
+  const s = AppState.shenavars.find(a => a.id === id);
+  if (!s) return;
+
+  currentShenavarParentIdForNewAccount = s.parentId;
+
+  const editIdIn = document.getElementById('newShenEditId');
+  if (editIdIn) editIdIn.value = '';
+
+  const selectParent = document.getElementById('newShenParentId');
+  const inputCode = document.getElementById('newShenCode');
+  const inputName = document.getElementById('newShenName');
+  if (inputName) inputName.value = '';
+
+  if (selectParent) {
+    selectParent.innerHTML = `<option value="${s.parentId || ''}">${s.parentId ? s.parentId : 'بدون والد'}</option>`;
+    selectParent.value = s.parentId || '';
+  }
+  if (inputCode) {
+    inputCode.value = suggestNextShenavarCode(s.parentId);
+  }
+
+  const titleEl = document.getElementById('shenavarModalTitle');
+  if (titleEl) {
+    const parentShen = s.parentId ? AppState.shenavars.find(a => a.id === s.parentId) : null;
+    const parentInfo = parentShen ? ` (فرزند <span style="color:var(--primary-color);">"${parentShen.name}"</span>)` : ' (شناور اصلی)';
+    titleEl.innerHTML = `➕ افزودن حساب شناور جدید همتا ${parentInfo}`;
+  }
+
+  selectedShenavarId = id;
   renderShenavaarTable();
 
-  document.getElementById('addShenavarRow').style.display = 'block';
-  document.getElementById('newShenName').focus();
+  openShenavarModal();
+  setTimeout(() => { if (inputCode) inputCode.focus(); }, 200);
 }
 
 function openEditShenavarRow(id) {
   const s = AppState.shenavars.find(x => x.id === id);
   if (!s) return;
   
-  document.getElementById('addShenavarRow').style.display = 'block';
-  document.getElementById('addShenavarRowTitle').innerHTML = `ویرایش حساب شناور <span style="font-size:0.85rem;color:var(--accent-color);font-weight:normal;margin-right:6px;">(کد: ${s.code})</span>`;
+  const titleEl = document.getElementById('shenavarModalTitle');
+  if (titleEl) titleEl.innerHTML = `✏️ ویرایش حساب شناور <span style="color:var(--accent-color);">(کد: ${s.code})</span>`;
   
   document.getElementById('newShenEditId').value = s.id;
   document.getElementById('newShenCode').value = s.code;
   document.getElementById('newShenName').value = s.name;
   document.getElementById('newShenParentId').value = s.parentId || '';
   
-  document.getElementById('newShenName').focus();
+  openShenavarModal();
+  setTimeout(() => { const n = document.getElementById('newShenName'); if (n) n.focus(); }, 200);
 }
 
 function resetShenavarParentSelectionForNewAccount(e) {
@@ -1578,7 +1628,7 @@ function saveNewShenavar() {
   document.getElementById('newShenEditId').value = '';
   document.getElementById('newShenCode').value = '';
   document.getElementById('newShenName').value = '';
-  document.getElementById('addShenavarRow').style.display = 'none';
+  closeShenavarModal();
   
   // Auto-expand parent so the new child is visible
   if (parentId) {
