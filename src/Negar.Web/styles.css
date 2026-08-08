@@ -853,7 +853,8 @@ tr:hover td { background: var(--accent-light); }
   padding: 20px;
 }
 .hesabdari-tab-panel.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Treeview Datagrid Simulation ── */
@@ -973,4 +974,60 @@ tr.selected-parent-row {
   color: #0f172a !important;
   border-color: var(--accent-color) !important;
   font-weight: bold !important;
+}
+
+
+/* ======================================================
+   ACCOUNTS PAGE - FIXED LAYOUT: no page scroll,
+   only datagrid body scrolls; header rows are sticky
+====================================================== */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+#formsArea {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 0;
+}
+#form-hesabdari-main {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#form-hesabdari-main .hesabdari-subtabs-bar {
+  flex-shrink: 0;
+}
+#form-hesabdari-main .hesabdari-tab-panel.active {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#tab-panel-accounts > .card.form-card {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+#tab-panel-accounts .table-wrapper {
+  flex: 1 1 0;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 0;
+}
+#tab-panel-accounts .table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg-secondary);
+  box-shadow: 0 1px 0 var(--border-color);
+}
+#tab-panel-accounts .table-wrapper thead tr:nth-child(2) th {
+  top: 42px;
+  z-index: 4;
 }

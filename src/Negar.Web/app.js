@@ -488,7 +488,7 @@ function showForm(formId) {
 
   // Show forms area
   const formsArea = document.getElementById('formsArea');
-  formsArea.style.display = 'block';
+  formsArea.style.display = 'flex';
 
   // Hide back-bar when in voucher editor (form-sanad2)
   const backBar = document.querySelector('.back-bar');
