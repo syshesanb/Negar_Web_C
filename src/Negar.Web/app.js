@@ -590,12 +590,20 @@ function switchHesabdariTab(tabId) {
   panels.forEach(panel => {
     if (panel.id === 'tab-panel-' + tabId) {
       panel.classList.add('active');
-      panel.style.display = 'block';
+      // accounts panel needs flex for fixed-height layout; others use block
+      panel.style.display = (tabId === 'accounts') ? 'flex' : 'block';
     } else {
       panel.classList.remove('active');
       panel.style.display = 'none';
     }
   });
+
+  // Toggle body class so accounts fixed-layout CSS applies only on that tab
+  if (tabId === 'accounts') {
+    document.body.classList.add('accounts-mode');
+  } else {
+    document.body.classList.remove('accounts-mode');
+  }
 
   // 3. Render dynamic content for specific tab
   if (tabId === 'accounts') renderAccountsTable();
