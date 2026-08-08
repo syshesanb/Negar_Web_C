@@ -833,27 +833,10 @@ function isAccountVisibleWithFilter(a, sortedAccounts) {
     return isAccountVisible(a);
   }
   
-  const matchesSearch = (acc) => {
-    const codeMatch = !accountSearchCode || (acc.code && acc.code.toLowerCase().includes(accountSearchCode.toLowerCase()));
-    const nameMatch = !accountSearchName || (acc.name && acc.name.toLowerCase().includes(accountSearchName.toLowerCase()));
-    return codeMatch && nameMatch;
-  };
-  
-  if (matchesSearch(a)) return true;
-  
-  const hasMatchingDescendant = (parent) => {
-    const children = sortedAccounts.filter(child => child.parentId === parent.id);
-    for (const child of children) {
-      if (matchesSearch(child) || hasMatchingDescendant(child)) {
-        return true;
-      }
-    }
-    return false;
-  };
-  
-  if (hasMatchingDescendant(a)) return true;
-  
-  return false;
+  // Match criteria: code must contain search code AND name must contain search name exactly as substring
+  const codeMatch = !accountSearchCode || (a.code && a.code.toLowerCase().includes(accountSearchCode.toLowerCase()));
+  const nameMatch = !accountSearchName || (a.name && a.name.toLowerCase().includes(accountSearchName.toLowerCase()));
+  return codeMatch && nameMatch;
 }
 
 function renderAccountsTable() {

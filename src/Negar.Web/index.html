@@ -1158,6 +1158,19 @@
                 سطح سرفصل جاری: - / زنجیره: -
               </div>
 
+              <!-- Search Filter Bar above the table -->
+              <div style="display:flex;gap:12px;margin-bottom:12px;background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;border:1px solid var(--border-color);align-items:center;flex-wrap:wrap;">
+                <div style="font-weight:bold;font-size:0.85rem;color:var(--accent-color);display:flex;align-items:center;gap:4px;">
+                  🔎 جستجوی سرفصل:
+                </div>
+                <div style="width:180px;">
+                  <input type="text" id="searchAccountCode" class="form-input search-input" placeholder="جستجوی کد..." oninput="filterAccountsGrid()" style="width:100%;padding:6px 12px;font-size:0.8rem;height:auto;border:1px solid var(--border-color);border-radius:4px;" />
+                </div>
+                <div style="width:280px;">
+                  <input type="text" id="searchAccountName" class="form-input search-input" placeholder="جستجوی عنوان..." oninput="filterAccountsGrid()" style="width:100%;padding:6px 12px;font-size:0.8rem;height:auto;border:1px solid var(--border-color);border-radius:4px;" />
+                </div>
+              </div>
+
               <div class="table-wrapper">
                 <table>
                   <thead>
@@ -1169,20 +1182,6 @@
                       <th>ماهیت</th>
                       <th>وضعیت</th>
                       <th>عملیات</th>
-                    </tr>
-                    <!-- Search Input Row -->
-                    <tr class="search-filter-row" style="background:var(--bg-light);">
-                      <th></th>
-                      <th>
-                        <input type="text" id="searchAccountCode" class="form-input search-input" placeholder="جستجوی کد..." oninput="filterAccountsGrid()" style="width:100%;padding:4px 8px;font-size:0.8rem;height:auto;border:1px solid var(--border-color);border-radius:4px;" />
-                      </th>
-                      <th>
-                        <input type="text" id="searchAccountName" class="form-input search-input" placeholder="جستجوی عنوان..." oninput="filterAccountsGrid()" style="width:100%;padding:4px 8px;font-size:0.8rem;height:auto;border:1px solid var(--border-color);border-radius:4px;" />
-                      </th>
-                      <th></th>
-                      <th></th>
-                      <th></th>
-                      <th></th>
                     </tr>
                   </thead>
                   <tbody id="accountsTableBody"></tbody>
