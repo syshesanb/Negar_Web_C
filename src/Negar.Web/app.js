@@ -1497,6 +1497,17 @@ function editSanad(id) {
     { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
     { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
   ];
+
+  // Store original state for edited voucher
+  originalSanadState = {
+    isNew: false,
+    id: id,
+    date: s.date,
+    desc: s.desc,
+    lines: JSON.parse(JSON.stringify(AppState.sanadLines)),
+    attachments: JSON.parse(JSON.stringify(AppState.sanadAttachments[id] || []))
+  };
+
   renderSanadEditorLines();
 }
 
@@ -1687,6 +1698,7 @@ function copyActiveVoucher() {
 
 // Sanad 2 (editor)
 let focusedLineIndex = 0;
+let originalSanadState = null;
 
 function updateFocusedPaths(i) {
   focusedLineIndex = i;
@@ -2732,11 +2744,131 @@ function openNewSanadForm() {
     { account: '110101', shenavarCode: '', desc: 'توضیحات ردیف ۱', debit: 0, credit: 0, txNo: '', txDate: '' },
     { account: '210101', shenavarCode: '', desc: 'توضیحات ردیف ۲', debit: 0, credit: 0, txNo: '', txDate: '' }
   ];
+
+  // Store original state for new voucher
+  originalSanadState = {
+    isNew: true,
+    id: nextNo,
+    date: todayStr,
+    desc: '',
+    lines: JSON.parse(JSON.stringify(AppState.sanadLines)),
+    attachments: []
+  };
+
   renderSanadEditorLines();
 }
 
+function getSanadUnsavedChanges() {
+  if (!originalSanadState) return null;
+  
+  const currentDate = document.getElementById('sanadDateInput')?.value || '';
+  const currentDesc = document.getElementById('sanadDescInput')?.value || '';
+  const currentLines = AppState.sanadLines || [];
+  const currentAttachments = AppState.tempAttachments || [];
+  
+  const orig = originalSanadState;
+  const changes = [];
+  
+  if (orig.isNew) {
+    const dateChanged = (currentDate !== orig.date);
+    const descEntered = (currentDesc.trim() !== '');
+    const linesLengthChanged = (currentLines.length !== orig.lines.length);
+    
+    let linesModified = false;
+    const lineDetails = [];
+    
+    currentLines.forEach((line, i) => {
+      const origLine = orig.lines[i];
+      if (!origLine) {
+        lineDetails.push(`ردیف جدید ${i + 1} ایجاد شده است.`);
+        linesModified = true;
+      } else {
+        const accChanged = (line.account !== origLine.account);
+        const descChanged = (line.desc && line.desc !== origLine.desc && line.desc !== 'توضیحات ردیف ' + (i+1));
+        const debitChanged = (Number(line.debit || 0) !== Number(origLine.debit || 0));
+        const creditChanged = (Number(line.credit || 0) !== Number(origLine.credit || 0));
+        const txNoChanged = (line.txNo && line.txNo !== origLine.txNo);
+        const txDateChanged = (line.txDate && line.txDate !== origLine.txDate);
+        const shenavarChanged = (line.shenavarCode && line.shenavarCode !== origLine.shenavarCode);
+        
+        if (accChanged || descChanged || debitChanged || creditChanged || txNoChanged || txDateChanged || shenavarChanged) {
+          lineDetails.push(`در ردیف ${i + 1} اطلاعات وارد شده است (سرفصل: ${line.account}، بدهکار: ${line.debit}، بستانکار: ${line.credit}).`);
+          linesModified = true;
+        }
+      }
+    });
+    
+    const hasAttachments = (currentAttachments.length > 0);
+    
+    if (dateChanged || descEntered || linesLengthChanged || linesModified || hasAttachments) {
+      if (dateChanged) changes.push(`- تاریخ سند به "${currentDate}" تغییر یافته است.`);
+      if (descEntered) changes.push(`- شرح سند به "${currentDesc}" تغییر یافته است.`);
+      if (hasAttachments) changes.push(`- ضمائم جدید به سند اضافه شده است.`);
+      lineDetails.forEach(det => changes.push(`- ${det}`));
+    }
+  } else {
+    if (currentDate !== orig.date) {
+      changes.push(`- تاریخ سند از "${orig.date}" به "${currentDate}" تغییر یافته است.`);
+    }
+    if (currentDesc !== orig.desc) {
+      changes.push(`- شرح سند از "${orig.desc}" به "${currentDesc}" تغییر یافته است.`);
+    }
+    
+    const maxLen = Math.max(orig.lines.length, currentLines.length);
+    for (let i = 0; i < maxLen; i++) {
+      const origLine = orig.lines[i];
+      const curLine = currentLines[i];
+      
+      if (origLine && !curLine) {
+        changes.push(`- ردیف شماره ${i + 1} سند حذف شده است.`);
+      } else if (!origLine && curLine) {
+        changes.push(`- ردیف شماره ${i + 1} جدید به سند اضافه شده است.`);
+      } else if (origLine && curLine) {
+        const diffs = [];
+        if (curLine.account !== origLine.account) diffs.push(`سرفصل از ${origLine.account} به ${curLine.account}`);
+        if (Number(curLine.debit || 0) !== Number(origLine.debit || 0)) diffs.push(`بدهکار از ${origLine.debit.toLocaleString()} به ${Number(curLine.debit).toLocaleString()}`);
+        if (Number(curLine.credit || 0) !== Number(origLine.credit || 0)) diffs.push(`بستانکار از ${origLine.credit.toLocaleString()} به ${Number(curLine.credit).toLocaleString()}`);
+        if (curLine.desc !== origLine.desc) diffs.push(`شرح ردیف`);
+        if (curLine.shenavarCode !== origLine.shenavarCode) diffs.push(`کد شناور`);
+        
+        if (diffs.length > 0) {
+          changes.push(`- ردیف شماره ${i + 1} تغییر کرده است (${diffs.join('، ')}).`);
+        }
+      }
+    }
+    
+    const origAttsStr = JSON.stringify(orig.attachments);
+    const curAttsStr = JSON.stringify(currentAttachments);
+    if (origAttsStr !== curAttsStr) {
+      changes.push(`- ضمائم یا عکس‌های پیوست سند تغییر کرده است.`);
+    }
+  }
+  
+  return changes;
+}
+
 function closeSanadEditor() {
+  const changes = getSanadUnsavedChanges();
+  if (changes && changes.length > 0) {
+    const isNew = originalSanadState.isNew;
+    let msg = '';
+    if (isNew) {
+      msg = `⚠️ اطلاعات زیر در سند جدید وارد شده و در صورت خروج بدون ذخیره، از بین خواهند رفت:\n\n` + 
+            changes.join('\n') + 
+            `\n\nآیا از خروج بدون ذخیره اطمینان دارید؟`;
+    } else {
+      msg = `⚠️ تغییرات زیر در سند شماره #${originalSanadState.id} اعمال شده ولی ذخیره نشده‌اند و در صورت خروج، لغو خواهند شد:\n\n` + 
+            changes.join('\n') + 
+            `\n\nآیا از خروج بدون ذخیره و لغو تغییرات اطمینان دارید؟`;
+    }
+    
+    if (!confirm(msg)) {
+      return; // cancel exit
+    }
+  }
+
   AppState.tempAttachments = null; // Discard attachments draft
+  originalSanadState = null;
   showForm('form-hesabdari-main');
   switchHesabdariTab('sanad');
 }
@@ -2787,6 +2919,7 @@ function saveSanadEntry() {
     AppState.tempAttachments = null;
   }
 
+  originalSanadState = null; // Clear original state after save
   AppState.sanadLines = [{ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' }];
   closeSanadEditor();
 }
@@ -6039,3 +6172,16 @@ function deleteActiveAttachment() {
     renderAttachmentsGrid();
   }
 }
+
+
+// Unsaved changes window listener
+window.addEventListener('beforeunload', function(e) {
+  if (AppState.currentForm === 'form-sanad2' || AppState.currentForm === 'form-sanad-attachments') {
+    const changes = getSanadUnsavedChanges();
+    if (changes && changes.length > 0) {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+  }
+});
