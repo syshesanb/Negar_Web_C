@@ -1406,6 +1406,29 @@ function selectSanadRow(id) {
   renderSanadListTable();
 }
 
+function getJalaliDayOfYear(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return 1;
+  const parts = dateStr.split('/');
+  if (parts.length < 3) return 1;
+  
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const day = parseInt(parts[2], 10);
+  
+  if (isNaN(year) || isNaN(month) || isNaN(day)) return 1;
+  
+  let dayOfYear = 0;
+  for (let m = 1; m < month; m++) {
+    if (m <= 6) {
+      dayOfYear += 31;
+    } else {
+      dayOfYear += 30;
+    }
+  }
+  dayOfYear += day;
+  return dayOfYear;
+}
+
 function renderSanadListTable() {
   const tbody = document.getElementById('sanadListTable');
   if (!tbody) return;
@@ -1414,10 +1437,15 @@ function renderSanadListTable() {
     const selectedClass = isSelected ? 'selected-parent-row' : '';
     const bakhshObj = AppState.bakhsh.find(b => b.id === s.bakhshId);
     const bakhshName = bakhshObj ? bakhshObj.name : 'حسابداری';
+    
+    if (!s.dayOfYear) {
+      s.dayOfYear = getJalaliDayOfYear(s.date);
+    }
 
     return `
       <tr class="${selectedClass}" onclick="selectSanadRow(${s.id})" style="cursor:pointer;">
         <td><b>#${s.id}</b></td>
+        <td style="text-align:center;"><b>${s.dayOfYear}</b></td>
         <td>${s.date}</td>
         <td>${s.desc}</td>
         <td>${s.debit.toLocaleString()}</td>
@@ -2730,7 +2758,8 @@ function saveSanadEntry() {
       date,
       desc,
       debit: td,
-      credit: tc
+      credit: tc,
+      dayOfYear: getJalaliDayOfYear(date)
     };
     alert(`سند شماره ${no} با موفقیت ویرایش شد.`);
   } else {
@@ -2741,7 +2770,8 @@ function saveSanadEntry() {
       debit: td, 
       credit: tc, 
       status: 'موقت', 
-      bakhshId: getCurrentBakhshId() 
+      bakhshId: getCurrentBakhshId(),
+      dayOfYear: getJalaliDayOfYear(date)
     });
     alert(`سند شماره ${no} با موفقیت ثبت شد.`);
   }
