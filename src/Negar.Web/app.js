@@ -931,6 +931,7 @@ function renderAccountsTable() {
         <td>${a.nature}</td>
         <td><span class="badge badge-success">فعال</span></td>
         <td>
+          <button class="btn btn-outline" style="padding:3px 8px;color:var(--success-color);border-color:var(--success-color);" onclick="event.stopPropagation(); openSameLevelNewAccount(${a.id})">➕ جدید</button>
           <button class="btn btn-outline" style="padding:3px 8px;" onclick="event.stopPropagation(); openEditAccountRow(${a.id})">✏️ ویرایش</button>
           <button class="btn btn-outline" style="padding:3px 8px;color:red;" onclick="event.stopPropagation(); deleteAccount(${a.id})">🗑️ حذف</button>
         </td>
@@ -1077,6 +1078,45 @@ function openEditAccountRow(id) {
   document.getElementById('newAccParentId').value = acc.parentId || '';
   
   document.getElementById('newAccName').focus();
+}
+
+function openSameLevelNewAccount(id) {
+  const acc = AppState.accounts.find(a => a.id === id);
+  if (!acc) return;
+
+  // Clear any active edit state and set parent to sibling's parent
+  currentParentIdForNewAccount = acc.parentId; // same parent = same level
+
+  const editIdIn = document.getElementById('newAccEditId');
+  if (editIdIn) editIdIn.value = '';
+
+  const selectType = document.getElementById('newAccType');
+  const selectParent = document.getElementById('newAccParentId');
+  const inputCode = document.getElementById('newAccCode');
+  const inputName = document.getElementById('newAccName');
+  if (inputName) inputName.value = '';
+
+  if (selectType) selectType.value = acc.type;
+  if (selectParent) {
+    selectParent.innerHTML = `<option value="${acc.parentId || ''}">${acc.parentId ? acc.parentId : 'بدون والد'}</option>`;
+    selectParent.value = acc.parentId || '';
+  }
+  if (inputCode) {
+    inputCode.value = suggestNextAccountCode(acc.type, acc.parentId);
+  }
+
+  const heading = document.querySelector('#addAccountRow h4');
+  if (heading) {
+    const parentAcc = acc.parentId ? AppState.accounts.find(a => a.id === acc.parentId) : null;
+    const parentInfo = parentAcc ? ` (فرزند "${parentAcc.name}")` : ' (حساب اصلی/گروه)';
+    heading.innerHTML = `افزودن حساب جدید در سطح <span style="color:var(--accent-color);font-weight:bold;">${acc.type}</span>${parentInfo}`;
+  }
+
+  selectedAccountId = id;
+  renderAccountsTable();
+
+  document.getElementById('addAccountRow').style.display = 'block';
+  if (inputCode) inputCode.focus();
 }
 
 function resetParentSelectionForNewAccount(e) {
