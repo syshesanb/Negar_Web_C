@@ -2840,6 +2840,10 @@ function getSanadUnsavedChanges() {
           lineDetails.push(`⚠️ فرمت تاریخ تراکنش در ردیف ${i + 1} نامعتبر است (${line.txDate}).`);
           linesModified = true;
         }
+        if (line.txDate && isValidJalaliDate(line.txDate) && currentDate && isValidJalaliDate(currentDate) && line.txDate > currentDate) {
+          lineDetails.push(`⚠️ تاریخ تراکنش در ردیف ${i + 1} (${line.txDate}) بزرگتر از تاریخ سند (${currentDate}) است.`);
+          linesModified = true;
+        }
       }
     });
     
@@ -2891,6 +2895,9 @@ function getSanadUnsavedChanges() {
         }
         if (curLine.txDate && !isValidJalaliDate(curLine.txDate)) {
           diffs.push(`⚠️ فرمت تاریخ تراکنش نامعتبر است (${curLine.txDate})`);
+        }
+        if (curLine.txDate && isValidJalaliDate(curLine.txDate) && currentDate && isValidJalaliDate(currentDate) && curLine.txDate > currentDate) {
+          diffs.push(`⚠️ تاریخ تراکنش (${curLine.txDate}) بزرگتر از تاریخ سند (${currentDate}) است`);
         }
         
         if (diffs.length > 0) {
@@ -2955,6 +2962,10 @@ function saveSanadEntry() {
     const line = AppState.sanadLines[i];
     if (line.txDate && !isValidJalaliDate(line.txDate)) {
       alert(`خطا: فرمت تاریخ تراکنش در ردیف ${i + 1} نامعتبر است (${line.txDate}). تاریخ باید به فرمت معتبر yyyy/mm/dd وارد شود.`);
+      return;
+    }
+    if (line.txDate && isValidJalaliDate(line.txDate) && line.txDate > date) {
+      alert(`خطا: تاریخ تراکنش در ردیف ${i + 1} (${line.txDate}) نمی‌تواند از تاریخ سند (${date}) بزرگتر باشد.`);
       return;
     }
   }
