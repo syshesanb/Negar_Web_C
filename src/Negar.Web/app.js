@@ -1478,6 +1478,7 @@ function deleteSanad(id) {
 }
 
 function editSanad(id) {
+  AppState.tempAttachments = null; // Clear attachments draft
   const s = AppState.sanads.find(x => x.id === id);
   if (s && s.bakhshId && s.bakhshId !== getCurrentBakhshId()) {
     const creatorBakhsh = AppState.bakhsh.find(b => b.id === s.bakhshId);
@@ -2710,6 +2711,7 @@ function deleteShenavarInPopup(id) {
 }
 
 function openNewSanadForm() {
+  AppState.tempAttachments = null; // Clear attachments draft
   const nextNo = AppState.sanads.length > 0 ? Math.max(...AppState.sanads.map(s => Number(s.id))) + 1 : 101;
   showForm('form-sanad2');
   
@@ -2734,6 +2736,7 @@ function openNewSanadForm() {
 }
 
 function closeSanadEditor() {
+  AppState.tempAttachments = null; // Discard attachments draft
   showForm('form-hesabdari-main');
   switchHesabdariTab('sanad');
 }
@@ -2776,6 +2779,12 @@ function saveSanadEntry() {
       dayOfYear: getJalaliDayOfYear(date)
     });
     alert(`سند شماره ${no} با موفقیت ثبت شد.`);
+  }
+
+  // COMMIT ATTACHMENTS TRANSACTION
+  if (AppState.tempAttachments) {
+    AppState.sanadAttachments[no] = AppState.tempAttachments;
+    AppState.tempAttachments = null;
   }
 
   AppState.sanadLines = [{ account: '110101', shenavarCode: '', desc: '', debit: 0, credit: 0, txNo: '', txDate: '' }];
@@ -5736,6 +5745,12 @@ function openSanadAttachments() {
   
   initVoucherAttachments();
   
+  // Clone existing attachments to tempAttachments for this editing session if not already initialized
+  if (!AppState.tempAttachments) {
+    const existing = AppState.sanadAttachments[selectedSanadId] || [];
+    AppState.tempAttachments = JSON.parse(JSON.stringify(existing));
+  }
+  
   // Open Form
   showForm('form-sanad-attachments');
   
@@ -5762,7 +5777,7 @@ function renderAttachmentsGrid() {
   const tbody = document.getElementById('attachGridTableBody');
   if (!tbody) return;
   
-  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const attachments = AppState.tempAttachments || [];
   
   // Render general voucher attachments row
   const generalItem = attachments.find(x => x.rowNo === 0);
@@ -5812,14 +5827,14 @@ function handleAttachmentUpload(event) {
   
   const targetRowNo = Number(document.getElementById('attachTargetSelect')?.value || 0);
   
-  if (!AppState.sanadAttachments[selectedSanadId]) {
-    AppState.sanadAttachments[selectedSanadId] = [];
+  if (!AppState.tempAttachments) {
+    AppState.tempAttachments = [];
   }
   
-  let rowItem = AppState.sanadAttachments[selectedSanadId].find(x => x.rowNo === targetRowNo);
+  let rowItem = AppState.tempAttachments.find(x => x.rowNo === targetRowNo);
   if (!rowItem) {
     rowItem = { rowNo: targetRowNo, images: [] };
-    AppState.sanadAttachments[selectedSanadId].push(rowItem);
+    AppState.tempAttachments.push(rowItem);
   }
   
   let processedCount = 0;
@@ -5842,14 +5857,14 @@ function handleAttachmentUpload(event) {
 function simulateScannerInput() {
   const targetRowNo = Number(document.getElementById('attachTargetSelect')?.value || 0);
   
-  if (!AppState.sanadAttachments[selectedSanadId]) {
-    AppState.sanadAttachments[selectedSanadId] = [];
+  if (!AppState.tempAttachments) {
+    AppState.tempAttachments = [];
   }
   
-  let rowItem = AppState.sanadAttachments[selectedSanadId].find(x => x.rowNo === targetRowNo);
+  let rowItem = AppState.tempAttachments.find(x => x.rowNo === targetRowNo);
   if (!rowItem) {
     rowItem = { rowNo: targetRowNo, images: [] };
-    AppState.sanadAttachments[selectedSanadId].push(rowItem);
+    AppState.tempAttachments.push(rowItem);
   }
   
   const canvas = document.createElement('canvas');
@@ -5919,7 +5934,7 @@ let viewerActiveRowNo = 0;
 let viewerActiveIndex = 0;
 
 function openRowAttachmentsViewer(rowNo) {
-  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const attachments = AppState.tempAttachments || [];
   const rowItem = attachments.find(x => x.rowNo === rowNo);
   
   if (!rowItem || rowItem.images.length === 0) {
@@ -5940,7 +5955,7 @@ function closeAttachmentsViewer() {
 }
 
 function showActiveAttachmentInViewer() {
-  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const attachments = AppState.tempAttachments || [];
   const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
   if (!rowItem || rowItem.images.length === 0) {
     closeAttachmentsViewer();
@@ -5958,7 +5973,7 @@ function showActiveAttachmentInViewer() {
 }
 
 function showNextAttachment() {
-  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const attachments = AppState.tempAttachments || [];
   const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
   if (!rowItem) return;
   
@@ -5971,7 +5986,7 @@ function showNextAttachment() {
 }
 
 function showPrevAttachment() {
-  const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+  const attachments = AppState.tempAttachments || [];
   const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
   if (!rowItem) return;
   
@@ -6010,14 +6025,14 @@ function printActiveAttachment() {
 
 function deleteActiveAttachment() {
   if (confirm('آیا از حذف این ضمیمه اطمینان دارید؟')) {
-    const attachments = AppState.sanadAttachments[selectedSanadId] || [];
+    const attachments = AppState.tempAttachments || [];
     const rowItem = attachments.find(x => x.rowNo === viewerActiveRowNo);
     if (!rowItem) return;
     
     rowItem.images.splice(viewerActiveIndex, 1);
     
     if (rowItem.images.length === 0) {
-      AppState.sanadAttachments[selectedSanadId] = attachments.filter(x => x.rowNo !== viewerActiveRowNo);
+      AppState.tempAttachments = attachments.filter(x => x.rowNo !== viewerActiveRowNo);
     }
     
     showActiveAttachmentInViewer();
