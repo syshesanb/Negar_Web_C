@@ -6310,19 +6310,6 @@ function openSanadAttachments() {
   // Update header label
   document.getElementById('attachSanadIdLabel').textContent = selectedSanadId;
   
-  // Update select target row options
-  const select = document.getElementById('attachTargetSelect');
-  if (select) {
-    let options = '<option value="0">کل سند (عمومی)</option>';
-    AppState.sanadLines.forEach((line, i) => {
-      const acc = AppState.accounts.find(a => a.code === line.account);
-      const accName = acc ? acc.name : '';
-      options += `<option value="${i + 1}">ردیف ${i + 1} (${line.account} - ${accName})</option>`;
-    });
-    select.innerHTML = options;
-    select.value = "0";
-  }
-  
   renderAttachmentsGrid();
 }
 
@@ -6342,6 +6329,12 @@ function renderAttachmentsGrid() {
       <td>-</td>
       <td style="text-align:right;"><b>عمومی / فاقد سرفصل خاص</b></td>
       <td style="text-align:right;">ضمائم متفرقه و عمومی مربوط به کل سند</td>
+      <td>
+        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color);" onclick="triggerRowFileUpload(0)">📂 انتخاب</button>
+      </td>
+      <td>
+        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308;" onclick="simulateScannerInputForRow(0)">🖨️ اسکن</button>
+      </td>
       <td><span class="badge ${generalCount > 0 ? 'badge-primary' : 'badge-secondary'}">${generalCount} تصویر</span></td>
       <td>
         <button class="btn btn-outline" style="padding:3px 8px;" onclick="openRowAttachmentsViewer(0)">👁️ نمایش ضمائم</button>
@@ -6363,6 +6356,12 @@ function renderAttachmentsGrid() {
         <td><b>${line.account}</b></td>
         <td style="text-align:right;"><b>${accName}</b></td>
         <td style="text-align:right;">${line.desc || '-'}</td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color);" onclick="triggerRowFileUpload(${rowNo})">📂 انتخاب</button>
+        </td>
+        <td>
+          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308;" onclick="simulateScannerInputForRow(${rowNo})">🖨️ اسکن</button>
+        </td>
         <td><span class="badge ${count > 0 ? 'badge-primary' : 'badge-secondary'}">${count} تصویر</span></td>
         <td>
           <button class="btn btn-outline" style="padding:3px 8px;" onclick="openRowAttachmentsViewer(${rowNo})">👁️ نمایش ضمائم</button>
@@ -6374,11 +6373,22 @@ function renderAttachmentsGrid() {
   tbody.innerHTML = rowsHtml;
 }
 
-function handleAttachmentUpload(event) {
+let activeRowNoForUpload = 0;
+
+function triggerRowFileUpload(rowNo) {
+  activeRowNoForUpload = rowNo;
+  const fileIn = document.getElementById('rowFileInput');
+  if (fileIn) {
+    fileIn.value = '';
+    fileIn.click();
+  }
+}
+
+function handleRowAttachmentUpload(event) {
   const files = event.target.files;
   if (!files || files.length === 0) return;
   
-  const targetRowNo = Number(document.getElementById('attachTargetSelect')?.value || 0);
+  const targetRowNo = activeRowNoForUpload;
   
   if (!AppState.tempAttachments) {
     AppState.tempAttachments = [];
@@ -6398,7 +6408,8 @@ function handleAttachmentUpload(event) {
       processedCount++;
       if (processedCount === files.length) {
         renderAttachmentsGrid();
-        alert(`${files.length} تصویر با موفقیت به عنوان ضمیمه افزوده شد.`);
+        const targetLabel = targetRowNo === 0 ? 'کل سند' : `ردیف ${targetRowNo}`;
+        alert(`${files.length} تصویر با موفقیت برای (${targetLabel}) افزوده شد.`);
       }
     };
     reader.readAsDataURL(files[i]);
@@ -6407,9 +6418,7 @@ function handleAttachmentUpload(event) {
   event.target.value = '';
 }
 
-function simulateScannerInput() {
-  const targetRowNo = Number(document.getElementById('attachTargetSelect')?.value || 0);
-  
+function simulateScannerInputForRow(targetRowNo) {
   if (!AppState.tempAttachments) {
     AppState.tempAttachments = [];
   }
@@ -6478,9 +6487,10 @@ function simulateScannerInput() {
   
   const dataUrl = canvas.toDataURL('image/png');
   rowItem.images.push(dataUrl);
-  
+
   renderAttachmentsGrid();
-  alert(`یک مدرک جدید با موفقیت توسط اسکنر شبیه‌سازی و به عنوان ضمیمه ذخیره گردید.`);
+  const labelText = targetRowNo === 0 ? 'کل سند' : `ردیف ${targetRowNo}`;
+  alert(`تصویر اسکن شده با موفقیت به عنوان ضمیمه (${labelText}) افزوده شد.`);
 }
 
 let viewerActiveRowNo = 0;

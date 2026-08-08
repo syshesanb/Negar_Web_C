@@ -1993,25 +1993,12 @@
               <button class="btn btn-outline" onclick="showForm('form-sanad2')" style="font-size:0.8rem; padding:6px 15px; font-weight:bold;">🔙 بازگشت به سند</button>
             </div>
 
-            <!-- Upload Panel -->
-            <div style="background:rgba(255,255,255,0.03); border:1px dashed var(--border-color); padding:15px; border-radius:6px; margin-bottom:15px; text-align:center; direction:rtl;">
-              <div style="font-weight:bold; font-size:0.9rem; margin-bottom:10px; color:var(--text-main);">➕ افزودن ضمیمه جدید برای کل سند یا ردیف انتخاب شده:</div>
-              <div style="display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap;">
-                
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <label class="form-label" style="margin-bottom:0; font-size:0.8rem;">هدف ضمیمه:</label>
-                  <select id="attachTargetSelect" class="form-select" style="padding:4px 8px; font-size:0.8rem; height:auto; width:180px;"></select>
-                </div>
-
-                <div style="position:relative; display:inline-block;">
-                  <button class="btn btn-primary" style="padding:6px 15px; font-size:0.8rem; font-weight:bold;">📂 انتخاب فایل تصویر...</button>
-                  <input type="file" id="attachFileInput" multiple accept="image/*" onchange="handleAttachmentUpload(event)" style="position:absolute; left:0; top:0; opacity:0; width:100%; height:100%; cursor:pointer;" />
-                </div>
-
-                <button class="btn btn-outline" onclick="simulateScannerInput()" style="padding:6px 15px; font-size:0.8rem; border-color:#eab308; color:#eab308; font-weight:bold;">🖨️ اسکن تصویر جدید (شبیه‌ساز)</button>
-              </div>
-              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">فرمت‌های مجاز: PNG, JPG, JPEG (امکان انتخاب همزمان چند تصویر)</div>
+            <!-- Info Panel -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:10px 15px; border-radius:6px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; direction:rtl; flex-wrap:wrap; gap:8px;">
+              <div style="font-weight:bold; font-size:0.85rem; color:var(--primary-color);">📌 جهت افزودن ضمیمه به کل سند یا هر ردیف، از دکمه‌های «انتخاب» یا «اسکن» در همان ردیف استفاده کنید.</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">فرمت‌های مجاز: PNG, JPG, JPEG (امکان انتخاب همزمان چند تصویر)</div>
             </div>
+            <input type="file" id="rowFileInput" multiple accept="image/*" onchange="handleRowAttachmentUpload(event)" style="display:none;" />
 
             <!-- Attachments DataGrid -->
             <div class="table-wrapper">
@@ -2019,11 +2006,13 @@
                 <thead>
                   <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
                     <th style="width:100px;">ردیف سند</th>
-                    <th style="width:120px;">کد سرفصل</th>
+                    <th style="width:110px;">کد سرفصل</th>
                     <th>عنوان سرفصل</th>
                     <th>شرح ردیف</th>
-                    <th style="width:120px;">تعداد ضمائم</th>
-                    <th style="width:180px;">عملیات</th>
+                    <th style="width:110px;">انتخاب تصویر</th>
+                    <th style="width:100px;">اسکن تصویر</th>
+                    <th style="width:110px;">تعداد ضمائم</th>
+                    <th style="width:130px;">عملیات</th>
                   </tr>
                 </thead>
                 <tbody id="attachGridTableBody"></tbody>
