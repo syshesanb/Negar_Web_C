@@ -923,10 +923,10 @@ function renderAccountsTable() {
     const isSelected = (a.id === selectedAccountId);
     const selectedClass = isSelected ? 'selected-parent-row' : '';
 
-    // Show tree toggle button for all rows
+    // Show tree toggle button (do not show '+' for leaf nodes at max allowed coding level)
     const toggleBtnHtml = hasChildren
       ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); handleTreeButtonClick(${a.id})">${isExpanded ? '-' : '+'}</button>`
-      : `<button class="tree-toggle-btn" onclick="event.stopPropagation(); handleTreeButtonClick(${a.id})">+</button>`;
+      : (canAddChildOf(a) ? `<button class="tree-toggle-btn" onclick="event.stopPropagation(); handleTreeButtonClick(${a.id})">+</button>` : '');
 
     const indentPx = level * 22;
 
@@ -1421,10 +1421,10 @@ function renderShenavaarTable() {
     const isSelected = (s.id === selectedShenavarId);
     const selectedClass = isSelected ? 'selected-parent-row' : '';
 
-    // Show tree toggle button
+    // Show tree toggle button (do not show '+' for leaf nodes at max level 3)
     const toggleBtnHtml = hasChildren
       ? `<button class="tree-toggle-btn ${isExpanded ? 'expanded' : ''}" onclick="event.stopPropagation(); handleShenavarTreeButtonClick(${s.id})">${isExpanded ? '-' : '+'}</button>`
-      : `<button class="tree-toggle-btn" onclick="event.stopPropagation(); handleShenavarTreeButtonClick(${s.id})">+</button>`;
+      : (level < 2 ? `<button class="tree-toggle-btn" onclick="event.stopPropagation(); handleShenavarTreeButtonClick(${s.id})">+</button>` : '');
 
     const indentPx = level * 22;
 
