@@ -1468,7 +1468,7 @@ function renderSanadListTable() {
         <td>${s.credit.toLocaleString()}</td>
         <td>
           ${(s.debit === s.credit && s.status !== 'نامتوازن' && s.status !== 'بدهکار' && s.status !== 'بستانکار')
-            ? `<span class="badge badge-success">متوازن ✅</span>`
+            ? `<span class="badge badge-success">تراز ✅</span>`
             : `<span class="badge" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); font-weight:bold;">${(s.debit > s.credit || s.status === 'بدهکار') ? 'بدهکار' : 'بستانکار'} ❌</span>`
           }
         </td>
