@@ -6330,14 +6330,14 @@ function renderAttachmentsGrid() {
       <td style="text-align:right;"><b>عمومی / فاقد سرفصل خاص</b></td>
       <td style="text-align:right;">ضمائم متفرقه و عمومی مربوط به کل سند</td>
       <td>
-        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color);" onclick="triggerRowFileUpload(0)">📂 انتخاب</button>
+        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color); white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="triggerRowFileUpload(0)">📂 انتخاب</button>
       </td>
       <td>
-        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308;" onclick="simulateScannerInputForRow(0)">🖨️ اسکن</button>
+        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="simulateScannerInputForRow(0)">🖨️ اسکن</button>
       </td>
       <td><span class="badge ${generalCount > 0 ? 'badge-primary' : 'badge-secondary'}">${generalCount} تصویر</span></td>
       <td>
-        <button class="btn btn-outline" style="padding:3px 8px;" onclick="openRowAttachmentsViewer(0)">👁️ نمایش ضمائم</button>
+        <button class="btn btn-outline" style="padding:3px 8px; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openRowAttachmentsViewer(0)">👁️ نمایش ضمائم</button>
       </td>
     </tr>
   `;
@@ -6357,14 +6357,14 @@ function renderAttachmentsGrid() {
         <td style="text-align:right;"><b>${accName}</b></td>
         <td style="text-align:right;">${line.desc || '-'}</td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color);" onclick="triggerRowFileUpload(${rowNo})">📂 انتخاب</button>
+          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color); white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="triggerRowFileUpload(${rowNo})">📂 انتخاب</button>
         </td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308;" onclick="simulateScannerInputForRow(${rowNo})">🖨️ اسکن</button>
+          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="simulateScannerInputForRow(${rowNo})">🖨️ اسکن</button>
         </td>
         <td><span class="badge ${count > 0 ? 'badge-primary' : 'badge-secondary'}">${count} تصویر</span></td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 8px;" onclick="openRowAttachmentsViewer(${rowNo})">👁️ نمایش ضمائم</button>
+          <button class="btn btn-outline" style="padding:3px 8px; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openRowAttachmentsViewer(${rowNo})">👁️ نمایش ضمائم</button>
         </td>
       </tr>
     `;
