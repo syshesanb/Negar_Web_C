@@ -2126,6 +2126,17 @@ function closePrintVouchersModal() {
   if (modal) modal.style.display = 'none';
 }
 
+function openPrintDateCal(inputId, btnEl) {
+  const radioDate = document.getElementById('printRangeByDate');
+  if (radioDate) {
+    radioDate.checked = true;
+    togglePrintRangeInputs();
+  }
+  setTimeout(() => {
+    PersianCal.open(inputId, btnEl);
+  }, 10);
+}
+
 function togglePrintRangeInputs() {
   const isByNo = document.getElementById('printRangeByNo')?.checked;
   const containerNo = document.getElementById('printRangeNoContainer');

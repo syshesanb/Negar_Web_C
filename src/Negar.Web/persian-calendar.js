@@ -193,6 +193,11 @@ const PersianCal = (() => {
       const popup = document.getElementById('persianCalendarPopup');
       if (!popup) { console.warn('Persian calendar popup element not found.'); return; }
 
+      // Ensure calendar is a direct child of <body> to break out of any parent stacking context
+      if (popup.parentElement !== document.body) {
+        document.body.appendChild(popup);
+      }
+
       // ── Position the popup using viewport coords (position:fixed) ───────
       const rect = btnEl.getBoundingClientRect();
       const popW = 298;
@@ -209,10 +214,11 @@ const PersianCal = (() => {
       if (top + popH > window.innerHeight - 8) top = rect.top - popH - 4;
       if (top < 4) top = 4;
 
-      popup.style.top     = top  + 'px';
-      popup.style.left    = left + 'px';
-      popup.style.zIndex  = '999999';
-      popup.style.display = 'block';
+      popup.style.position = 'fixed';
+      popup.style.top      = top  + 'px';
+      popup.style.left     = left + 'px';
+      popup.style.zIndex   = '999999';
+      popup.style.display  = 'block';
 
       render();
     },

@@ -3259,14 +3259,14 @@
           <div id="printRangeDateContainer" style="display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding-right:24px; opacity:0.4; transition:opacity 0.2s ease;">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-size:0.82rem; color:var(--text-muted);">از تاریخ :</span>
-              <input type="text" id="printFromDate" class="form-input" style="width:105px; text-align:center; height:28px; font-size:0.8rem;" placeholder="1403/01/01" maxlength="10" disabled oninput="autoFormatDate(this)" />
-              <button type="button" id="btnCalPrintFrom" class="btn btn-outline date-picker-btn" style="padding:2px 8px; height:28px; font-size:0.8rem;" disabled onclick="PersianCal.open('printFromDate', this)">...</button>
+              <input type="text" id="printFromDate" class="form-input" style="width:105px; text-align:center; height:28px; font-size:0.8rem;" placeholder="1403/01/01" maxlength="10" onfocus="openPrintDateCal('printFromDate', this)" oninput="autoFormatDate(this)" />
+              <button type="button" id="btnCalPrintFrom" class="btn btn-outline date-picker-btn" style="padding:2px 8px; height:28px; font-size:0.8rem;" onclick="openPrintDateCal('printFromDate', this)">...</button>
             </div>
             
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-size:0.82rem; color:var(--text-muted);">تا تاریخ :</span>
-              <input type="text" id="printToDate" class="form-input" style="width:105px; text-align:center; height:28px; font-size:0.8rem;" placeholder="1403/12/29" maxlength="10" disabled oninput="autoFormatDate(this)" />
-              <button type="button" id="btnCalPrintTo" class="btn btn-outline date-picker-btn" style="padding:2px 8px; height:28px; font-size:0.8rem;" disabled onclick="PersianCal.open('printToDate', this)">...</button>
+              <input type="text" id="printToDate" class="form-input" style="width:105px; text-align:center; height:28px; font-size:0.8rem;" placeholder="1403/12/29" maxlength="10" onfocus="openPrintDateCal('printToDate', this)" oninput="autoFormatDate(this)" />
+              <button type="button" id="btnCalPrintTo" class="btn btn-outline date-picker-btn" style="padding:2px 8px; height:28px; font-size:0.8rem;" onclick="openPrintDateCal('printToDate', this)">...</button>
             </div>
           </div>
         </div>
