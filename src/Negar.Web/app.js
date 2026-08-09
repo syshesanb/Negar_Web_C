@@ -5318,6 +5318,18 @@ function ensureSanadMockLines() {
 }
 
 // 1. Trial Balance (تراز آزمایشی)
+function toggleTarazNode(code) {
+  if (!AppState.expandedTarazNodes) {
+    AppState.expandedTarazNodes = new Set(AppState.accounts.map(a => a.code));
+  }
+  if (AppState.expandedTarazNodes.has(code)) {
+    AppState.expandedTarazNodes.delete(code);
+  } else {
+    AppState.expandedTarazNodes.add(code);
+  }
+  calculateTrialBalance();
+}
+
 function populateTarazFields() {
   ensureSanadMockLines();
   const fromEl = document.getElementById('tarazFromDate');
@@ -5334,6 +5346,10 @@ function calculateTrialBalance() {
   const fromDate = document.getElementById('tarazFromDate')?.value || '1403/01/01';
   const toDate = document.getElementById('tarazToDate')?.value || '1403/12/29';
   const onlyTurnover = document.getElementById('tarazOnlyTurnover')?.checked;
+
+  if (!AppState.expandedTarazNodes) {
+    AppState.expandedTarazNodes = new Set(AppState.accounts.map(a => a.code));
+  }
 
   const headerRow = document.querySelector('#tblTrialBalance thead');
   const bodyEl = document.getElementById('tblTrialBalanceBody');
@@ -5381,9 +5397,14 @@ function calculateTrialBalance() {
   }
   if (headerRow) headerRow.innerHTML = headerHtml;
 
+  // سورت ساختار درختی حساب‌ها بر اساس کد حساب
+  const sortedAccounts = [...AppState.accounts].sort((a, b) => 
+    a.code.localeCompare(b.code, 'fa', { numeric: true })
+  );
+
   // Process data
   let rowData = [];
-  AppState.accounts.forEach(acc => {
+  sortedAccounts.forEach(acc => {
     // Determine level
     let meetsLevel = false;
     if (maxLevel === 'group' && acc.type === 'گروه') meetsLevel = true;
@@ -5392,6 +5413,22 @@ function calculateTrialBalance() {
     if (maxLevel === 'tafsili') meetsLevel = true; // All
 
     if (!meetsLevel) return;
+
+    // بررسی وضعیت گستردگی/جمعبندی گره‌های والد در درخت
+    let isVisible = true;
+    if (acc.code.length > 4) {
+      const parentMoein = acc.code.substring(0, 4);
+      if (sortedAccounts.some(a => a.code === parentMoein) && !AppState.expandedTarazNodes.has(parentMoein)) isVisible = false;
+    }
+    if (acc.code.length > 2) {
+      const parentKol = acc.code.substring(0, 2);
+      if (sortedAccounts.some(a => a.code === parentKol) && !AppState.expandedTarazNodes.has(parentKol)) isVisible = false;
+    }
+    if (acc.code.length > 1) {
+      const parentGroup = acc.code.substring(0, 1);
+      if (sortedAccounts.some(a => a.code === parentGroup) && !AppState.expandedTarazNodes.has(parentGroup)) isVisible = false;
+    }
+    if (!isVisible) return;
 
     // Calculate sums
     let debitBefore = 0, creditBefore = 0;
@@ -5446,30 +5483,45 @@ function calculateTrialBalance() {
 
   // Render rows
   bodyEl.innerHTML = rowData.map(row => {
+    const acc = row.acc;
+    const hasChildren = sortedAccounts.some(child => child.code !== acc.code && child.code.startsWith(acc.code));
+    const isExpanded = AppState.expandedTarazNodes.has(acc.code);
+
     let style = '';
     let indent = 0;
-    if (row.acc.type === 'گروه') {
-      style = 'background:rgba(210, 228, 255, 0.7); font-weight:bold; color:#1e3a8a;';
+    if (acc.type === 'گروه') {
+      style = 'background:rgba(210, 228, 255, 0.25); font-weight:bold; color:#1e3a8a;';
       indent = 0;
-    } else if (row.acc.type === 'کل') {
-      style = 'background:rgba(232, 243, 255, 0.5); font-weight:bold; color:#1e40af;';
-      indent = 15;
-    } else if (row.acc.type === 'معین') {
-      style = 'background:rgba(246, 251, 255, 0.4);';
-      indent = 30;
+    } else if (acc.type === 'کل') {
+      style = 'background:rgba(232, 243, 255, 0.18); font-weight:bold; color:#1e40af;';
+      indent = 16;
+    } else if (acc.type === 'معین') {
+      style = 'background:rgba(246, 251, 255, 0.1);';
+      indent = 34;
     } else {
       style = 'background:transparent;';
-      indent = 45;
+      indent = 54;
     }
 
-    const nameSpan = `<span style="padding-right:${indent}px;">${row.acc.name}</span>`;
-    const ledgerBtn = `<button class="btn btn-outline" style="padding:1px 5px; font-size:0.7rem; border-color:var(--accent-color); color:var(--accent-color);" onclick="navigateToLedger('${row.acc.code}')">دفتر</button>`;
+    const toggleBtn = hasChildren
+      ? `<span onclick="event.stopPropagation(); toggleTarazNode('${acc.code}')" style="cursor:pointer; display:inline-block; width:16px; text-align:center; font-size:0.75rem; color:#3b82f6; font-weight:bold; margin-left:4px;">${isExpanded ? '▼' : '◀'}</span>`
+      : `<span style="display:inline-block; width:16px; margin-left:4px;"></span>`;
+
+    const folderIcon = hasChildren ? (isExpanded ? '📂' : '📁') : '📄';
+
+    const nameSpan = `<span style="padding-right:${indent}px; display:inline-flex; align-items:center;">
+      ${toggleBtn}
+      <span style="margin-left:6px; font-size:0.85rem;">${folderIcon}</span>
+      <span>${acc.name}</span>
+    </span>`;
+
+    const ledgerBtn = `<button class="btn btn-outline" style="padding:1px 5px; font-size:0.7rem; border-color:var(--accent-color); color:var(--accent-color);" onclick="navigateToLedger('${acc.code}')">دفتر</button>`;
 
     if (colCount === 2) {
       return `
         <tr style="${style}">
           <td style="text-align:center;">${ledgerBtn}</td>
-          <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.acc.code}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold;">${acc.code}</td>
           <td>${nameSpan}</td>
           <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
           <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
@@ -5479,7 +5531,7 @@ function calculateTrialBalance() {
       return `
         <tr style="${style}">
           <td style="text-align:center;">${ledgerBtn}</td>
-          <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.acc.code}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold;">${acc.code}</td>
           <td>${nameSpan}</td>
           <td style="text-align:left;">${row.debitTurnover ? row.debitTurnover.toLocaleString() : '0'}</td>
           <td style="text-align:left;">${row.creditTurnover ? row.creditTurnover.toLocaleString() : '0'}</td>
@@ -5491,7 +5543,7 @@ function calculateTrialBalance() {
       return `
         <tr style="${style}">
           <td style="text-align:center;">${ledgerBtn}</td>
-          <td style="text-align:center; font-family:monospace; font-weight:bold;">${row.acc.code}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold;">${acc.code}</td>
           <td>${nameSpan}</td>
           <td style="text-align:left; color:#6b7280;">${row.beforeDeb ? row.beforeDeb.toLocaleString() : '0'}</td>
           <td style="text-align:left; color:#6b7280;">${row.beforeCred ? row.beforeCred.toLocaleString() : '0'}</td>
