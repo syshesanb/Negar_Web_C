@@ -4881,7 +4881,7 @@ function renderMoghayeratReconcilePanel() {
   const isAll = bankIdVal === 'all';
   
   // سوییچ کلاس فعال دکمه‌های گرید بانک
-  const bankSubtabs = ['all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
+  const bankSubtabs = ['allBank', 'all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
   bankSubtabs.forEach(s => {
     const el = document.getElementById('btnBankSubtab' + s.charAt(0).toUpperCase() + s.slice(1));
     if (el) {
@@ -4891,7 +4891,7 @@ function renderMoghayeratReconcilePanel() {
   });
   
   // سوییچ کلاس فعال دکمه‌های گرید دفتر
-  const ledgerSubtabs = ['all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
+  const ledgerSubtabs = ['allLedger', 'all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
   ledgerSubtabs.forEach(s => {
     const el = document.getElementById('btnLedgerSubtab' + s.charAt(0).toUpperCase() + s.slice(1));
     if (el) {
@@ -4906,7 +4906,10 @@ function renderMoghayeratReconcilePanel() {
     : AppState.bankTransactions.filter(t => t.bankId === Number(bankIdVal));
     
   if (AppState.moghayeratReconciled) {
-    if (AppState.moghBankSubtabFilter === 'debit') bankList = bankList.filter(t => !t.isClosed && t.debit > 0);
+    if (AppState.moghBankSubtabFilter === 'allBank') {
+      // کل ارقام بانک: تمام تراکنش‌های موجود بانک
+    } else if (AppState.moghBankSubtabFilter === 'all') bankList = bankList.filter(t => !t.isClosed);
+    else if (AppState.moghBankSubtabFilter === 'debit') bankList = bankList.filter(t => !t.isClosed && t.debit > 0);
     else if (AppState.moghBankSubtabFilter === 'credit') bankList = bankList.filter(t => !t.isClosed && t.credit > 0);
     else if (AppState.moghBankSubtabFilter === 'closed') bankList = bankList.filter(t => t.isClosed);
     else if (AppState.moghBankSubtabFilter === 'closedDebit') bankList = bankList.filter(t => t.isClosed && t.debit > 0);
@@ -4939,7 +4942,10 @@ function renderMoghayeratReconcilePanel() {
   // فیلترینگ تراکنش‌های دفاتر
   let ledgerList = AppState.ledgerTransactions;
   if (AppState.moghayeratReconciled) {
-    if (AppState.moghLedgerSubtabFilter === 'debit') ledgerList = ledgerList.filter(t => !t.isClosed && t.debit > 0);
+    if (AppState.moghLedgerSubtabFilter === 'allLedger') {
+      // کل ارقام دفتر: تمام تراکنش‌های موجود دفتر
+    } else if (AppState.moghLedgerSubtabFilter === 'all') ledgerList = ledgerList.filter(t => !t.isClosed);
+    else if (AppState.moghLedgerSubtabFilter === 'debit') ledgerList = ledgerList.filter(t => !t.isClosed && t.debit > 0);
     else if (AppState.moghLedgerSubtabFilter === 'credit') ledgerList = ledgerList.filter(t => !t.isClosed && t.credit > 0);
     else if (AppState.moghLedgerSubtabFilter === 'closed') ledgerList = ledgerList.filter(t => t.isClosed);
     else if (AppState.moghLedgerSubtabFilter === 'closedDebit') ledgerList = ledgerList.filter(t => t.isClosed && t.debit > 0);
