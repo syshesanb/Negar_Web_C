@@ -4323,12 +4323,52 @@ function populateMoghCombos() {
   }
 }
 
+function openBankModal() {
+  const modal = document.getElementById('bankModalOverlay');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeBankModal() {
+  const modal = document.getElementById('bankModalOverlay');
+  if (modal) modal.style.display = 'none';
+}
+
+function openAddBankModal() {
+  clearMoghayeratBankForm();
+  const title = document.getElementById('bankModalTitle');
+  if (title) title.textContent = '🏢 تعریف بانک جدید';
+  openBankModal();
+}
+
+function openEditBankModal(id) {
+  selectMoghayeratBank(id);
+  const b = AppState.moghayeratBanks.find(x => x.id === id);
+  const title = document.getElementById('bankModalTitle');
+  if (title && b) title.textContent = `✏️ ویرایش مشخصات بانک (${b.bankName})`;
+  openBankModal();
+}
+
+function deleteMoghayeratBankById(id) {
+  const b = AppState.moghayeratBanks.find(x => x.id === id);
+  const bankName = b ? b.bankName : '';
+  if (!confirm(`آیا از حذف بانک (${bankName}) اطمینان دارید؟`)) return;
+
+  AppState.moghayeratBanks = AppState.moghayeratBanks.filter(x => x.id !== id);
+  if (AppState.selectedMoghBankId === id) {
+    AppState.selectedMoghBankId = AppState.moghayeratBanks.length > 0 ? AppState.moghayeratBanks[0].id : null;
+  }
+
+  populateMoghCombos();
+  clearMoghayeratBankForm();
+  renderMoghayeratBanksTable();
+}
+
 function renderMoghayeratBanksTable() {
   const tbody = document.getElementById('tblMoghayeratBanksBody');
   if (!tbody) return;
   
   if (AppState.moghayeratBanks.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">هیچ بانکی تعریف نشده است.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--text-muted); padding:20px;">هیچ بانکی تعریف نشده است.</td></tr>`;
     updateBankStatementRangeHeader(null);
     return;
   }
@@ -4350,6 +4390,12 @@ function renderMoghayeratBanksTable() {
         <td style="padding:8px; text-align:center;">${b.accountType || '-'}</td>
         <td style="padding:8px; text-align:center;">${b.accountNumber}</td>
         <td style="padding:8px; text-align:center; direction:ltr;">${accName}</td>
+        <td style="padding:4px; text-align:center;">
+          <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem;" onclick="event.stopPropagation(); openEditBankModal(${b.id})">✏️ ویرایش</button>
+        </td>
+        <td style="padding:4px; text-align:center;">
+          <button class="btn btn-outline" style="padding:2px 8px; font-size:0.75rem; color:red; border-color:red;" onclick="event.stopPropagation(); deleteMoghayeratBankById(${b.id})">🗑️ حذف</button>
+        </td>
       </tr>
     `;
   }).join('');
@@ -4444,6 +4490,7 @@ function saveMoghayeratBank() {
   
   populateMoghCombos();
   clearMoghayeratBankForm();
+  closeBankModal();
   renderMoghayeratBanksTable();
 }
 
@@ -4475,6 +4522,7 @@ function deleteMoghayeratBank() {
   
   populateMoghCombos();
   clearMoghayeratBankForm();
+  closeBankModal();
   renderMoghayeratBanksTable();
 }
 
