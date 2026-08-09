@@ -5320,7 +5320,7 @@ function ensureSanadMockLines() {
 // 1. Trial Balance (تراز آزمایشی)
 function toggleTarazNode(code) {
   if (!AppState.expandedTarazNodes) {
-    AppState.expandedTarazNodes = new Set(AppState.accounts.map(a => a.code));
+    AppState.expandedTarazNodes = new Set();
   }
   if (AppState.expandedTarazNodes.has(code)) {
     AppState.expandedTarazNodes.delete(code);
@@ -5348,7 +5348,7 @@ function calculateTrialBalance() {
   const onlyTurnover = document.getElementById('tarazOnlyTurnover')?.checked;
 
   if (!AppState.expandedTarazNodes) {
-    AppState.expandedTarazNodes = new Set(AppState.accounts.map(a => a.code));
+    AppState.expandedTarazNodes = new Set(); // پیش‌فرض بسته بودن گره‌ها جهت باز شدن با دکمه +
   }
 
   const headerRow = document.querySelector('#tblTrialBalance thead');
@@ -5504,8 +5504,8 @@ function calculateTrialBalance() {
     }
 
     const toggleBtn = hasChildren
-      ? `<span onclick="event.stopPropagation(); toggleTarazNode('${acc.code}')" style="cursor:pointer; display:inline-block; width:16px; text-align:center; font-size:0.75rem; color:#3b82f6; font-weight:bold; margin-left:4px;">${isExpanded ? '▼' : '◀'}</span>`
-      : `<span style="display:inline-block; width:16px; margin-left:4px;"></span>`;
+      ? `<button class="btn btn-outline" style="width:20px; height:20px; padding:0; line-height:18px; text-align:center; font-weight:bold; font-size:0.85rem; border-color:${isExpanded ? '#ef4444' : '#3b82f6'}; color:${isExpanded ? '#ef4444' : '#3b82f6'}; border-radius:4px; margin-left:6px; background:var(--bg-primary); cursor:pointer;" onclick="event.stopPropagation(); toggleTarazNode('${acc.code}')">${isExpanded ? '-' : '+'}</button>`
+      : `<span style="display:inline-block; width:20px; height:20px; margin-left:6px;"></span>`;
 
     const folderIcon = hasChildren ? (isExpanded ? '📂' : '📁') : '📄';
 
