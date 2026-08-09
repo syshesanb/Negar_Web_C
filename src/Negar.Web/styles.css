@@ -139,8 +139,8 @@ html, body {
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  box-shadow: -3px 0 14px rgba(0, 0, 0, 0.35);
-  z-index: 1000;
+  box-shadow: -8px 0 28px rgba(0, 0, 0, 0.65);
+  z-index: 2000;
   overflow-y: visible;
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(0);
@@ -154,9 +154,9 @@ html, body {
 /* Sidebar Toggle Handle Button (دستگیره کشویی) */
 .sidebar-toggle-handle {
   position: absolute;
-  left: -26px;
+  left: -28px;
   top: 100px;
-  width: 26px;
+  width: 28px;
   height: 64px;
   background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
   border: 1px solid #38bdf8;
@@ -167,16 +167,16 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 100;
-  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
+  z-index: 2001;
+  box-shadow: -4px 0 14px rgba(0, 0, 0, 0.5);
   transition: all 0.22s ease;
   user-select: none;
 }
 
 .sidebar-toggle-handle:hover {
   background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-  width: 29px;
-  left: -29px;
+  width: 32px;
+  left: -32px;
   box-shadow: -6px 0 18px rgba(56, 189, 248, 0.6);
 }
 
@@ -258,20 +258,21 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* ── Main Workspace ── */
+/* ── Main Workspace: 100% Full Width (No Gap) ── */
 .app-container {
   flex: 1;
   width: 100%;
-  margin-right: 250px;
-  transition: margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 0 !important;
   min-width: 0;
+  background: var(--bg-main);
 }
 
-.app-layout-wrapper.sidebar-collapsed .app-container {
-  margin-right: 0px;
+.main-content {
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 }
-
-.main-content { padding: 24px; max-width: 1400px; margin: 0 auto; }
 
 /* ── Tiles Container ── */
 .tiles-container { display: none; }
