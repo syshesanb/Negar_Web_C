@@ -4907,6 +4907,14 @@ function sortMoghLedgerGrid(colKey) {
   renderMoghayeratReconcilePanel();
 }
 
+function filterMoghBankGrid() {
+  renderMoghayeratReconcilePanel();
+}
+
+function filterMoghLedgerGrid() {
+  renderMoghayeratReconcilePanel();
+}
+
 function openSanadFromMoghayerat(sanadNoStr, targetLineIdx) {
   const sanadId = Number(sanadNoStr);
   let s = AppState.sanads.find(x => x.id === sanadId);
@@ -5053,8 +5061,32 @@ function renderMoghayeratReconcilePanel() {
       return String(valA || '').localeCompare(String(valB || ''), 'fa', { numeric: true }) * dir;
     });
   }
+
+  // اعمال جستجوی ترکیبی و لحظه‌ای سرستون‌های گرید بانک
+  const srchBankRow = document.getElementById('srchBank_row')?.value.trim();
+  const srchBankTxDate = document.getElementById('srchBank_txDate')?.value.trim();
+  const srchBankSanadNo = document.getElementById('srchBank_sanadNo')?.value.trim();
+  const srchBankRefNo = document.getElementById('srchBank_refNo')?.value.trim();
+  const srchBankDebit = document.getElementById('srchBank_debit')?.value.trim();
+  const srchBankCredit = document.getElementById('srchBank_credit')?.value.trim();
+  const srchBankDesc = document.getElementById('srchBank_desc')?.value.trim();
+  const srchBankIsClosed = document.getElementById('srchBank_isClosed')?.value.trim();
+
+  if (srchBankRow) mappedBankList = mappedBankList.filter(t => String(t.origRow).includes(srchBankRow));
+  if (srchBankTxDate) mappedBankList = mappedBankList.filter(t => String(t.txDate || '').includes(srchBankTxDate));
+  if (srchBankSanadNo) mappedBankList = mappedBankList.filter(t => String(t.matchedSanadNo || '').includes(srchBankSanadNo));
+  if (srchBankRefNo) mappedBankList = mappedBankList.filter(t => String(t.refNo || '').includes(srchBankRefNo));
+  if (srchBankDebit) mappedBankList = mappedBankList.filter(t => (t.debit ? t.debit.toLocaleString() : '-').includes(srchBankDebit) || String(t.debit).includes(srchBankDebit));
+  if (srchBankCredit) mappedBankList = mappedBankList.filter(t => (t.credit ? t.credit.toLocaleString() : '-').includes(srchBankCredit) || String(t.credit).includes(srchBankCredit));
+  if (srchBankDesc) mappedBankList = mappedBankList.filter(t => String(t.desc || '').toLowerCase().includes(srchBankDesc.toLowerCase()));
+  if (srchBankIsClosed) {
+    mappedBankList = mappedBankList.filter(t => {
+      const st = t.isClosed ? 'بسته' : 'باز';
+      return st.toLowerCase().includes(srchBankIsClosed.toLowerCase());
+    });
+  }
   
-  document.getElementById('lblCountBankTransactions').textContent = `تعداد رکورد در این تب: ${bankList.length}`;
+  document.getElementById('lblCountBankTransactions').textContent = `تعداد رکورد در این تب: ${mappedBankList.length}`;
   
   tbodyBank.innerHTML = mappedBankList.map((t) => {
     const statusText = t.isClosed 
@@ -5111,8 +5143,32 @@ function renderMoghayeratReconcilePanel() {
       return String(valA || '').localeCompare(String(valB || ''), 'fa', { numeric: true }) * dir;
     });
   }
+
+  // اعمال جستجوی ترکیبی و لحظه‌ای سرستون‌های گرید دفتر
+  const srchLedgerRow = document.getElementById('srchLedger_row')?.value.trim();
+  const srchLedgerDate = document.getElementById('srchLedger_date')?.value.trim();
+  const srchLedgerSanadNo = document.getElementById('srchLedger_sanadNo')?.value.trim();
+  const srchLedgerTxNo = document.getElementById('srchLedger_txNo')?.value.trim();
+  const srchLedgerDebit = document.getElementById('srchLedger_debit')?.value.trim();
+  const srchLedgerCredit = document.getElementById('srchLedger_credit')?.value.trim();
+  const srchLedgerDesc = document.getElementById('srchLedger_desc')?.value.trim();
+  const srchLedgerIsClosed = document.getElementById('srchLedger_isClosed')?.value.trim();
+
+  if (srchLedgerRow) mappedLedgerList = mappedLedgerList.filter(t => String(t.origRow).includes(srchLedgerRow));
+  if (srchLedgerDate) mappedLedgerList = mappedLedgerList.filter(t => String(t.date || '').includes(srchLedgerDate));
+  if (srchLedgerSanadNo) mappedLedgerList = mappedLedgerList.filter(t => String(t.sanadNo || '').includes(srchLedgerSanadNo));
+  if (srchLedgerTxNo) mappedLedgerList = mappedLedgerList.filter(t => String(t.txNo || '').includes(srchLedgerTxNo));
+  if (srchLedgerDebit) mappedLedgerList = mappedLedgerList.filter(t => (t.debit ? t.debit.toLocaleString() : '-').includes(srchLedgerDebit) || String(t.debit).includes(srchLedgerDebit));
+  if (srchLedgerCredit) mappedLedgerList = mappedLedgerList.filter(t => (t.credit ? t.credit.toLocaleString() : '-').includes(srchLedgerCredit) || String(t.credit).includes(srchLedgerCredit));
+  if (srchLedgerDesc) mappedLedgerList = mappedLedgerList.filter(t => String(t.desc || '').toLowerCase().includes(srchLedgerDesc.toLowerCase()));
+  if (srchLedgerIsClosed) {
+    mappedLedgerList = mappedLedgerList.filter(t => {
+      const st = t.isClosed ? 'بسته' : 'باز';
+      return st.toLowerCase().includes(srchLedgerIsClosed.toLowerCase());
+    });
+  }
   
-  document.getElementById('lblCountLedgerTransactions').textContent = `تعداد رکورد در این تب: ${ledgerList.length}`;
+  document.getElementById('lblCountLedgerTransactions').textContent = `تعداد رکورد در این تب: ${mappedLedgerList.length}`;
   
   tbodyLedger.innerHTML = mappedLedgerList.map((t) => {
     const statusText = t.isClosed 

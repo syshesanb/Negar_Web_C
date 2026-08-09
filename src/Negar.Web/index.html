@@ -1451,9 +1451,19 @@
                     <button class="btn btn-outline btn-xs" id="btnBankSubtabDup" onclick="switchBankGridSubtab('dup')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام تکراری در بانک</button>
                   </div>
                   
-                  <div style="height:140px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
+                  <div style="height:180px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
                     <table style="width:100%; border-collapse:collapse; font-size:0.75rem; table-layout:fixed;" id="tblMoghBankStatement">
                       <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
+                        <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                          <th style="width:80px; padding:2px;"><input type="text" id="srchBank_row" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghBankGrid()" placeholder="جستجو..."></th>
+                          <th style="width:75px; padding:2px;"><input type="text" id="srchBank_txDate" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghBankGrid()" placeholder="تاریخ..."></th>
+                          <th style="width:65px; padding:2px;"><input type="text" id="srchBank_sanadNo" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghBankGrid()" placeholder="سند..."></th>
+                          <th style="width:85px; padding:2px;"><input type="text" id="srchBank_refNo" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghBankGrid()" placeholder="پیگیری..."></th>
+                          <th style="width:105px; padding:2px;"><input type="text" id="srchBank_debit" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:right;" oninput="filterMoghBankGrid()" placeholder="بدهکار..."></th>
+                          <th style="width:105px; padding:2px;"><input type="text" id="srchBank_credit" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:right;" oninput="filterMoghBankGrid()" placeholder="بستانکار..."></th>
+                          <th style="width:150px; padding:2px;"><input type="text" id="srchBank_desc" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:right;" oninput="filterMoghBankGrid()" placeholder="شرح..."></th>
+                          <th style="width:85px; padding:2px;"><input type="text" id="srchBank_isClosed" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghBankGrid()" placeholder="وضعیت..."></th>
+                        </tr>
                         <tr style="border-bottom:1px solid var(--border-color);">
                           <th id="thMoghBank_row" data-title="ردیف" style="width:80px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('row')">ردیف</th>
                           <th id="thMoghBank_txDate" data-title="تاریخ تراکنش" style="width:75px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('txDate')">تاریخ</th>
@@ -1489,9 +1499,20 @@
                     <button class="btn btn-outline btn-xs" id="btnLedgerSubtabDup" onclick="switchLedgerGridSubtab('dup')" style="font-size:0.65rem; padding:2px 6px; font-weight:bold;">ارقام تکراری در دفتر</button>
                   </div>
                   
-                  <div style="height:140px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
+                  <div style="height:180px; overflow-y:auto; overflow-x:hidden; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
                     <table style="width:100%; border-collapse:collapse; font-size:0.75rem; table-layout:fixed;" id="tblMoghLedger">
                       <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
+                        <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
+                          <th style="width:35px; padding:2px;"><input type="text" id="srchLedger_row" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghLedgerGrid()" placeholder="جستجو..."></th>
+                          <th style="width:45px; padding:2px;"><input type="text" id="srchLedger_btnSanad" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" disabled placeholder="..."></th>
+                          <th style="width:75px; padding:2px;"><input type="text" id="srchLedger_date" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghLedgerGrid()" placeholder="تاریخ..."></th>
+                          <th style="width:65px; padding:2px;"><input type="text" id="srchLedger_sanadNo" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghLedgerGrid()" placeholder="سند..."></th>
+                          <th style="width:85px; padding:2px;"><input type="text" id="srchLedger_txNo" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghLedgerGrid()" placeholder="تراکنش..."></th>
+                          <th style="width:105px; padding:2px;"><input type="text" id="srchLedger_debit" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:right;" oninput="filterMoghLedgerGrid()" placeholder="بدهکار..."></th>
+                          <th style="width:105px; padding:2px;"><input type="text" id="srchLedger_credit" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:right;" oninput="filterMoghLedgerGrid()" placeholder="بستانکار..."></th>
+                          <th style="width:150px; padding:2px;"><input type="text" id="srchLedger_desc" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:right;" oninput="filterMoghLedgerGrid()" placeholder="شرح..."></th>
+                          <th style="width:85px; padding:2px;"><input type="text" id="srchLedger_isClosed" class="form-input" style="width:100%; height:20px; font-size:0.65rem; padding:1px 2px; text-align:center;" oninput="filterMoghLedgerGrid()" placeholder="وضعیت..."></th>
+                        </tr>
                         <tr style="border-bottom:1px solid var(--border-color);">
                           <th id="thMoghLedger_row" data-title="ردیف" style="width:35px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('row')">ردیف</th>
                           <th id="thMoghLedger_btnSanad" data-title="سند" style="width:45px; padding:4px; text-align:center; user-select:none;">سند</th>
