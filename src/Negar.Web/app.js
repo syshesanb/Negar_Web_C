@@ -4800,6 +4800,7 @@ function runMoghReconciliation() {
           id: itemId++,
           date: s.date,
           sanadNo: String(s.id),
+          txNo: d.txNo || '-',
           debit: d.debit,
           credit: d.credit,
           desc: d.desc || s.desc,
@@ -4960,6 +4961,7 @@ function renderMoghayeratReconcilePanel() {
         <td style="padding:4px; text-align:center;">${i + 1}</td>
         <td style="padding:4px; text-align:center;">${t.date}</td>
         <td style="padding:4px; text-align:center;">${t.sanadNo}</td>
+        <td style="padding:4px; text-align:center;">${t.txNo || '-'}</td>
         <td style="padding:4px; text-align:left; color:#10b981;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
         <td style="padding:4px; text-align:left; color:#ef4444;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
         <td style="padding:4px; text-align:right;">${t.desc}</td>
