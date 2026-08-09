@@ -1353,27 +1353,27 @@
               <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:4px; padding:10px; margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between;">
                 <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
                   <label class="form-label" style="font-size:0.75rem; font-weight:bold;">تاریخ تراکنش:</label>
-                  <select id="mapColTxDate" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                  <select id="mapColTxDate" class="form-select" style="height:24px; font-size:0.75rem; padding:0 4px;"></select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
                   <label class="form-label" style="font-size:0.75rem; font-weight:bold;">شماره پیگیری:</label>
-                  <select id="mapColTxNo" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                  <select id="mapColTxNo" class="form-select" style="height:24px; font-size:0.75rem; padding:0 4px;"></select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
                   <label class="form-label" style="font-size:0.75rem; font-weight:bold;">واریز (بستانکار):</label>
-                  <select id="mapColCredit" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                  <select id="mapColCredit" class="form-select" style="height:24px; font-size:0.75rem; padding:0 4px;"></select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:110px;">
                   <label class="form-label" style="font-size:0.75rem; font-weight:bold;">برداشت (بدهکار):</label>
-                  <select id="mapColDebit" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                  <select id="mapColDebit" class="form-select" style="height:24px; font-size:0.75rem; padding:0 4px;"></select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:150px;">
                   <label class="form-label" style="font-size:0.75rem; font-weight:bold;">شرح:</label>
-                  <select id="mapColDesc" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                  <select id="mapColDesc" class="form-select" style="height:24px; font-size:0.75rem; padding:0 4px;"></select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:150px;">
                   <label class="form-label" style="font-size:0.75rem; font-weight:bold;">واریز کننده / ذینفع:</label>
-                  <select id="mapColBeneficiary" class="form-select" style="height:24px; font-size:0.75rem;"></select>
+                  <select id="mapColBeneficiary" class="form-select" style="height:24px; font-size:0.75rem; padding:0 4px;"></select>
                 </div>
               </div>
               
@@ -1395,7 +1395,7 @@
               <div style="display:flex; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:15px;">
                 <div style="display:flex; align-items:center; gap:6px;">
                   <label class="form-label" style="font-size:0.8rem; font-weight:bold;">انتخاب بانک:</label>
-                  <select id="cmbMoghReconcileBank" class="form-select" style="width:200px; height:28px; font-size:0.8rem;"></select>
+                  <select id="cmbMoghReconcileBank" class="form-select" style="width:200px; height:28px; font-size:0.8rem;" onchange="renderMoghayeratReconcilePanel()"></select>
                 </div>
                 
                 <!-- Date Range Radio selection -->
@@ -3093,3 +3093,4 @@
 
 </body>
 </html>
+

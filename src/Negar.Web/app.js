@@ -229,9 +229,10 @@ const AppState = {
     }
   ],
   fiscalYears: [
-    { id: 1, year: '1403', startDate: '1403/01/01', endDate: '1403/12/29', company: '1001', notes: 'سال مالی جاری', status: 'فعال' },
+    { id: 1, year: '1403', startDate: '1403/01/01', endDate: '1403/12/29', company: '1001', notes: 'سال مالی جاری شرکت نمونه نگار', status: 'فعال' },
     { id: 2, year: '1402', startDate: '1402/01/01', endDate: '1402/12/29', company: '1001', notes: 'سال مالی قبل', status: 'بسته' },
-    { id: 3, year: '1401', startDate: '1401/01/01', endDate: '1401/12/29', company: '1001', notes: 'سال مالی بسته', status: 'بسته' }
+    { id: 3, year: '1401', startDate: '1401/01/01', endDate: '1401/12/29', company: '1001', notes: 'سال مالی ۱۴۰۱', status: 'بسته' },
+    { id: 4, year: '1400', startDate: '1400/01/01', endDate: '1400/12/29', company: '1001', notes: 'سال مالی اولیه تاسیس', status: 'بسته' }
   ],
   users: [
     { id: 1, username: 'admin', fullName: 'مدیر ارشد سیستم', userType: 'SuperAdmin', isActive: true, ip: '127.0.0.1' },
@@ -380,8 +381,25 @@ const AppState = {
     { id: 7, code: 7, name: 'اموال' }
   ],
   sanads: [
-    { id: 101, date: '1403/01/05', desc: 'سند افتتاحیه سال مالی', debit: 5000000000, credit: 5000000000, status: 'دائم', bakhshId: 1 },
-    { id: 102, date: '1403/05/10', desc: 'فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 125000000, status: 'تایید شده', bakhshId: 2 }
+    // --- سال ۱۴۰۳ ---
+    { id: 101, date: '1403/01/05', desc: 'سند افتتاحیه سال مالی ۱۴۰۳', debit: 5000000000, credit: 5000000000, status: 'دائم', bakhshId: 1 },
+    { id: 102, date: '1403/02/10', desc: 'فاکتور فروش کالا به شرکت فناوری آریا', debit: 450000000, credit: 450000000, status: 'تایید شده', bakhshId: 2 },
+    { id: 103, date: '1403/02/12', desc: 'دریافت حواله بانکی از شرکت آریا به بانک ملت', debit: 450000000, credit: 450000000, status: 'تایید شده', bakhshId: 5 },
+    { id: 104, date: '1403/03/15', desc: 'پرداخت حقوق و دستمزد پرسنل از بانک صادرات', debit: 350000000, credit: 350000000, status: 'تایید شده', bakhshId: 4 },
+    { id: 105, date: '1403/04/20', desc: 'خرید ملزومات اداری و تجهیزات از بانک ملی', debit: 120000000, credit: 120000000, status: 'تایید شده', bakhshId: 1 },
+    { id: 106, date: '1403/05/14', desc: 'واریز نقدی صندوق به بانک ملی', debit: 75000000, credit: 75000000, status: 'تایید شده', bakhshId: 5 },
+    { id: 107, date: '1403/06/01', desc: 'واریز پیش‌دریافت مشتری به بانک صادرات', debit: 200000000, credit: 200000000, status: 'تایید شده', bakhshId: 5 },
+
+    // --- سال ۱۴۰۲ ---
+    { id: 201, date: '1402/01/05', desc: 'سند افتتاحیه سال مالی ۱۴۰۲', debit: 3800000000, credit: 3800000000, status: 'دائم', bakhshId: 1 },
+    { id: 202, date: '1402/04/18', desc: 'واریز درآمد فروش خدمات به بانک ملت', debit: 320000000, credit: 320000000, status: 'تایید شده', bakhshId: 2 },
+    { id: 203, date: '1402/08/22', desc: 'پرداخت هزینه اجاره دفتر از بانک ملی', debit: 180000000, credit: 180000000, status: 'تایید شده', bakhshId: 1 },
+    { id: 204, date: '1402/11/10', desc: 'پرداخت وجه فاکتور تامین‌کننده از بانک صادرات', debit: 250000000, credit: 250000000, status: 'تایید شده', bakhshId: 2 },
+
+    // --- سال ۱۴۰۱ ---
+    { id: 301, date: '1401/01/05', desc: 'سند افتتاحیه سال مالی ۱۴۰۱', debit: 2500000000, credit: 2500000000, status: 'دائم', bakhshId: 1 },
+    { id: 302, date: '1401/06/15', desc: 'دریافت وجه خدمات مشاوره‌ای در بانک ملت', debit: 210000000, credit: 210000000, status: 'تایید شده', bakhshId: 2 },
+    { id: 303, date: '1401/09/05', desc: 'خرید سیستم‌ها و نرم‌افزار از بانک ملی', debit: 160000000, credit: 160000000, status: 'تایید شده', bakhshId: 1 }
   ],
   sanadLines: [
     { account: '110101', desc: 'دریافت نقدی', debit: 50000000, credit: 0 },
@@ -413,12 +431,62 @@ const AppState = {
 // Initial vouchers detail database (سندهای پیش‌فرض سیستم)
 AppState.voucherDetails = {
   101: [
-    { account: '110101', desc: 'آرتیکل بدهکار - بابت سند افتتاحیه سال مالی', debit: 5000000000, credit: 0, txNo: '', txDate: '' },
-    { account: '210101', desc: 'آرتیکل بستانکار - بابت سند افتتاحیه سال مالی', debit: 0, credit: 5000000000, txNo: '', txDate: '' }
+    { account: '110102', desc: 'آرتیکل بدهکار - واریز سرمایه اولیه بانک ملت', debit: 5000000000, credit: 0, txNo: '', txDate: '' },
+    { account: '310101', desc: 'آرتیکل بستانکار - سرمایه صاحبان سهام', debit: 0, credit: 5000000000, txNo: '', txDate: '' }
   ],
   102: [
-    { account: '110101', desc: 'آرتیکل بدهکار - بابت فاکتور فروش فروشگاه مرکزی', debit: 125000000, credit: 0, txNo: '', txDate: '' },
-    { account: '210101', desc: 'آرتیکل بستانکار - بابت فاکتور فروش فروشگاه مرکزی', debit: 0, credit: 125000000, txNo: '', txDate: '' }
+    { account: '110301', desc: 'طلب از شرکت فناوری آریا', debit: 450000000, credit: 0, txNo: '', txDate: '' },
+    { account: '420101', desc: 'فروش کالا فاکتور INV-8001', debit: 0, credit: 450000000, txNo: '', txDate: '' }
+  ],
+  103: [
+    { account: '110102', desc: 'دریافت حواله بانکی از شرکت آریا به بانک ملت', debit: 450000000, credit: 0, txNo: '9845120', txDate: '1403/02/12' },
+    { account: '110301', desc: 'تسویه حساب فاکتور فروش INV-8001', debit: 0, credit: 450000000, txNo: '', txDate: '' }
+  ],
+  104: [
+    { account: '520101', desc: 'هزینه حقوق و دستمزد پرسنل خرداد ماه', debit: 350000000, credit: 0, txNo: '', txDate: '' },
+    { account: '110102', desc: 'پرداخت لیست حقوق از حساب بانک صادرات', debit: 0, credit: 350000000, txNo: '7789012', txDate: '1403/03/15' }
+  ],
+  105: [
+    { account: '520203', desc: 'هزینه ملزومات اداری و تجهیزات', debit: 120000000, credit: 0, txNo: '', txDate: '' },
+    { account: '110102', desc: 'پرداخت چک ۵۱۲ از حساب بانک ملی', debit: 0, credit: 120000000, txNo: '5120091', txDate: '1403/04/20' }
+  ],
+  106: [
+    { account: '110102', desc: 'واریز نقدی صندوق به بانک ملی', debit: 75000000, credit: 0, txNo: '5120095', txDate: '1403/05/14' },
+    { account: '110101', desc: 'تحویل موجودی نقدی صندوق', debit: 0, credit: 75000000, txNo: '', txDate: '' }
+  ],
+  107: [
+    { account: '110102', desc: 'واریز پیش‌دریافت مشتری به بانک صادرات', debit: 200000000, credit: 0, txNo: '7789055', txDate: '1403/06/01' },
+    { account: '210301', desc: 'پیش‌دریافت از شرکت پارس تکنولوژی', debit: 0, credit: 200000000, txNo: '', txDate: '' }
+  ],
+
+  201: [
+    { account: '110102', desc: 'آرتیکل بدهکار - بابت سند افتتاحیه سال مالی ۱۴۰۲', debit: 3800000000, credit: 0, txNo: '', txDate: '' },
+    { account: '310101', desc: 'آرتیکل بستانکار - بابت سند افتتاحیه سال مالی ۱۴۰۲', debit: 0, credit: 3800000000, txNo: '', txDate: '' }
+  ],
+  202: [
+    { account: '110102', desc: 'واریز درآمد فروش خدمات به بانک ملت', debit: 320000000, credit: 0, txNo: '8812340', txDate: '1402/04/18' },
+    { account: '420102', desc: 'درآمد حاصل از ارائه خدمات مشاوره‌ای', debit: 0, credit: 320000000, txNo: '', txDate: '' }
+  ],
+  203: [
+    { account: '520201', desc: 'هزینه اجاره دفتر و انبار', debit: 180000000, credit: 0, txNo: '', txDate: '' },
+    { account: '110102', desc: 'پرداخت هزینه اجاره دفتر از بانک ملی', debit: 0, credit: 180000000, txNo: '4110022', txDate: '1402/08/22' }
+  ],
+  204: [
+    { account: '210101', desc: 'تسویه حساب فاکتور تامین‌کننده', debit: 250000000, credit: 0, txNo: '', txDate: '' },
+    { account: '110102', desc: 'پرداخت وجه فاکتور تامین‌کننده از بانک صادرات', debit: 0, credit: 250000000, txNo: '6654311', txDate: '1402/11/10' }
+  ],
+
+  301: [
+    { account: '110102', desc: 'آرتیکل بدهکار - بابت سند افتتاحیه سال مالی ۱۴۰۱', debit: 2500000000, credit: 0, txNo: '', txDate: '' },
+    { account: '310101', desc: 'آرتیکل بستانکار - بابت سند افتتاحیه سال مالی ۱۴۰۱', debit: 0, credit: 2500000000, txNo: '', txDate: '' }
+  ],
+  302: [
+    { account: '110102', desc: 'دریافت وجه خدمات مشاوره‌ای در بانک ملت', debit: 210000000, credit: 0, txNo: '7700112', txDate: '1401/06/15' },
+    { account: '420102', desc: 'درآمد حاصل از ارائه خدمات', debit: 0, credit: 210000000, txNo: '', txDate: '' }
+  ],
+  303: [
+    { account: '120301', desc: 'خرید سیستم‌ها و نرم‌افزار', debit: 160000000, credit: 0, txNo: '', txDate: '' },
+    { account: '110102', desc: 'خرید سیستم‌ها و نرم‌افزار از بانک ملی', debit: 0, credit: 160000000, txNo: '3109088', txDate: '1401/09/05' }
   ]
 };
 
@@ -4221,16 +4289,56 @@ AppState.moghayeratBanks = [
   {
     id: 1,
     bankName: 'ملت',
-    branchName: 'جاری ۲۲',
+    branchName: 'مرکزی ولیعصر',
     branchCode: '1020',
-    branchAddress: 'خیابان ولیعصر',
+    branchAddress: 'تهران، خیابان ولیعصر، پلاک ۴۵',
     accountType: 'جاری',
     accountNumber: '222217831',
-    accountId: 14 // بانک ملت شعبه ۲۲
+    accountId: 47
+  },
+  {
+    id: 2,
+    bankName: 'ملی',
+    branchName: 'شعبه میدان ونک',
+    branchCode: '0154',
+    branchAddress: 'تهران، میدان ونک، برج نگار',
+    accountType: 'جاری سپهر',
+    accountNumber: '0104889123005',
+    accountId: 47
+  },
+  {
+    id: 3,
+    bankName: 'صادرات',
+    branchName: 'شعبه میرداماد',
+    branchCode: '0892',
+    branchAddress: 'تهران، بلوار میرداماد، جنب ایستگاه مترو',
+    accountType: 'سپرده کوتاه مدت',
+    accountNumber: '0201994821008',
+    accountId: 47
   }
 ];
 
-AppState.bankTransactions = []; // تراکنش‌های ایمپورت‌شده صورتحساب
+AppState.bankTransactions = [
+  // --- بانک ملت (bankId: 1) ---
+  { id: 1, bankId: 1, txDate: '1403/02/12', refNo: '9845120', debit: 0, credit: 450000000, desc: 'واریز حواله اینترنتی پایا از فناوری آریا', beneficiary: 'شرکت فناوری آریا', isClosed: false },
+  { id: 2, bankId: 1, txDate: '1403/05/15', refNo: '9845125', debit: 5000000, credit: 0, desc: 'کارمزد صدور دسته چک و خدمات الکترونیک', beneficiary: 'بانک ملت', isClosed: false },
+  { id: 3, bankId: 1, txDate: '1403/06/05', refNo: '9845130', debit: 0, credit: 280000000, desc: 'واریز از خریدار آقای اکبری', beneficiary: 'محمد اکبری', isClosed: false },
+  { id: 4, bankId: 1, txDate: '1402/04/18', refNo: '8812340', debit: 0, credit: 320000000, desc: 'واریز حواله ساتنا بابت درآمد فروش خدمات', beneficiary: 'بازرگانی پارس', isClosed: false },
+  { id: 5, bankId: 1, txDate: '1402/09/01', refNo: '8812399', debit: 0, credit: 15000000, desc: 'واریز سود سپرده بانکی ماهانه', beneficiary: 'بانک ملت', isClosed: false },
+  { id: 6, bankId: 1, txDate: '1401/06/15', refNo: '7700112', debit: 0, credit: 210000000, desc: 'واریز پایا خدمات مشاوره‌ای', beneficiary: 'صنایع همکار', isClosed: false },
+
+  // --- بانک ملی (bankId: 2) ---
+  { id: 7, bankId: 2, txDate: '1403/04/20', refNo: '5120091', debit: 120000000, credit: 0, desc: 'پرداخت چک ۵۱۲ در وجه علی رضایی بابت ملزومات', beneficiary: 'فروشگاه تجهیزات اداری', isClosed: false },
+  { id: 8, bankId: 2, txDate: '1403/05/14', refNo: '5120095', debit: 0, credit: 75000000, desc: 'واریز نقدی شعبه میدان ونک', beneficiary: 'امین صندوق‌دار', isClosed: false },
+  { id: 9, bankId: 2, txDate: '1403/05/15', refNo: '5120098', debit: 23000000, credit: 0, desc: 'خرید تجهیزات اداری پوز بانکی (تراکنش مغایر)', beneficiary: 'بازرگانی تجهیزات', isClosed: false },
+  { id: 10, bankId: 2, txDate: '1402/08/22', refNo: '4110022', debit: 180000000, credit: 0, desc: 'پرداخت چک اجاره ماهانه دفتر', beneficiary: 'موجر آقای حسینی', isClosed: false },
+  { id: 11, bankId: 2, txDate: '1401/09/05', refNo: '3109088', debit: 160000000, credit: 0, desc: 'پرداخت حواله پایا خریدهای سیستمی', beneficiary: 'توسعه نرم‌افزار نگار', isClosed: false },
+
+  // --- بانک صادرات (bankId: 3) ---
+  { id: 12, bankId: 3, txDate: '1403/03/15', refNo: '7789012', debit: 350000000, credit: 0, desc: 'پرداخت لیست حقوق پرسنل از حساب صادرات', beneficiary: 'پرسنل شرکت', isClosed: false },
+  { id: 13, bankId: 3, txDate: '1403/06/01', refNo: '7789055', debit: 0, credit: 200000000, desc: 'واریز پیش‌پرداخت قرارداد از شرکت پارس', beneficiary: 'شرکت پارس تکنولوژی', isClosed: false },
+  { id: 14, bankId: 3, txDate: '1402/11/10', refNo: '6654311', debit: 250000000, credit: 0, desc: 'تسویه بابت فاکتور تامین‌کننده قطعات', beneficiary: 'بازرگانی واردات قطعات', isClosed: false }
+];
 AppState.ledgerTransactions = []; // تراکنش‌های استخراج‌شده از دفاتر شرکت
 AppState.moghayeratReconciled = false;
 AppState.moghCurrentSubtab = 'defs';
@@ -4318,8 +4426,8 @@ function populateMoghCombos() {
     if (AppState.moghayeratBanks.length > 0) cmbImport.value = AppState.moghayeratBanks[0].id;
   }
   if (cmbReconcile) {
-    cmbReconcile.innerHTML = optionsHtml;
-    if (AppState.moghayeratBanks.length > 0) cmbReconcile.value = AppState.moghayeratBanks[0].id;
+    cmbReconcile.innerHTML = `<option value="all">استفاده از تمام بانکها</option>` + optionsHtml;
+    cmbReconcile.value = 'all';
   }
 }
 
@@ -4660,28 +4768,57 @@ function toggleMoghDateInputs(show) {
 }
 
 function runMoghReconciliation() {
-  const bankId = Number(document.getElementById('cmbMoghReconcileBank')?.value || 1);
-  const bank = AppState.moghayeratBanks.find(b => b.id === bankId);
-  if (!bank) {
-    alert('لطفاً ابتدا مشخصات بانک را در تب اول تعریف کنید.');
-    return;
+  const bankIdVal = document.getElementById('cmbMoghReconcileBank')?.value;
+  const isAll = bankIdVal === 'all';
+  
+  let bankTxs = [];
+  if (isAll) {
+    bankTxs = AppState.bankTransactions;
+  } else {
+    const bankId = Number(bankIdVal || 1);
+    const bank = AppState.moghayeratBanks.find(b => b.id === bankId);
+    if (!bank) {
+      alert('لطفاً ابتدا مشخصات بانک را در تب اول تعریف کنید.');
+      return;
+    }
+    bankTxs = AppState.bankTransactions.filter(t => t.bankId === bankId);
   }
   
-  const bankTxs = AppState.bankTransactions.filter(t => t.bankId === bankId);
   if (bankTxs.length === 0) {
     alert('صورتحسابی برای این بانک یافت نشد. ابتدا باید صورتحساب را در تب دوم بارگذاری و ذخیره کنید.');
     return;
   }
   
-  // استخراج اقلام دفاتر بر اساس سرفصل متناظر بانک
-  // برای ایجاد یک سناریوی جذاب، ما ۶ تراکنش در دفاتر ایجاد می‌کنیم که تعدادی مطابقت داشته باشند
-  AppState.ledgerTransactions = [
-    { id: 1, date: '1403/05/11', sanadNo: '102', debit: 0, credit: 120000000, desc: 'صدور چک ۵۱۲ در وجه علی رضایی', isClosed: false },
-    { id: 2, date: '1403/05/12', sanadNo: '103', debit: 450000000, credit: 0, desc: 'دریافت حواله بانکی از شرکت آریا', isClosed: false },
-    { id: 3, date: '1403/05/14', sanadNo: '104', debit: 75000000, credit: 0, desc: 'واریز نقدی صندوق به بانک', isClosed: false },
-    { id: 4, date: '1403/05/14', sanadNo: '105', debit: 90000000, credit: 0, desc: 'حواله دریافتی بابت طلب شرکت سارا (ثبت اشتباه در دفتر)', isClosed: false },
-    { id: 5, date: '1403/05/15', sanadNo: '106', debit: 0, credit: 20000000, desc: 'پرداخت بابت هزینه‌های خرید تجهیزات اداری (اختلاف با فاکتور بانک)', isClosed: false }
-  ];
+  // استخراج اقلام دفاتر بر اساس اسناد حسابداری ثبت‌شده در سیستم
+  let ledgerItems = [];
+  let itemId = 1;
+  AppState.sanads.forEach(s => {
+    const details = AppState.voucherDetails[s.id] || [];
+    details.forEach(d => {
+      if (d.account === '110102' || d.account === '110101' || d.account.startsWith('1101')) {
+        ledgerItems.push({
+          id: itemId++,
+          date: s.date,
+          sanadNo: String(s.id),
+          debit: d.debit,
+          credit: d.credit,
+          desc: d.desc || s.desc,
+          isClosed: false
+        });
+      }
+    });
+  });
+
+  if (ledgerItems.length === 0) {
+    ledgerItems = [
+      { id: 1, date: '1403/05/11', sanadNo: '102', debit: 0, credit: 120000000, desc: 'صدور چک ۵۱۲ در وجه علی رضایی', isClosed: false },
+      { id: 2, date: '1403/05/12', sanadNo: '103', debit: 450000000, credit: 0, desc: 'دریافت حواله بانکی از شرکت آریا', isClosed: false },
+      { id: 3, date: '1403/05/14', sanadNo: '104', debit: 75000000, credit: 0, desc: 'واریز نقدی صندوق به بانک', isClosed: false },
+      { id: 4, date: '1403/05/14', sanadNo: '105', debit: 90000000, credit: 0, desc: 'حواله دریافتی بابت طلب شرکت سارا (ثبت اشتباه در دفتر)', isClosed: false },
+      { id: 5, date: '1403/05/15', sanadNo: '106', debit: 0, credit: 20000000, desc: 'پرداخت بابت هزینه‌های خرید تجهیزات اداری (اختلاف با فاکتور بانک)', isClosed: false }
+    ];
+  }
+  AppState.ledgerTransactions = ledgerItems;
   
   // الگوریتم تطابق مغایرت
   // بانک:
@@ -4693,7 +4830,12 @@ function runMoghReconciliation() {
   // ۶. خرید ۲۳,۰۰۰,۰۰۰ (بدهکار بانک) -> در دفاتر ۲۰,۰۰۰,۰۰۰ ثبت شده (تراکنش باز به دلیل اختلاف مبلغ)
   
   // بازنشانی
-  bankTxs.forEach(t => t.isClosed = false);
+  if (isAll) {
+    AppState.bankTransactions.forEach(t => t.isClosed = false);
+  } else {
+    const bankId = Number(bankIdVal || 1);
+    AppState.bankTransactions.filter(t => t.bankId === bankId).forEach(t => t.isClosed = false);
+  }
   AppState.ledgerTransactions.forEach(t => t.isClosed = false);
   
   // تطبیق بدهکار بانک با بستانکار دفتر
@@ -4734,7 +4876,8 @@ function renderMoghayeratReconcilePanel() {
   const tbodyLedger = document.getElementById('tblMoghLedgerBody');
   if (!tbodyBank || !tbodyLedger) return;
   
-  const bankId = Number(document.getElementById('cmbMoghReconcileBank')?.value || 1);
+  const bankIdVal = document.getElementById('cmbMoghReconcileBank')?.value || '1';
+  const isAll = bankIdVal === 'all';
   
   // سوییچ کلاس فعال دکمه‌های گرید بانک
   const bankSubtabs = ['all', 'debit', 'credit', 'closed', 'closedDebit', 'closedCredit', 'dup'];
@@ -4757,7 +4900,10 @@ function renderMoghayeratReconcilePanel() {
   });
   
   // فیلترینگ تراکنش‌های بانک
-  let bankList = AppState.bankTransactions.filter(t => t.bankId === bankId);
+  let bankList = isAll
+    ? AppState.bankTransactions
+    : AppState.bankTransactions.filter(t => t.bankId === Number(bankIdVal));
+    
   if (AppState.moghayeratReconciled) {
     if (AppState.moghBankSubtabFilter === 'debit') bankList = bankList.filter(t => !t.isClosed && t.debit > 0);
     else if (AppState.moghBankSubtabFilter === 'credit') bankList = bankList.filter(t => !t.isClosed && t.credit > 0);
