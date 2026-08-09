@@ -4896,6 +4896,52 @@ function sortMoghLedgerGrid(colKey) {
   renderMoghayeratReconcilePanel();
 }
 
+function openSanadFromMoghayerat(sanadNoStr, targetLineIdx) {
+  const sanadId = Number(sanadNoStr);
+  let s = AppState.sanads.find(x => x.id === sanadId);
+  
+  if (!s) {
+    s = {
+      id: sanadId,
+      date: '1403/05/12',
+      desc: `سند شماره ${sanadId}`,
+      debit: 0,
+      credit: 0,
+      status: 'موقت',
+      bakhshId: getCurrentBakhshId(),
+      dayOfYear: 135
+    };
+    AppState.sanads.push(s);
+  }
+
+  AppState.openedFromMoghayerat = true;
+  editSanad(sanadId);
+
+  let focusIdx = 0;
+  if (typeof targetLineIdx === 'number' && targetLineIdx >= 0 && targetLineIdx < AppState.sanadLines.length) {
+    focusIdx = targetLineIdx;
+  } else {
+    const foundIdx = AppState.sanadLines.findIndex(l => l.account && l.account.startsWith('1101'));
+    if (foundIdx !== -1) focusIdx = foundIdx;
+  }
+
+  focusedLineIndex = focusIdx;
+  renderSanadEditorLines();
+
+  setTimeout(() => {
+    const rowEl = document.querySelector(`#sanadLinesEditorBody tr[data-index="${focusIdx}"]`);
+    if (rowEl) {
+      rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const inputs = rowEl.querySelectorAll('input');
+      if (inputs && inputs.length > 0) {
+        const targetInput = inputs[2] || inputs[0];
+        targetInput.focus();
+        targetInput.select();
+      }
+    }
+  }, 150);
+}
+
 function getMoghSortIcon(gridType, colKey) {
   const currentCol = gridType === 'bank' ? AppState.moghBankSortColumn : AppState.moghLedgerSortColumn;
   const currentDir = gridType === 'bank' ? AppState.moghBankSortDir : AppState.moghLedgerSortDir;
@@ -5068,12 +5114,15 @@ function renderMoghayeratReconcilePanel() {
     return `
       <tr style="${rowColor}">
         <td style="width:35px; padding:4px; text-align:center;">${t.origRow}</td>
+        <td style="width:45px; padding:4px; text-align:center;">
+          <button class="btn btn-outline btn-xs" style="padding:1px 6px; font-size:0.65rem; font-weight:bold; border-color:#3b82f6; color:#3b82f6;" onclick="event.stopPropagation(); openSanadFromMoghayerat('${t.sanadNo}', ${t.lineIndex ?? -1})">سند</button>
+        </td>
         <td style="width:75px; padding:4px; text-align:center;">${t.date}</td>
         <td style="width:65px; padding:4px; text-align:center;">${t.sanadNo}</td>
         <td style="width:85px; padding:4px; text-align:center;">${t.txNo || '-'}</td>
         <td style="width:105px; padding:4px; text-align:right; color:#10b981;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
         <td style="width:105px; padding:4px; text-align:right; color:#ef4444;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
-        <td style="width:180px; max-width:180px; padding:4px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.desc}">${t.desc}</td>
+        <td style="width:150px; max-width:150px; padding:4px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.desc}">${t.desc}</td>
         <td style="width:85px; padding:4px; text-align:center;">${statusText}</td>
       </tr>
     `;
