@@ -2137,39 +2137,94 @@ function openPrintDateCal(inputId, btnEl) {
   }, 10);
 }
 
+function selectPrintRangeByNo() {
+  const radioNo = document.getElementById('printRangeByNo');
+  if (radioNo && !radioNo.checked) {
+    radioNo.checked = true;
+    togglePrintRangeInputs();
+  }
+}
+
+function updatePrintNumTypeState() {
+  const isByNo = document.getElementById('printRangeByNo')?.checked;
+  const numTypeSelect = document.getElementById('printSanadNumType');
+  const numType = numTypeSelect?.value || 'sanadNo';
+
+  const rowSanad = document.getElementById('rowSanadNoInputs');
+  const rowDay = document.getElementById('rowDayNoInputs');
+
+  const fromSanad = document.getElementById('printFromSanadNo');
+  const toSanad = document.getElementById('printToSanadNo');
+  const fromDay = document.getElementById('printFromDayNo');
+  const toDay = document.getElementById('printToDayNo');
+
+  if (!isByNo) {
+    if (numTypeSelect) numTypeSelect.disabled = true;
+    if (fromSanad) fromSanad.disabled = true;
+    if (toSanad) toSanad.disabled = true;
+    if (fromDay) fromDay.disabled = true;
+    if (toDay) toDay.disabled = true;
+
+    if (rowSanad) rowSanad.style.opacity = '0.4';
+    if (rowDay) rowDay.style.opacity = '0.4';
+    return;
+  }
+
+  if (numTypeSelect) numTypeSelect.disabled = false;
+
+  if (numType === 'sanadNo') {
+    // Item 1: Enable Sanad No row only
+    if (fromSanad) fromSanad.disabled = false;
+    if (toSanad) toSanad.disabled = false;
+    if (fromDay) fromDay.disabled = true;
+    if (toDay) toDay.disabled = true;
+
+    if (rowSanad) rowSanad.style.opacity = '1';
+    if (rowDay) rowDay.style.opacity = '0.4';
+  } else if (numType === 'dayNo') {
+    // Item 2: Enable Day No row only
+    if (fromSanad) fromSanad.disabled = true;
+    if (toSanad) toSanad.disabled = true;
+    if (fromDay) fromDay.disabled = false;
+    if (toDay) toDay.disabled = false;
+
+    if (rowSanad) rowSanad.style.opacity = '0.4';
+    if (rowDay) rowDay.style.opacity = '1';
+  } else if (numType === 'bothNo') {
+    // Item 3: Enable Both rows
+    if (fromSanad) fromSanad.disabled = false;
+    if (toSanad) toSanad.disabled = false;
+    if (fromDay) fromDay.disabled = false;
+    if (toDay) toDay.disabled = false;
+
+    if (rowSanad) rowSanad.style.opacity = '1';
+    if (rowDay) rowDay.style.opacity = '1';
+  }
+}
+
 function togglePrintRangeInputs() {
   const isByNo = document.getElementById('printRangeByNo')?.checked;
   const containerNo = document.getElementById('printRangeNoContainer');
   const containerDate = document.getElementById('printRangeDateContainer');
 
-  const fromNo = document.getElementById('printFromSanadNo');
-  const toNo = document.getElementById('printToSanadNo');
   const fromDate = document.getElementById('printFromDate');
   const toDate = document.getElementById('printToDate');
-  const btnFrom = document.getElementById('btnCalPrintFrom');
-  const btnTo = document.getElementById('btnCalPrintTo');
 
   if (isByNo) {
-    if (fromNo) fromNo.disabled = false;
-    if (toNo) toNo.disabled = false;
     if (containerNo) containerNo.style.opacity = '1';
+    if (containerDate) containerDate.style.opacity = '0.4';
 
     if (fromDate) fromDate.disabled = true;
     if (toDate) toDate.disabled = true;
-    if (btnFrom) btnFrom.disabled = true;
-    if (btnTo) btnTo.disabled = true;
-    if (containerDate) containerDate.style.opacity = '0.4';
   } else {
-    if (fromNo) fromNo.disabled = true;
-    if (toNo) toNo.disabled = true;
     if (containerNo) containerNo.style.opacity = '0.4';
+    if (containerDate) containerDate.style.opacity = '1';
 
     if (fromDate) fromDate.disabled = false;
     if (toDate) toDate.disabled = false;
-    if (btnFrom) btnFrom.disabled = false;
-    if (btnTo) btnTo.disabled = false;
-    if (containerDate) containerDate.style.opacity = '1';
   }
+
+  updatePrintNumTypeState();
 }
 
 function submitPrintVouchersRange() {
@@ -2177,9 +2232,24 @@ function submitPrintVouchersRange() {
   let selectedVouchers = [];
 
   if (isByNo) {
-    const fromNo = parseInt(document.getElementById('printFromSanadNo')?.value || '0', 10);
-    const toNo = parseInt(document.getElementById('printToSanadNo')?.value || '999999', 10);
-    selectedVouchers = AppState.sanads.filter(s => s.id >= fromNo && s.id <= toNo);
+    const numType = document.getElementById('printSanadNumType')?.value || 'sanadNo';
+    const fromSanad = parseInt(document.getElementById('printFromSanadNo')?.value || '0', 10);
+    const toSanad = parseInt(document.getElementById('printToSanadNo')?.value || '999999', 10);
+    const fromDay = parseInt(document.getElementById('printFromDayNo')?.value || '0', 10);
+    const toDay = parseInt(document.getElementById('printToDayNo')?.value || '999999', 10);
+
+    selectedVouchers = AppState.sanads.filter(s => {
+      if (!s.dayOfYear) s.dayOfYear = getJalaliDayOfYear(s.date);
+
+      if (numType === 'sanadNo') {
+        return s.id >= fromSanad && s.id <= toSanad;
+      } else if (numType === 'dayNo') {
+        return s.dayOfYear >= fromDay && s.dayOfYear <= toDay;
+      } else if (numType === 'bothNo') {
+        return (s.id >= fromSanad && s.id <= toSanad) && (s.dayOfYear >= fromDay && s.dayOfYear <= toDay);
+      }
+      return true;
+    });
   } else {
     const fromDate = (document.getElementById('printFromDate')?.value || '').trim();
     const toDate = (document.getElementById('printToDate')?.value || '').trim();

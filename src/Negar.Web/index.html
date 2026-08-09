@@ -3230,20 +3230,47 @@
 
         <!-- Option 1: By Voucher Numbers -->
         <div style="margin-bottom:16px;">
-          <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:#f1f5f9; margin-bottom:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:#f1f5f9; margin-bottom:10px;">
             <input type="radio" id="printRangeByNo" name="printRangeType" value="no" checked onchange="togglePrintRangeInputs()">
             <span>انتخاب بازه بر اساس شماره اسناد</span>
           </label>
           
-          <div id="printRangeNoContainer" style="display:flex; align-items:center; gap:12px; padding-right:24px; transition:opacity 0.2s ease;">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:0.82rem; color:var(--text-muted);">از سند شماره:</span>
-              <input type="number" id="printFromSanadNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="101" />
+          <div id="printRangeNoContainer" style="display:flex; flex-direction:column; gap:10px; padding-right:24px; transition:opacity 0.2s ease;">
+            
+            <!-- ComboBox: Select Number Type -->
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">انتخاب نوع شماره سند:</span>
+              <select id="printSanadNumType" class="form-input" style="height:30px; font-size:0.8rem; background:rgba(30,41,59,0.9); color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 8px; flex:1;" onchange="updatePrintNumTypeState()">
+                <option value="sanadNo">استفاده از شماره سند</option>
+                <option value="dayNo">استفاده از شماره روز</option>
+                <option value="bothNo">استفاده از هر دو شماره</option>
+              </select>
             </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:0.82rem; color:var(--text-muted);">تا سند شماره:</span>
-              <input type="number" id="printToSanadNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="105" />
+
+            <!-- Top Row: Sanad Number -->
+            <div id="rowSanadNoInputs" style="display:flex; align-items:center; gap:12px; transition:opacity 0.2s ease;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.82rem; color:var(--text-muted);">از شماره سند:</span>
+                <input type="number" id="printFromSanadNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="101" onfocus="selectPrintRangeByNo()" />
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.82rem; color:var(--text-muted);">تا شماره سند:</span>
+                <input type="number" id="printToSanadNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="105" onfocus="selectPrintRangeByNo()" />
+              </div>
             </div>
+
+            <!-- Bottom Row: Daily Day Number -->
+            <div id="rowDayNoInputs" style="display:flex; align-items:center; gap:12px; transition:opacity 0.2s ease;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.82rem; color:var(--text-muted);">از شماره روزانه:</span>
+                <input type="number" id="printFromDayNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="1" onfocus="selectPrintRangeByNo()" />
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.82rem; color:var(--text-muted);">تا شماره روزانه:</span>
+                <input type="number" id="printToDayNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="365" onfocus="selectPrintRangeByNo()" />
+              </div>
+            </div>
+
           </div>
         </div>
 
