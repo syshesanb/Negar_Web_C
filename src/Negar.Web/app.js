@@ -2269,7 +2269,24 @@ function submitPrintVouchersRange() {
 
   AppState.voucherDetails = AppState.voucherDetails || {};
 
+  const numType = document.getElementById('printSanadNumType')?.value || 'sanadNo';
+
   const vouchersHtml = selectedVouchers.map(s => {
+    if (!s.dayOfYear) {
+      s.dayOfYear = getJalaliDayOfYear(s.date);
+    }
+
+    let numDisplay = '';
+    if (numType === 'sanadNo') {
+      numDisplay = `${s.id}`;
+    } else if (numType === 'dayNo') {
+      numDisplay = `${s.dayOfYear || ''}`;
+    } else if (numType === 'bothNo') {
+      numDisplay = `${s.id} / ${s.dayOfYear || ''}`;
+    } else {
+      numDisplay = `${s.id}`;
+    }
+
     const targetLines = AppState.voucherDetails[s.id] || [
       { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
       { account: '310101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
@@ -2294,10 +2311,10 @@ function submitPrintVouchersRange() {
       <div class="voucher-page">
         <div class="voucher-header">
           <div class="company-title">${SessionState.company?.name || 'شرکت نمونه نگار'}</div>
-          <div class="doc-title">سند حسابداری شماره #${s.id}</div>
+          <div class="doc-title">سند حسابداری</div>
           <div class="doc-info">
+            <div>شماره سند: <b>${numDisplay}</b></div>
             <div>تاریخ: <b>${s.date}</b></div>
-            <div>شماره روز: <b>${s.dayOfYear || ''}</b></div>
             <div>وضعیت: <b>${s.status}</b></div>
           </div>
         </div>
