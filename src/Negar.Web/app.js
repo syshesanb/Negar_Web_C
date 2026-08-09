@@ -2368,6 +2368,33 @@ function handleAmountInput(input, index, field) {
   input.setSelectionRange(newCursor, newCursor);
 }
 
+function cleanAmountSearchInput(input) {
+  if (!input || input.value === undefined) return;
+  let val = input.value;
+
+  // Convert Persian & Arabic digits to standard 0-9 digits
+  val = val.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+           .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
+  // Restrict input to digits (0-9), prefix chars (> < = *), and comma (,)
+  let cleaned = val.replace(/[^><=\*0-9,]/g, '');
+
+  // Prefix characters (> < = *) can ONLY be at index 0!
+  if (cleaned.length > 1) {
+    const first = cleaned[0];
+    const rest = cleaned.slice(1).replace(/[><=\*]/g, '');
+    cleaned = first + rest;
+  }
+
+  if (input.value !== cleaned) {
+    const start = input.selectionStart;
+    input.value = cleaned;
+    try {
+      input.setSelectionRange(start, start);
+    } catch(e) {}
+  }
+}
+
 function matchAmount(val, filterText) {
   filterText = filterText.replace(/,/g, '').trim();
   if (filterText.length === 0) return true;
