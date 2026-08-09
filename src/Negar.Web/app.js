@@ -5002,7 +5002,7 @@ function renderMoghayeratReconcilePanel() {
   
   tbodyBank.innerHTML = mappedBankList.map((t) => {
     const statusText = t.isClosed 
-      ? '<span class="badge badge-success">✓ بسته شده</span>' 
+      ? '<span class="badge badge-success">✓ بسته</span>' 
       : '<span class="badge badge-danger">✗ باز</span>';
       
     const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
@@ -5060,7 +5060,7 @@ function renderMoghayeratReconcilePanel() {
   
   tbodyLedger.innerHTML = mappedLedgerList.map((t) => {
     const statusText = t.isClosed 
-      ? '<span class="badge badge-success">✓ بسته شده</span>' 
+      ? '<span class="badge badge-success">✓ بسته</span>' 
       : '<span class="badge badge-danger">✗ باز</span>';
       
     const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
