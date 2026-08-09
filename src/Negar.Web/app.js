@@ -5318,16 +5318,32 @@ function ensureSanadMockLines() {
 }
 
 // 1. Trial Balance (تراز آزمایشی)
-function toggleTarazNode(code) {
+function toggleTarazNode(nodeIdOrCode) {
   if (!AppState.expandedTarazNodes) {
     AppState.expandedTarazNodes = new Set();
   }
-  if (AppState.expandedTarazNodes.has(code)) {
-    AppState.expandedTarazNodes.delete(code);
+  const key = String(nodeIdOrCode);
+  if (AppState.expandedTarazNodes.has(key)) {
+    AppState.expandedTarazNodes.delete(key);
   } else {
-    AppState.expandedTarazNodes.add(code);
+    AppState.expandedTarazNodes.add(key);
   }
   calculateTrialBalance();
+}
+
+function isAccountTreeNodeVisible(acc) {
+  let curr = acc;
+  while (curr && curr.parentId !== null && curr.parentId !== undefined) {
+    const parentAcc = AppState.accounts.find(p => p.id === curr.parentId);
+    if (!parentAcc) break;
+    const parentKeyId = String(parentAcc.id);
+    const parentKeyCode = String(parentAcc.code);
+    if (!AppState.expandedTarazNodes.has(parentKeyId) && !AppState.expandedTarazNodes.has(parentKeyCode)) {
+      return false;
+    }
+    curr = parentAcc;
+  }
+  return true;
 }
 
 function populateTarazFields() {
@@ -5360,47 +5376,45 @@ function calculateTrialBalance() {
   let headerHtml = '';
   if (colCount === 2) {
     headerHtml = `
-      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
-        <th style="padding:6px; text-align:center; width:50px;">دفتر</th>
-        <th style="padding:6px; text-align:center; width:120px;">کد حساب</th>
-        <th style="padding:6px; text-align:right;">نام حساب</th>
-        <th style="padding:6px; text-align:left; width:180px;">مانده بدهکار (ریال)</th>
-        <th style="padding:6px; text-align:left; width:180px;">مانده بستانکار (ریال)</th>
+      <tr style="background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-bottom:2px solid #3b82f6; color:#f8fafc;">
+        <th style="padding:8px; text-align:center; width:55px;">دفتر</th>
+        <th style="padding:8px; text-align:center; width:110px;">کد حساب</th>
+        <th style="padding:8px; text-align:right;">نام حساب</th>
+        <th style="padding:8px; text-align:left; width:180px;">مانده بدهکار (ریال)</th>
+        <th style="padding:8px; text-align:left; width:180px;">مانده بستانکار (ریال)</th>
       </tr>
     `;
   } else if (colCount === 4) {
     headerHtml = `
-      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
-        <th style="padding:6px; text-align:center; width:50px;">دفتر</th>
-        <th style="padding:6px; text-align:center; width:120px;">کد حساب</th>
-        <th style="padding:6px; text-align:right;">نام حساب</th>
-        <th style="padding:6px; text-align:left; width:150px;">گردش بدهکار (ریال)</th>
-        <th style="padding:6px; text-align:left; width:150px;">گردش بستانکار (ریال)</th>
-        <th style="padding:6px; text-align:left; width:150px;">مانده بدهکار (ریال)</th>
-        <th style="padding:6px; text-align:left; width:150px;">مانده بستانکار (ریال)</th>
+      <tr style="background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-bottom:2px solid #3b82f6; color:#f8fafc;">
+        <th style="padding:8px; text-align:center; width:55px;">دفتر</th>
+        <th style="padding:8px; text-align:center; width:110px;">کد حساب</th>
+        <th style="padding:8px; text-align:right;">نام حساب</th>
+        <th style="padding:8px; text-align:left; width:150px;">گردش بدهکار (ریال)</th>
+        <th style="padding:8px; text-align:left; width:150px;">گردش بستانکار (ریال)</th>
+        <th style="padding:8px; text-align:left; width:150px;">مانده بدهکار (ریال)</th>
+        <th style="padding:8px; text-align:left; width:150px;">مانده بستانکار (ریال)</th>
       </tr>
     `;
   } else {
     headerHtml = `
-      <tr style="background:var(--bg-secondary); border-bottom:1px solid var(--border-color);">
-        <th style="padding:6px; text-align:center; width:50px;">دفتر</th>
-        <th style="padding:6px; text-align:center; width:100px;">کد حساب</th>
-        <th style="padding:6px; text-align:right;">نام حساب</th>
-        <th style="padding:6px; text-align:left; width:130px;">مانده قبل بدهکار</th>
-        <th style="padding:6px; text-align:left; width:130px;">مانده قبل بستانکار</th>
-        <th style="padding:6px; text-align:left; width:130px;">گردش طی بدهکار</th>
-        <th style="padding:6px; text-align:left; width:130px;">گردش طی بستانکار</th>
-        <th style="padding:6px; text-align:left; width:130px;">مانده نهایی بدهکار</th>
-        <th style="padding:6px; text-align:left; width:130px;">مانده نهایی بستانکار</th>
+      <tr style="background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-bottom:2px solid #3b82f6; color:#f8fafc;">
+        <th style="padding:8px; text-align:center; width:55px;">دفتر</th>
+        <th style="padding:8px; text-align:center; width:100px;">کد حساب</th>
+        <th style="padding:8px; text-align:right;">نام حساب</th>
+        <th style="padding:8px; text-align:left; width:130px;">مانده قبل بدهکار</th>
+        <th style="padding:8px; text-align:left; width:130px;">مانده قبل بستانکار</th>
+        <th style="padding:8px; text-align:left; width:130px;">گردش طی بدهکار</th>
+        <th style="padding:8px; text-align:left; width:130px;">گردش طی بستانکار</th>
+        <th style="padding:8px; text-align:left; width:130px;">مانده نهایی بدهکار</th>
+        <th style="padding:8px; text-align:left; width:130px;">مانده نهایی بستانکار</th>
       </tr>
     `;
   }
   if (headerRow) headerRow.innerHTML = headerHtml;
 
-  // سورت ساختار درختی حساب‌ها بر اساس کد حساب
-  const sortedAccounts = [...AppState.accounts].sort((a, b) => 
-    a.code.localeCompare(b.code, 'fa', { numeric: true })
-  );
+  // استفاده از پیمایش پیش‌ترتیب (Depth-First Pre-Order) تا تمام فرزندان بلافاصله زیر والد قرار گیرند
+  const sortedAccounts = sortTreePreOrder(AppState.accounts);
 
   // Process data
   let rowData = [];
@@ -5414,21 +5428,8 @@ function calculateTrialBalance() {
 
     if (!meetsLevel) return;
 
-    // بررسی وضعیت گستردگی/جمعبندی گره‌های والد در درخت
-    let isVisible = true;
-    if (acc.code.length > 4) {
-      const parentMoein = acc.code.substring(0, 4);
-      if (sortedAccounts.some(a => a.code === parentMoein) && !AppState.expandedTarazNodes.has(parentMoein)) isVisible = false;
-    }
-    if (acc.code.length > 2) {
-      const parentKol = acc.code.substring(0, 2);
-      if (sortedAccounts.some(a => a.code === parentKol) && !AppState.expandedTarazNodes.has(parentKol)) isVisible = false;
-    }
-    if (acc.code.length > 1) {
-      const parentGroup = acc.code.substring(0, 1);
-      if (sortedAccounts.some(a => a.code === parentGroup) && !AppState.expandedTarazNodes.has(parentGroup)) isVisible = false;
-    }
-    if (!isVisible) return;
+    // بررسی وضعیت گستردگی/جمعبندی والدها در درخت
+    if (!isAccountTreeNodeVisible(acc)) return;
 
     // Calculate sums
     let debitBefore = 0, creditBefore = 0;
@@ -5481,30 +5482,43 @@ function calculateTrialBalance() {
     return;
   }
 
-  // Render rows
+  // Render rows with modern high-contrast styling
   bodyEl.innerHTML = rowData.map(row => {
     const acc = row.acc;
-    const hasChildren = sortedAccounts.some(child => child.code !== acc.code && child.code.startsWith(acc.code));
-    const isExpanded = AppState.expandedTarazNodes.has(acc.code);
+    const hasChildren = AppState.accounts.some(child => child.parentId === acc.id);
+    const nodeKey = String(acc.id);
+    const isExpanded = AppState.expandedTarazNodes.has(nodeKey) || AppState.expandedTarazNodes.has(acc.code);
 
-    let style = '';
+    let rowStyle = '';
+    let codeColor = '#38bdf8';
+    let titleColor = '#f8fafc';
     let indent = 0;
-    if (acc.type === 'گروه') {
-      style = 'background:rgba(210, 228, 255, 0.25); font-weight:bold; color:#1e3a8a;';
-      indent = 0;
-    } else if (acc.type === 'کل') {
-      style = 'background:rgba(232, 243, 255, 0.18); font-weight:bold; color:#1e40af;';
-      indent = 16;
-    } else if (acc.type === 'معین') {
-      style = 'background:rgba(246, 251, 255, 0.1);';
-      indent = 34;
+
+    const level = getAccountLevel(acc);
+    if (level === 0 || acc.type === 'گروه') {
+      rowStyle = 'background:linear-gradient(90deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%); font-weight:bold; border-bottom:1px solid rgba(59, 130, 246, 0.2);';
+      codeColor = '#93c5fd';
+      titleColor = '#60a5fa';
+      indent = 8;
+    } else if (level === 1 || acc.type === 'کل') {
+      rowStyle = 'background:linear-gradient(90deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%); font-weight:600; border-bottom:1px solid rgba(255, 255, 255, 0.05);';
+      codeColor = '#38bdf8';
+      titleColor = '#e2e8f0';
+      indent = 28;
+    } else if (level === 2 || acc.type === 'معین') {
+      rowStyle = 'background:rgba(15, 23, 42, 0.25); border-bottom:1px solid rgba(255, 255, 255, 0.03);';
+      codeColor = '#a7f3d0';
+      titleColor = '#cbd5e1';
+      indent = 48;
     } else {
-      style = 'background:transparent;';
-      indent = 54;
+      rowStyle = 'background:transparent; border-bottom:1px solid rgba(255, 255, 255, 0.02);';
+      codeColor = '#cbd5e1';
+      titleColor = '#94a3b8';
+      indent = 68;
     }
 
     const toggleBtn = hasChildren
-      ? `<button class="btn btn-outline" style="width:20px; height:20px; padding:0; line-height:18px; text-align:center; font-weight:bold; font-size:0.85rem; border-color:${isExpanded ? '#ef4444' : '#3b82f6'}; color:${isExpanded ? '#ef4444' : '#3b82f6'}; border-radius:4px; margin-left:6px; background:var(--bg-primary); cursor:pointer;" onclick="event.stopPropagation(); toggleTarazNode('${acc.code}')">${isExpanded ? '-' : '+'}</button>`
+      ? `<button class="btn btn-outline" style="width:20px; height:20px; padding:0; line-height:18px; text-align:center; font-weight:bold; font-size:0.85rem; border-color:${isExpanded ? '#fb7185' : '#38bdf8'}; color:${isExpanded ? '#fb7185' : '#38bdf8'}; background:${isExpanded ? 'rgba(251, 113, 133, 0.15)' : 'rgba(56, 189, 248, 0.15)'}; border-radius:4px; margin-left:6px; cursor:pointer; box-shadow:0 0 6px ${isExpanded ? 'rgba(251,113,133,0.2)' : 'rgba(56,189,248,0.2)'};" onclick="event.stopPropagation(); toggleTarazNode('${acc.id}')">${isExpanded ? '-' : '+'}</button>`
       : `<span style="display:inline-block; width:20px; height:20px; margin-left:6px;"></span>`;
 
     const folderIcon = hasChildren ? (isExpanded ? '📂' : '📁') : '📄';
@@ -5512,45 +5526,48 @@ function calculateTrialBalance() {
     const nameSpan = `<span style="padding-right:${indent}px; display:inline-flex; align-items:center;">
       ${toggleBtn}
       <span style="margin-left:6px; font-size:0.85rem;">${folderIcon}</span>
-      <span>${acc.name}</span>
+      <span style="color:${titleColor};">${acc.name}</span>
     </span>`;
 
-    const ledgerBtn = `<button class="btn btn-outline" style="padding:1px 5px; font-size:0.7rem; border-color:var(--accent-color); color:var(--accent-color);" onclick="navigateToLedger('${acc.code}')">دفتر</button>`;
+    const ledgerBtn = `<button class="btn btn-outline" style="padding:2px 6px; font-size:0.68rem; border-color:var(--accent-color); color:var(--accent-color); border-radius:3px;" onclick="navigateToLedger('${acc.code}')">دفتر</button>`;
+
+    const formatDeb = (val) => val ? `<span style="color:#f87171; font-weight:600;">${val.toLocaleString()}</span>` : '<span style="color:#64748b;">-</span>';
+    const formatCred = (val) => val ? `<span style="color:#34d399; font-weight:600;">${val.toLocaleString()}</span>` : '<span style="color:#64748b;">-</span>';
 
     if (colCount === 2) {
       return `
-        <tr style="${style}">
-          <td style="text-align:center;">${ledgerBtn}</td>
-          <td style="text-align:center; font-family:monospace; font-weight:bold;">${acc.code}</td>
-          <td>${nameSpan}</td>
-          <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
-          <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+        <tr style="${rowStyle}">
+          <td style="text-align:center; padding:6px;">${ledgerBtn}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold; color:${codeColor}; padding:6px;">${acc.code}</td>
+          <td style="padding:6px;">${nameSpan}</td>
+          <td style="text-align:left; padding:6px;">${formatDeb(row.endDeb)}</td>
+          <td style="text-align:left; padding:6px;">${formatCred(row.endCred)}</td>
         </tr>
       `;
     } else if (colCount === 4) {
       return `
-        <tr style="${style}">
-          <td style="text-align:center;">${ledgerBtn}</td>
-          <td style="text-align:center; font-family:monospace; font-weight:bold;">${acc.code}</td>
-          <td>${nameSpan}</td>
-          <td style="text-align:left;">${row.debitTurnover ? row.debitTurnover.toLocaleString() : '0'}</td>
-          <td style="text-align:left;">${row.creditTurnover ? row.creditTurnover.toLocaleString() : '0'}</td>
-          <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
-          <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+        <tr style="${rowStyle}">
+          <td style="text-align:center; padding:6px;">${ledgerBtn}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold; color:${codeColor}; padding:6px;">${acc.code}</td>
+          <td style="padding:6px;">${nameSpan}</td>
+          <td style="text-align:left; padding:6px;">${formatDeb(row.debitTurnover)}</td>
+          <td style="text-align:left; padding:6px;">${formatCred(row.creditTurnover)}</td>
+          <td style="text-align:left; padding:6px;">${formatDeb(row.endDeb)}</td>
+          <td style="text-align:left; padding:6px;">${formatCred(row.endCred)}</td>
         </tr>
       `;
     } else {
       return `
-        <tr style="${style}">
-          <td style="text-align:center;">${ledgerBtn}</td>
-          <td style="text-align:center; font-family:monospace; font-weight:bold;">${acc.code}</td>
-          <td>${nameSpan}</td>
-          <td style="text-align:left; color:#6b7280;">${row.beforeDeb ? row.beforeDeb.toLocaleString() : '0'}</td>
-          <td style="text-align:left; color:#6b7280;">${row.beforeCred ? row.beforeCred.toLocaleString() : '0'}</td>
-          <td style="text-align:left;">${row.debitTurnover ? row.debitTurnover.toLocaleString() : '0'}</td>
-          <td style="text-align:left;">${row.creditTurnover ? row.creditTurnover.toLocaleString() : '0'}</td>
-          <td style="text-align:left; font-weight:bold;">${row.endDeb ? row.endDeb.toLocaleString() : '0'}</td>
-          <td style="text-align:left; font-weight:bold;">${row.endCred ? row.endCred.toLocaleString() : '0'}</td>
+        <tr style="${rowStyle}">
+          <td style="text-align:center; padding:6px;">${ledgerBtn}</td>
+          <td style="text-align:center; font-family:monospace; font-weight:bold; color:${codeColor}; padding:6px;">${acc.code}</td>
+          <td style="padding:6px;">${nameSpan}</td>
+          <td style="text-align:left; padding:6px;">${formatDeb(row.beforeDeb)}</td>
+          <td style="text-align:left; padding:6px;">${formatCred(row.beforeCred)}</td>
+          <td style="text-align:left; padding:6px;">${formatDeb(row.debitTurnover)}</td>
+          <td style="text-align:left; padding:6px;">${formatCred(row.creditTurnover)}</td>
+          <td style="text-align:left; padding:6px;">${formatDeb(row.endDeb)}</td>
+          <td style="text-align:left; padding:6px;">${formatCred(row.endCred)}</td>
         </tr>
       `;
     }
