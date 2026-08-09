@@ -523,10 +523,9 @@ function toggleAppSidebar(forceState) {
 
 function switchRibbon(moduleId, tabEl) {
   AppState.currentModule = moduleId;
-  AppState.currentForm = null;
 
-  // Update active status on sidebar & ribbon nav items
-  document.querySelectorAll('.ribbon-tab, .sidebar-nav-item').forEach(t => t.classList.remove('active'));
+  // Update active status on sidebar nav items
+  document.querySelectorAll('.sidebar-nav-item').forEach(t => t.classList.remove('active'));
   
   if (tabEl) {
     tabEl.classList.add('active');
@@ -535,9 +534,93 @@ function switchRibbon(moduleId, tabEl) {
     if (navItem) navItem.classList.add('active');
   }
 
-  // Hide forms area, show tiles
-  showTiles(moduleId);
+  // Ensure sidebar is expanded so user sees active module item alongside flyout panel
+  toggleAppSidebar(false);
+
+  // Open Flyout Submenu Panel floating over current page WITHOUT changing background workspace!
+  openModuleFlyoutPanel(moduleId);
 }
+
+function openModuleFlyoutPanel(moduleId) {
+  const panel = document.getElementById('moduleFlyoutPanel');
+  const titleEl = document.getElementById('flyoutTitle');
+  const bodyEl = document.getElementById('flyoutBody');
+  const targetTiles = document.getElementById('tiles-' + moduleId);
+  if (!panel || !bodyEl || !targetTiles) return;
+
+  // 1. Get module title
+  const pageTitle = targetTiles.querySelector('.page-title');
+  if (titleEl && pageTitle) {
+    titleEl.textContent = pageTitle.textContent.trim();
+  }
+
+  // 2. Clear previous flyout cards
+  bodyEl.innerHTML = '';
+
+  // 3. Extract tile-card items from targetTiles
+  const cards = targetTiles.querySelectorAll('.tile-card');
+  cards.forEach(card => {
+    const iconBox = card.querySelector('.tile-icon-box');
+    const titleBox = card.querySelector('.tile-title');
+    const onclickAttr = card.getAttribute('onclick') || '';
+
+    const item = document.createElement('div');
+    item.className = 'flyout-card-item';
+    
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'flyout-card-icon ' + (iconBox ? iconBox.className : '');
+    iconDiv.innerHTML = iconBox ? iconBox.innerHTML : '⚡';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'flyout-card-title';
+    titleDiv.textContent = titleBox ? titleBox.textContent.trim() : '';
+
+    item.appendChild(iconDiv);
+    item.appendChild(titleDiv);
+
+    // Onclick: Open in a NEW BROWSER TAB and close flyout panel!
+    item.onclick = function(e) {
+      e.stopPropagation();
+      closeModuleFlyoutPanel();
+      executeCardInNewTab(onclickAttr);
+    };
+
+    bodyEl.appendChild(item);
+  });
+
+  // Display flyout panel
+  panel.style.display = 'flex';
+}
+
+function closeModuleFlyoutPanel() {
+  const panel = document.getElementById('moduleFlyoutPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function executeCardInNewTab(onclickAttr) {
+  if (onclickAttr.includes('openHesabdariMain')) {
+    const match = onclickAttr.match(/openHesabdariMain\(['"]([^'"]+)['"]\)/);
+    const mode = match ? match[1] : 'coding';
+    window.open(`index.html?form=form-hesabdari-main&mode=${mode}`, '_blank');
+  } else if (onclickAttr.includes('showForm')) {
+    const match = onclickAttr.match(/showForm\(['"]([^'"]+)['"]\)/);
+    if (match && match[1]) {
+      window.open(`index.html?form=${match[1]}`, '_blank');
+    }
+  } else {
+    window.open(`index.html`, '_blank');
+  }
+}
+
+// Close flyout panel when clicking outside
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('moduleFlyoutPanel');
+  const sidebar = document.getElementById('appSidebar');
+  if (!panel || panel.style.display === 'none') return;
+  if (!panel.contains(e.target) && !sidebar.contains(e.target)) {
+    closeModuleFlyoutPanel();
+  }
+});
 
 function showTiles(moduleId) {
   document.body.classList.remove('accounts-mode');
