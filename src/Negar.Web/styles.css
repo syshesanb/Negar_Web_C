@@ -1014,7 +1014,7 @@ tr:hover td { background: var(--accent-light); }
 ══════════════════════════════════════════════════════ */
 .pcal-popup {
   position: fixed;  /* fixed so it floats above everything */
-  z-index: 99999;
+  z-index: 999999 !important;
   width: 298px;
   background: #0f1e35;
   border: 1px solid var(--accent-color);

@@ -211,6 +211,7 @@ const PersianCal = (() => {
 
       popup.style.top     = top  + 'px';
       popup.style.left    = left + 'px';
+      popup.style.zIndex  = '999999';
       popup.style.display = 'block';
 
       render();
