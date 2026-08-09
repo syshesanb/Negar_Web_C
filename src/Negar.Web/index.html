@@ -1455,14 +1455,14 @@
                     <table style="width:100%; border-collapse:collapse; font-size:0.75rem; table-layout:fixed;" id="tblMoghBankStatement">
                       <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
                         <tr style="border-bottom:1px solid var(--border-color);">
-                          <th style="width:50px; padding:4px; text-align:center;">ردیف</th>
-                          <th style="width:90px; padding:4px; text-align:center;">تاریخ تراکنش</th>
-                          <th style="width:80px; padding:4px; text-align:center;">شماره سند</th>
-                          <th style="width:100px; padding:4px; text-align:center;">شماره پیگیری</th>
-                          <th style="width:130px; padding:4px; text-align:right;">برداشت (بدهکار)</th>
-                          <th style="width:130px; padding:4px; text-align:right;">واریز (بستانکار)</th>
-                          <th style="padding:4px; text-align:right;">شرح تراکنش</th>
-                          <th style="width:85px; padding:4px; text-align:center;">وضعیت</th>
+                          <th id="thMoghBank_row" data-title="ردیف" style="width:50px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('row')">ردیف</th>
+                          <th id="thMoghBank_txDate" data-title="تاریخ تراکنش" style="width:90px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('txDate')">تاریخ تراکنش</th>
+                          <th id="thMoghBank_sanadNo" data-title="شماره سند" style="width:80px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('sanadNo')">شماره سند</th>
+                          <th id="thMoghBank_refNo" data-title="شماره پیگیری" style="width:100px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('refNo')">شماره پیگیری</th>
+                          <th id="thMoghBank_debit" data-title="برداشت (بدهکار)" style="width:130px; padding:4px; text-align:right; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('debit')">برداشت (بدهکار)</th>
+                          <th id="thMoghBank_credit" data-title="واریز (بستانکار)" style="width:130px; padding:4px; text-align:right; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('credit')">واریز (بستانکار)</th>
+                          <th id="thMoghBank_desc" data-title="شرح تراکنش" style="padding:4px; text-align:right; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('desc')">شرح تراکنش</th>
+                          <th id="thMoghBank_isClosed" data-title="وضعیت" style="width:85px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghBankGrid('isClosed')">وضعیت</th>
                         </tr>
                       </thead>
                       <tbody id="tblMoghBankStatementBody"></tbody>
@@ -1493,14 +1493,14 @@
                     <table style="width:100%; border-collapse:collapse; font-size:0.75rem; table-layout:fixed;" id="tblMoghLedger">
                       <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
                         <tr style="border-bottom:1px solid var(--border-color);">
-                          <th style="width:50px; padding:4px; text-align:center;">ردیف</th>
-                          <th style="width:90px; padding:4px; text-align:center;">تاریخ سند</th>
-                          <th style="width:80px; padding:4px; text-align:center;">شماره سند</th>
-                          <th style="width:100px; padding:4px; text-align:center;">شماره تراکنش</th>
-                          <th style="width:130px; padding:4px; text-align:right;">بدهکار دفتر</th>
-                          <th style="width:130px; padding:4px; text-align:right;">بستانکار دفتر</th>
-                          <th style="padding:4px; text-align:right;">شرح ردیف سند</th>
-                          <th style="width:85px; padding:4px; text-align:center;">وضعیت</th>
+                          <th id="thMoghLedger_row" data-title="ردیف" style="width:50px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('row')">ردیف</th>
+                          <th id="thMoghLedger_date" data-title="تاریخ سند" style="width:90px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('date')">تاریخ سند</th>
+                          <th id="thMoghLedger_sanadNo" data-title="شماره سند" style="width:80px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('sanadNo')">شماره سند</th>
+                          <th id="thMoghLedger_txNo" data-title="شماره تراکنش" style="width:100px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('txNo')">شماره تراکنش</th>
+                          <th id="thMoghLedger_debit" data-title="بدهکار دفتر" style="width:130px; padding:4px; text-align:right; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('debit')">بدهکار دفتر</th>
+                          <th id="thMoghLedger_credit" data-title="بستانکار دفتر" style="width:130px; padding:4px; text-align:right; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('credit')">بستانکار دفتر</th>
+                          <th id="thMoghLedger_desc" data-title="شرح ردیف سند" style="padding:4px; text-align:right; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('desc')">شرح ردیف سند</th>
+                          <th id="thMoghLedger_isClosed" data-title="وضعیت" style="width:85px; padding:4px; text-align:center; cursor:pointer; user-select:none;" onclick="sortMoghLedgerGrid('isClosed')">وضعیت</th>
                         </tr>
                       </thead>
                       <tbody id="tblMoghLedgerBody"></tbody>

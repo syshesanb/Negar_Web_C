@@ -4344,6 +4344,10 @@ AppState.moghayeratReconciled = false;
 AppState.moghCurrentSubtab = 'defs';
 AppState.moghBankSubtabFilter = 'all';
 AppState.moghLedgerSubtabFilter = 'all';
+AppState.moghBankSortColumn = null;
+AppState.moghBankSortDir = 'asc';
+AppState.moghLedgerSortColumn = null;
+AppState.moghLedgerSortDir = 'asc';
 AppState.selectedMoghBankId = 1;
 
 // بارگذاری اولیه مقادیر کامبوها به صورت پیش‌فرض
@@ -4872,6 +4876,33 @@ function switchLedgerGridSubtab(filter) {
   renderMoghayeratReconcilePanel();
 }
 
+function sortMoghBankGrid(colKey) {
+  if (AppState.moghBankSortColumn === colKey) {
+    AppState.moghBankSortDir = AppState.moghBankSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    AppState.moghBankSortColumn = colKey;
+    AppState.moghBankSortDir = 'asc';
+  }
+  renderMoghayeratReconcilePanel();
+}
+
+function sortMoghLedgerGrid(colKey) {
+  if (AppState.moghLedgerSortColumn === colKey) {
+    AppState.moghLedgerSortDir = AppState.moghLedgerSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    AppState.moghLedgerSortColumn = colKey;
+    AppState.moghLedgerSortDir = 'asc';
+  }
+  renderMoghayeratReconcilePanel();
+}
+
+function getMoghSortIcon(gridType, colKey) {
+  const currentCol = gridType === 'bank' ? AppState.moghBankSortColumn : AppState.moghLedgerSortColumn;
+  const currentDir = gridType === 'bank' ? AppState.moghBankSortDir : AppState.moghLedgerSortDir;
+  if (currentCol !== colKey) return '';
+  return currentDir === 'asc' ? ' 🔼' : ' 🔽';
+}
+
 function renderMoghayeratReconcilePanel() {
   const tbodyBank = document.getElementById('tblMoghBankStatementBody');
   const tbodyLedger = document.getElementById('tblMoghLedgerBody');
@@ -4900,6 +4931,27 @@ function renderMoghayeratReconcilePanel() {
     }
   });
   
+  // بروزرسانی عناوین سرستون‌ها همراه با آیکون جهتی سورت
+  const bankCols = ['row', 'txDate', 'sanadNo', 'refNo', 'debit', 'credit', 'desc', 'isClosed'];
+  bankCols.forEach(col => {
+    const th = document.getElementById(`thMoghBank_${col}`);
+    if (th) {
+      const baseTitle = th.getAttribute('data-title') || th.textContent.replace(/[🔼🔽\s]+/g, '');
+      th.setAttribute('data-title', baseTitle);
+      th.innerHTML = baseTitle + getMoghSortIcon('bank', col);
+    }
+  });
+
+  const ledgerCols = ['row', 'date', 'sanadNo', 'txNo', 'debit', 'credit', 'desc', 'isClosed'];
+  ledgerCols.forEach(col => {
+    const th = document.getElementById(`thMoghLedger_${col}`);
+    if (th) {
+      const baseTitle = th.getAttribute('data-title') || th.textContent.replace(/[🔼🔽\s]+/g, '');
+      th.setAttribute('data-title', baseTitle);
+      th.innerHTML = baseTitle + getMoghSortIcon('ledger', col);
+    }
+  });
+
   // فیلترینگ تراکنش‌های بانک
   let bankList = isAll
     ? AppState.bankTransactions
@@ -4914,29 +4966,52 @@ function renderMoghayeratReconcilePanel() {
     else if (AppState.moghBankSubtabFilter === 'closed') bankList = bankList.filter(t => t.isClosed);
     else if (AppState.moghBankSubtabFilter === 'closedDebit') bankList = bankList.filter(t => t.isClosed && t.debit > 0);
     else if (AppState.moghBankSubtabFilter === 'closedCredit') bankList = bankList.filter(t => t.isClosed && t.credit > 0);
-    else if (AppState.moghBankSubtabFilter === 'dup') bankList = []; // در سناریو ما تراکنش تکراری تعبیه نشده
+    else if (AppState.moghBankSubtabFilter === 'dup') bankList = [];
   }
-  
-  document.getElementById('lblCountBankTransactions').textContent = `تعداد رکورد در این تب: ${bankList.length}`;
-  
-  tbodyBank.innerHTML = bankList.map((t, i) => {
-    const statusText = t.isClosed 
-      ? '<span class="badge badge-success">✓ بسته شده</span>' 
-      : '<span class="badge badge-danger">✗ باز</span>';
-      
-    const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
-    
+
+  let mappedBankList = bankList.map((t, idx) => {
     let matchedSanadNo = '-';
     if (t.isClosed) {
       const match = AppState.ledgerTransactions.find(lt => lt.isClosed && (lt.debit === t.credit || lt.credit === t.debit));
       if (match) matchedSanadNo = match.sanadNo;
     }
+    return { ...t, origRow: idx + 1, matchedSanadNo };
+  });
+
+  if (AppState.moghBankSortColumn) {
+    const col = AppState.moghBankSortColumn;
+    const dir = AppState.moghBankSortDir === 'asc' ? 1 : -1;
+    mappedBankList.sort((a, b) => {
+      let valA, valB;
+      if (col === 'row') { valA = a.origRow; valB = b.origRow; }
+      else if (col === 'sanadNo') { valA = a.matchedSanadNo; valB = b.matchedSanadNo; }
+      else { valA = a[col]; valB = b[col]; }
+
+      if (typeof valA === 'boolean' || typeof valB === 'boolean') {
+        valA = valA ? 1 : 0;
+        valB = valB ? 1 : 0;
+      }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return (valA - valB) * dir;
+      }
+      return String(valA || '').localeCompare(String(valB || ''), 'fa', { numeric: true }) * dir;
+    });
+  }
+  
+  document.getElementById('lblCountBankTransactions').textContent = `تعداد رکورد در این تب: ${bankList.length}`;
+  
+  tbodyBank.innerHTML = mappedBankList.map((t) => {
+    const statusText = t.isClosed 
+      ? '<span class="badge badge-success">✓ بسته شده</span>' 
+      : '<span class="badge badge-danger">✗ باز</span>';
+      
+    const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
 
     return `
       <tr style="${rowColor}">
-        <td style="width:50px; padding:4px; text-align:center;">${i + 1}</td>
+        <td style="width:50px; padding:4px; text-align:center;">${t.origRow}</td>
         <td style="width:90px; padding:4px; text-align:center;">${t.txDate}</td>
-        <td style="width:80px; padding:4px; text-align:center;">${matchedSanadNo}</td>
+        <td style="width:80px; padding:4px; text-align:center;">${t.matchedSanadNo}</td>
         <td style="width:100px; padding:4px; text-align:center;">${t.refNo}</td>
         <td style="width:130px; padding:4px; text-align:right; color:#ef4444;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
         <td style="width:130px; padding:4px; text-align:right; color:#10b981;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
@@ -4959,10 +5034,31 @@ function renderMoghayeratReconcilePanel() {
     else if (AppState.moghLedgerSubtabFilter === 'closedCredit') ledgerList = ledgerList.filter(t => t.isClosed && t.credit > 0);
     else if (AppState.moghLedgerSubtabFilter === 'dup') ledgerList = [];
   }
+
+  let mappedLedgerList = ledgerList.map((t, idx) => ({ ...t, origRow: idx + 1 }));
+
+  if (AppState.moghLedgerSortColumn) {
+    const col = AppState.moghLedgerSortColumn;
+    const dir = AppState.moghLedgerSortDir === 'asc' ? 1 : -1;
+    mappedLedgerList.sort((a, b) => {
+      let valA, valB;
+      if (col === 'row') { valA = a.origRow; valB = b.origRow; }
+      else { valA = a[col]; valB = b[col]; }
+
+      if (typeof valA === 'boolean' || typeof valB === 'boolean') {
+        valA = valA ? 1 : 0;
+        valB = valB ? 1 : 0;
+      }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return (valA - valB) * dir;
+      }
+      return String(valA || '').localeCompare(String(valB || ''), 'fa', { numeric: true }) * dir;
+    });
+  }
   
   document.getElementById('lblCountLedgerTransactions').textContent = `تعداد رکورد در این تب: ${ledgerList.length}`;
   
-  tbodyLedger.innerHTML = ledgerList.map((t, i) => {
+  tbodyLedger.innerHTML = mappedLedgerList.map((t) => {
     const statusText = t.isClosed 
       ? '<span class="badge badge-success">✓ بسته شده</span>' 
       : '<span class="badge badge-danger">✗ باز</span>';
@@ -4971,7 +5067,7 @@ function renderMoghayeratReconcilePanel() {
     
     return `
       <tr style="${rowColor}">
-        <td style="width:50px; padding:4px; text-align:center;">${i + 1}</td>
+        <td style="width:50px; padding:4px; text-align:center;">${t.origRow}</td>
         <td style="width:90px; padding:4px; text-align:center;">${t.date}</td>
         <td style="width:80px; padding:4px; text-align:center;">${t.sanadNo}</td>
         <td style="width:100px; padding:4px; text-align:center;">${t.txNo || '-'}</td>
