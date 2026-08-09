@@ -1864,6 +1864,23 @@ function deleteShenavar(id) {
 let selectedSanadId = null;
 
 function getCurrentBakhshId() {
+  // If we are in Hesabdari main form or voucher editor:
+  if (AppState.currentForm === 'form-hesabdari-main' || AppState.currentForm === 'form-sanad2' || AppState.currentModule === 'accounting') {
+    return 1; // 1 = حسابداری (Accounting)
+  }
+  if (AppState.currentForm === 'form-sales-invoice' || AppState.currentForm === 'form-purchase-invoice') {
+    return 2; // 2 = خرید و فروش
+  }
+  if (AppState.currentForm === 'form-products' || AppState.currentForm === 'form-warehouses' || AppState.currentForm === 'form-cardex' || AppState.currentModule === 'inventory') {
+    return 3; // 3 = انبارداری
+  }
+  if (AppState.currentForm === 'form-personnel' || AppState.currentForm === 'form-payroll' || AppState.currentModule === 'payroll') {
+    return 4; // 4 = حقوق و دستمزد
+  }
+  if (AppState.currentForm === 'form-moghayerat-banki' || AppState.currentModule === 'treasury') {
+    return 5; // 5 = خزانه‌داری
+  }
+
   const mapping = {
     'accounting': 1,
     'purchase-sales': 2,
@@ -4351,6 +4368,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderBar();
 
     // 5. Show the requested form
+    if (formParam === 'form-hesabdari-main') {
+      AppState.currentModule = 'accounting';
+    }
     showForm(formParam);
 
     // 6. Handle special mode for accounting main module
