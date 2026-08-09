@@ -211,6 +211,29 @@ html, body {
   flex-direction: column;
   padding: 10px 8px;
   gap: 4px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #0284c7 rgba(15, 23, 42, 0.5);
+}
+
+.sidebar-nav-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-nav-menu::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 4px;
+}
+
+.sidebar-nav-menu::-webkit-scrollbar-thumb {
+  background: #0284c7;
+  border-radius: 4px;
+}
+
+.sidebar-nav-menu::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
 }
 
 .sidebar-nav-item {
