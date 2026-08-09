@@ -1925,17 +1925,17 @@ function renderSanadListTable() {
   if (!tbody) return;
 
   // Read search values from header textboxes
-  const qId     = (document.getElementById('searchSanadId')?.value || '').trim().toLowerCase();
-  const qDay    = (document.getElementById('searchSanadDay')?.value || '').trim().toLowerCase();
-  const qDate   = (document.getElementById('searchSanadDate')?.value || '').trim().toLowerCase();
-  const qDesc   = (document.getElementById('searchSanadDesc')?.value || '').trim().toLowerCase();
-  const qDebit  = (document.getElementById('searchSanadDebit')?.value || '').replace(/,/g, '').trim().toLowerCase();
-  const qCredit = (document.getElementById('searchSanadCredit')?.value || '').replace(/,/g, '').trim().toLowerCase();
-  const qTaraz  = (document.getElementById('searchSanadTaraz')?.value || '').trim().toLowerCase();
-  const qBakhsh = (document.getElementById('searchSanadBakhsh')?.value || '').trim().toLowerCase();
-  const qStatus = (document.getElementById('searchSanadStatus')?.value || '').trim().toLowerCase();
+  const qId        = (document.getElementById('searchSanadId')?.value || '').trim().toLowerCase();
+  const qDay       = (document.getElementById('searchSanadDay')?.value || '').trim().toLowerCase();
+  const qDate      = (document.getElementById('searchSanadDate')?.value || '').trim().toLowerCase();
+  const qDesc      = (document.getElementById('searchSanadDesc')?.value || '').trim().toLowerCase();
+  const qDebitRaw  = (document.getElementById('searchSanadDebit')?.value || '').trim();
+  const qCreditRaw = (document.getElementById('searchSanadCredit')?.value || '').trim();
+  const qTaraz     = (document.getElementById('searchSanadTaraz')?.value || '').trim().toLowerCase();
+  const qBakhsh    = (document.getElementById('searchSanadBakhsh')?.value || '').trim().toLowerCase();
+  const qStatus    = (document.getElementById('searchSanadStatus')?.value || '').trim().toLowerCase();
 
-  // Multi-column combined filtering
+  // Multi-column combined filtering with prefix support (> < = *)
   const filtered = AppState.sanads.filter(s => {
     const bakhshObj = AppState.bakhsh.find(b => b.id === s.bakhshId);
     const bakhshName = bakhshObj ? bakhshObj.name : 'حسابداری';
@@ -1951,8 +1951,11 @@ function renderSanadListTable() {
     if (qDay && !String(s.dayOfYear).toLowerCase().includes(qDay)) return false;
     if (qDate && !String(s.date).toLowerCase().includes(qDate)) return false;
     if (qDesc && !String(s.desc).toLowerCase().includes(qDesc)) return false;
-    if (qDebit && !String(s.debit).toLowerCase().includes(qDebit)) return false;
-    if (qCredit && !String(s.credit).toLowerCase().includes(qCredit)) return false;
+    
+    // Support prefix search (> < = *) for Debit and Credit
+    if (qDebitRaw && !matchAmount(Number(s.debit || 0), qDebitRaw)) return false;
+    if (qCreditRaw && !matchAmount(Number(s.credit || 0), qCreditRaw)) return false;
+
     if (qTaraz && !tarazText.toLowerCase().includes(qTaraz)) return false;
     if (qBakhsh && !bakhshName.toLowerCase().includes(qBakhsh)) return false;
     if (qStatus && !String(s.status).toLowerCase().includes(qStatus)) return false;
