@@ -1344,8 +1344,35 @@
                 </div>
               </div>
               <div class="table-wrapper">
-                <table><thead><tr><th>شماره سند</th><th>شماره روز</th><th>تاریخ</th><th>شرح سند</th><th>جمع بدهکار</th><th>جمع بستانکار</th><th>تراز سند</th><th>بخش سند</th><th>وضعیت</th><th>عملیات</th></tr></thead>
-                <tbody id="sanadListTable"></tbody></table>
+                <table>
+                  <thead>
+                    <tr class="table-search-row">
+                      <th><input type="text" id="searchSanadId" class="grid-search-input" placeholder="جستجو شماره..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadDay" class="grid-search-input" placeholder="جستجو روز..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadDate" class="grid-search-input" placeholder="جستجو تاریخ..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadDesc" class="grid-search-input" placeholder="جستجو شرح..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadDebit" class="grid-search-input" placeholder="جستجو بدهکار..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadCredit" class="grid-search-input" placeholder="جستجو بستانکار..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadTaraz" class="grid-search-input" placeholder="جستجو تراز..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadBakhsh" class="grid-search-input" placeholder="جستجو بخش..." oninput="renderSanadListTable()"></th>
+                      <th><input type="text" id="searchSanadStatus" class="grid-search-input" placeholder="جستجو وضعیت..." oninput="renderSanadListTable()"></th>
+                      <th></th>
+                    </tr>
+                    <tr>
+                      <th>شماره سند</th>
+                      <th>شماره روز</th>
+                      <th>تاریخ</th>
+                      <th>شرح سند</th>
+                      <th>جمع بدهکار</th>
+                      <th>جمع بستانکار</th>
+                      <th>تراز سند</th>
+                      <th>بخش سند</th>
+                      <th>وضعیت</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sanadListTable"></tbody>
+                </table>
               </div>
             </div>
           </div>

@@ -281,6 +281,39 @@ html, body {
   text-overflow: ellipsis;
 }
 
+/* ── Grid Column Search Textboxes (تکست‌باکس‌های جستجوی سرستون) ── */
+.table-search-row th {
+  padding: 4px 6px !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+.grid-search-input {
+  width: 100%;
+  height: 24px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  font-family: inherit;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+  color: #f8fafc;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.grid-search-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.45);
+  background: rgba(15, 23, 42, 0.98);
+}
+
+.grid-search-input::placeholder {
+  color: #64748b;
+  font-size: 0.68rem;
+}
+
 /* ── Module Submenu Flyout Panel (پنل شناور زیرمنو) ── */
 .module-flyout-panel {
   position: fixed;

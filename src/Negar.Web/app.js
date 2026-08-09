@@ -1923,15 +1923,53 @@ function getJalaliDayOfYear(dateStr) {
 function renderSanadListTable() {
   const tbody = document.getElementById('sanadListTable');
   if (!tbody) return;
-  tbody.innerHTML = AppState.sanads.map(s => {
-    const isSelected = (s.id === selectedSanadId);
-    const selectedClass = isSelected ? 'selected-parent-row' : '';
+
+  // Read search values from header textboxes
+  const qId     = (document.getElementById('searchSanadId')?.value || '').trim().toLowerCase();
+  const qDay    = (document.getElementById('searchSanadDay')?.value || '').trim().toLowerCase();
+  const qDate   = (document.getElementById('searchSanadDate')?.value || '').trim().toLowerCase();
+  const qDesc   = (document.getElementById('searchSanadDesc')?.value || '').trim().toLowerCase();
+  const qDebit  = (document.getElementById('searchSanadDebit')?.value || '').replace(/,/g, '').trim().toLowerCase();
+  const qCredit = (document.getElementById('searchSanadCredit')?.value || '').replace(/,/g, '').trim().toLowerCase();
+  const qTaraz  = (document.getElementById('searchSanadTaraz')?.value || '').trim().toLowerCase();
+  const qBakhsh = (document.getElementById('searchSanadBakhsh')?.value || '').trim().toLowerCase();
+  const qStatus = (document.getElementById('searchSanadStatus')?.value || '').trim().toLowerCase();
+
+  // Multi-column combined filtering
+  const filtered = AppState.sanads.filter(s => {
     const bakhshObj = AppState.bakhsh.find(b => b.id === s.bakhshId);
     const bakhshName = bakhshObj ? bakhshObj.name : 'حسابداری';
     
     if (!s.dayOfYear) {
       s.dayOfYear = getJalaliDayOfYear(s.date);
     }
+
+    const isBalanced = (s.debit === s.credit && s.status !== 'نامتوازن' && s.status !== 'بدهکار' && s.status !== 'بستانکار');
+    const tarazText = isBalanced ? 'تراز' : ((s.debit > s.credit || s.status === 'بدهکار') ? 'بدهکار' : 'بستانکار');
+
+    if (qId && !String(s.id).toLowerCase().includes(qId.replace('#', ''))) return false;
+    if (qDay && !String(s.dayOfYear).toLowerCase().includes(qDay)) return false;
+    if (qDate && !String(s.date).toLowerCase().includes(qDate)) return false;
+    if (qDesc && !String(s.desc).toLowerCase().includes(qDesc)) return false;
+    if (qDebit && !String(s.debit).toLowerCase().includes(qDebit)) return false;
+    if (qCredit && !String(s.credit).toLowerCase().includes(qCredit)) return false;
+    if (qTaraz && !tarazText.toLowerCase().includes(qTaraz)) return false;
+    if (qBakhsh && !bakhshName.toLowerCase().includes(qBakhsh)) return false;
+    if (qStatus && !String(s.status).toLowerCase().includes(qStatus)) return false;
+
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:var(--text-muted); font-weight:bold;">هیچ سندی با مشخصات واردشده یافت نشد.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(s => {
+    const isSelected = (s.id === selectedSanadId);
+    const selectedClass = isSelected ? 'selected-parent-row' : '';
+    const bakhshObj = AppState.bakhsh.find(b => b.id === s.bakhshId);
+    const bakhshName = bakhshObj ? bakhshObj.name : 'حسابداری';
 
     return `
       <tr class="${selectedClass}" onclick="selectSanadRow(${s.id})" style="cursor:pointer;">
