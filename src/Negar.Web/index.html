@@ -1452,16 +1452,17 @@
                   </div>
                   
                   <div style="height:100px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
-                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;" id="tblMoghBankStatement">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem; table-layout:fixed;" id="tblMoghBankStatement">
                       <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
                         <tr style="border-bottom:1px solid var(--border-color);">
-                          <th style="padding:4px; text-align:center;">ردیف</th>
-                          <th style="padding:4px; text-align:center;">تاریخ تراکنش</th>
-                          <th style="padding:4px; text-align:center;">شماره پیگیری</th>
-                          <th style="padding:4px; text-align:right;">برداشت (بدهکار)</th>
-                          <th style="padding:4px; text-align:right;">واریز (بستانکار)</th>
+                          <th style="width:50px; padding:4px; text-align:center;">ردیف</th>
+                          <th style="width:90px; padding:4px; text-align:center;">تاریخ تراکنش</th>
+                          <th style="width:80px; padding:4px; text-align:center;">شماره سند</th>
+                          <th style="width:100px; padding:4px; text-align:center;">شماره پیگیری</th>
+                          <th style="width:130px; padding:4px; text-align:right;">برداشت (بدهکار)</th>
+                          <th style="width:130px; padding:4px; text-align:right;">واریز (بستانکار)</th>
                           <th style="padding:4px; text-align:right;">شرح تراکنش</th>
-                          <th style="padding:4px; text-align:center;">وضعیت</th>
+                          <th style="width:85px; padding:4px; text-align:center;">وضعیت</th>
                         </tr>
                       </thead>
                       <tbody id="tblMoghBankStatementBody"></tbody>
@@ -1489,17 +1490,17 @@
                   </div>
                   
                   <div style="height:100px; overflow-y:auto; overflow-x:auto; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-secondary);">
-                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;" id="tblMoghLedger">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem; table-layout:fixed;" id="tblMoghLedger">
                       <thead style="position:sticky; top:0; background:var(--bg-primary); z-index:3;">
                         <tr style="border-bottom:1px solid var(--border-color);">
-                          <th style="padding:4px; text-align:center;">ردیف</th>
-                          <th style="padding:4px; text-align:center;">تاریخ سند</th>
-                          <th style="padding:4px; text-align:center;">شماره سند</th>
-                          <th style="padding:4px; text-align:center;">شماره تراکنش</th>
-                          <th style="padding:4px; text-align:right;">بدهکار دفتر</th>
-                          <th style="padding:4px; text-align:right;">بستانکار دفتر</th>
+                          <th style="width:50px; padding:4px; text-align:center;">ردیف</th>
+                          <th style="width:90px; padding:4px; text-align:center;">تاریخ سند</th>
+                          <th style="width:80px; padding:4px; text-align:center;">شماره سند</th>
+                          <th style="width:100px; padding:4px; text-align:center;">شماره تراکنش</th>
+                          <th style="width:130px; padding:4px; text-align:right;">بدهکار دفتر</th>
+                          <th style="width:130px; padding:4px; text-align:right;">بستانکار دفتر</th>
                           <th style="padding:4px; text-align:right;">شرح ردیف سند</th>
-                          <th style="padding:4px; text-align:center;">وضعیت</th>
+                          <th style="width:85px; padding:4px; text-align:center;">وضعیت</th>
                         </tr>
                       </thead>
                       <tbody id="tblMoghLedgerBody"></tbody>

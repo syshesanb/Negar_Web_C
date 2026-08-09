@@ -4926,15 +4926,22 @@ function renderMoghayeratReconcilePanel() {
       
     const rowColor = t.isClosed ? 'background-color:rgba(16, 185, 129, 0.08);' : 'background-color:rgba(239, 68, 68, 0.04);';
     
+    let matchedSanadNo = '-';
+    if (t.isClosed) {
+      const match = AppState.ledgerTransactions.find(lt => lt.isClosed && (lt.debit === t.credit || lt.credit === t.debit));
+      if (match) matchedSanadNo = match.sanadNo;
+    }
+
     return `
       <tr style="${rowColor}">
-        <td style="padding:4px; text-align:center;">${i + 1}</td>
-        <td style="padding:4px; text-align:center;">${t.txDate}</td>
-        <td style="padding:4px; text-align:center;">${t.refNo}</td>
-        <td style="padding:4px; text-align:right; color:#ef4444;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
-        <td style="padding:4px; text-align:right; color:#10b981;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
+        <td style="width:50px; padding:4px; text-align:center;">${i + 1}</td>
+        <td style="width:90px; padding:4px; text-align:center;">${t.txDate}</td>
+        <td style="width:80px; padding:4px; text-align:center;">${matchedSanadNo}</td>
+        <td style="width:100px; padding:4px; text-align:center;">${t.refNo}</td>
+        <td style="width:130px; padding:4px; text-align:right; color:#ef4444;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
+        <td style="width:130px; padding:4px; text-align:right; color:#10b981;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
         <td style="padding:4px; text-align:right;">${t.desc}</td>
-        <td style="padding:4px; text-align:center;">${statusText}</td>
+        <td style="width:85px; padding:4px; text-align:center;">${statusText}</td>
       </tr>
     `;
   }).join('');
@@ -4964,14 +4971,14 @@ function renderMoghayeratReconcilePanel() {
     
     return `
       <tr style="${rowColor}">
-        <td style="padding:4px; text-align:center;">${i + 1}</td>
-        <td style="padding:4px; text-align:center;">${t.date}</td>
-        <td style="padding:4px; text-align:center;">${t.sanadNo}</td>
-        <td style="padding:4px; text-align:center;">${t.txNo || '-'}</td>
-        <td style="padding:4px; text-align:right; color:#10b981;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
-        <td style="padding:4px; text-align:right; color:#ef4444;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
+        <td style="width:50px; padding:4px; text-align:center;">${i + 1}</td>
+        <td style="width:90px; padding:4px; text-align:center;">${t.date}</td>
+        <td style="width:80px; padding:4px; text-align:center;">${t.sanadNo}</td>
+        <td style="width:100px; padding:4px; text-align:center;">${t.txNo || '-'}</td>
+        <td style="width:130px; padding:4px; text-align:right; color:#10b981;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
+        <td style="width:130px; padding:4px; text-align:right; color:#ef4444;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
         <td style="padding:4px; text-align:right;">${t.desc}</td>
-        <td style="padding:4px; text-align:center;">${statusText}</td>
+        <td style="width:85px; padding:4px; text-align:center;">${statusText}</td>
       </tr>
     `;
   }).join('');
