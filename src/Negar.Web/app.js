@@ -5055,13 +5055,13 @@ function renderMoghayeratReconcilePanel() {
 
     return `
       <tr style="${rowColor}">
-        <td style="width:35px; padding:4px; text-align:center;">${t.origRow}</td>
+        <td style="width:80px; padding:4px; text-align:center;">${t.origRow}</td>
         <td style="width:75px; padding:4px; text-align:center;">${t.txDate}</td>
         <td style="width:65px; padding:4px; text-align:center;">${t.matchedSanadNo}</td>
         <td style="width:85px; padding:4px; text-align:center;">${t.refNo}</td>
         <td style="width:105px; padding:4px; text-align:right; color:#ef4444;">${t.debit === 0 ? '-' : t.debit.toLocaleString()}</td>
         <td style="width:105px; padding:4px; text-align:right; color:#10b981;">${t.credit === 0 ? '-' : t.credit.toLocaleString()}</td>
-        <td style="width:180px; max-width:180px; padding:4px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.desc}">${t.desc}</td>
+        <td style="width:150px; max-width:150px; padding:4px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.desc}">${t.desc}</td>
         <td style="width:85px; padding:4px; text-align:center;">${statusText}</td>
       </tr>
     `;
