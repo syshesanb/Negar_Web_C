@@ -129,10 +129,54 @@ body {
   flex-direction: column;
   box-shadow: -3px 0 14px rgba(0, 0, 0, 0.35);
   z-index: 90;
-  overflow-y: auto;
+  overflow-y: visible;
   position: sticky;
   top: 36px;
   max-height: calc(100vh - 36px);
+  margin-right: 0;
+  transition: margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-sidebar.collapsed {
+  margin-right: -250px;
+  width: 0px;
+  min-width: 0px;
+  box-shadow: none;
+}
+
+/* Sidebar Toggle Handle Button (دستگیره کشویی) */
+.sidebar-toggle-handle {
+  position: absolute;
+  left: -26px;
+  top: 100px;
+  width: 26px;
+  height: 64px;
+  background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid #38bdf8;
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.22s ease;
+  user-select: none;
+}
+
+.sidebar-toggle-handle:hover {
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+  width: 29px;
+  left: -29px;
+  box-shadow: -6px 0 18px rgba(56, 189, 248, 0.6);
+}
+
+.handle-icon {
+  font-size: 0.75rem;
+  font-weight: 900;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-header {

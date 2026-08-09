@@ -504,6 +504,23 @@ AppState.codingSettings = {
 // ============================
 // Navigation: Ribbon Tab Switch
 // ============================
+function toggleAppSidebar(forceState) {
+  const sidebar = document.getElementById('appSidebar');
+  const icon = document.getElementById('sidebarHandleIcon');
+  if (!sidebar) return;
+
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  const shouldCollapse = (typeof forceState === 'boolean') ? forceState : !isCollapsed;
+
+  if (shouldCollapse) {
+    sidebar.classList.add('collapsed');
+    if (icon) icon.textContent = '◀';
+  } else {
+    sidebar.classList.remove('collapsed');
+    if (icon) icon.textContent = '▶';
+  }
+}
+
 function switchRibbon(moduleId, tabEl) {
   AppState.currentModule = moduleId;
   AppState.currentForm = null;
@@ -550,6 +567,9 @@ function showTiles(moduleId) {
     target.classList.add('active');
     target.style.display = 'block';
   }
+
+  // Automatically expand sidebar on tile dashboard
+  toggleAppSidebar(false);
 }
 
 // ============================
@@ -565,6 +585,9 @@ function showForm(formId) {
   }
 
   AppState.currentForm = formId;
+
+  // Automatically slide collapse sidebar to the right when entering any form
+  toggleAppSidebar(true);
 
   if (formId !== 'form-hesabdari-main') {
     document.body.classList.remove('accounts-mode');
