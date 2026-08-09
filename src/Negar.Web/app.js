@@ -6322,6 +6322,7 @@ function renderAttachmentsGrid() {
   // Render general voucher attachments row
   const generalItem = attachments.find(x => x.rowNo === 0);
   const generalCount = generalItem ? generalItem.images.length : 0;
+  const generalHasNote = !!(generalItem && generalItem.note && generalItem.note.trim() !== '');
   
   let rowsHtml = `
     <tr style="border-bottom:1px solid var(--border-color);">
@@ -6330,10 +6331,10 @@ function renderAttachmentsGrid() {
       <td style="text-align:right;"><b>عمومی / فاقد سرفصل خاص</b></td>
       <td style="text-align:right;">ضمائم متفرقه و عمومی مربوط به کل سند</td>
       <td>
-        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color); white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="triggerRowFileUpload(0)">📂 انتخاب</button>
+        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:${generalHasNote ? '#38bdf8' : 'var(--text-muted)'}; border-color:${generalHasNote ? '#38bdf8' : 'rgba(255,255,255,0.2)'}; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openRowNoteModal(0)">📝 ${generalHasNote ? 'یادداشت (دارد)' : 'یادداشت'}</button>
       </td>
       <td>
-        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="simulateScannerInputForRow(0)">🖨️ اسکن</button>
+        <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color); white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="triggerRowFileUpload(0)">📂 انتخاب</button>
       </td>
       <td><span class="badge ${generalCount > 0 ? 'badge-primary' : 'badge-secondary'}">${generalCount} تصویر</span></td>
       <td>
@@ -6349,6 +6350,7 @@ function renderAttachmentsGrid() {
     const accName = acc ? acc.name : 'سرفصل نامشخص';
     const rowItem = attachments.find(x => x.rowNo === rowNo);
     const count = rowItem ? rowItem.images.length : 0;
+    const rowHasNote = !!(rowItem && rowItem.note && rowItem.note.trim() !== '');
     
     rowsHtml += `
       <tr style="border-bottom:1px solid var(--border-color);">
@@ -6357,10 +6359,10 @@ function renderAttachmentsGrid() {
         <td style="text-align:right;"><b>${accName}</b></td>
         <td style="text-align:right;">${line.desc || '-'}</td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color); white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="triggerRowFileUpload(${rowNo})">📂 انتخاب</button>
+          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:${rowHasNote ? '#38bdf8' : 'var(--text-muted)'}; border-color:${rowHasNote ? '#38bdf8' : 'rgba(255,255,255,0.2)'}; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openRowNoteModal(${rowNo})">📝 ${rowHasNote ? 'یادداشت (دارد)' : 'یادداشت'}</button>
         </td>
         <td>
-          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:#eab308; border-color:#eab308; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="simulateScannerInputForRow(${rowNo})">🖨️ اسکن</button>
+          <button class="btn btn-outline" style="padding:3px 10px; font-size:0.8rem; font-weight:bold; color:var(--accent-color); border-color:var(--accent-color); white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="triggerRowFileUpload(${rowNo})">📂 انتخاب</button>
         </td>
         <td><span class="badge ${count > 0 ? 'badge-primary' : 'badge-secondary'}">${count} تصویر</span></td>
         <td>
@@ -6371,6 +6373,57 @@ function renderAttachmentsGrid() {
   });
   
   tbody.innerHTML = rowsHtml;
+}
+
+let activeRowNoForNote = 0;
+
+function openRowNoteModal(rowNo) {
+  activeRowNoForNote = rowNo;
+  const attachments = AppState.tempAttachments || [];
+  const rowItem = attachments.find(x => x.rowNo === rowNo);
+  const existingNote = rowItem ? (rowItem.note || '') : '';
+
+  const targetLabel = rowNo === 0 ? 'کل سند' : `ردیف ${rowNo}`;
+  const titleEl = document.getElementById('rowNoteModalTitle');
+  if (titleEl) {
+    titleEl.textContent = `📝 ثبت/ویرایش یادداشت ضمیمه (${targetLabel})`;
+  }
+
+  const input = document.getElementById('rowNoteTextInput');
+  if (input) {
+    input.value = existingNote;
+  }
+
+  const modal = document.getElementById('attachmentNoteModalOverlay');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => { if (input) input.focus(); }, 150);
+  }
+}
+
+function closeRowNoteModal() {
+  const modal = document.getElementById('attachmentNoteModalOverlay');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function saveRowNote() {
+  const noteText = document.getElementById('rowNoteTextInput')?.value?.trim() || '';
+
+  if (!AppState.tempAttachments) {
+    AppState.tempAttachments = [];
+  }
+
+  let rowItem = AppState.tempAttachments.find(x => x.rowNo === activeRowNoForNote);
+  if (!rowItem) {
+    rowItem = { rowNo: activeRowNoForNote, images: [], note: '' };
+    AppState.tempAttachments.push(rowItem);
+  }
+
+  rowItem.note = noteText;
+  closeRowNoteModal();
+  renderAttachmentsGrid();
 }
 
 let activeRowNoForUpload = 0;
