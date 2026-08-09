@@ -4246,10 +4246,10 @@ document.addEventListener('DOMContentLoaded', () => {
       mainApp.classList.add('app-fade-in');
     }
 
-    // 3. Hide the desktop header (tabs like سیستم، کاربران، شرکتها و سالها...)
+    // 3. Keep desktop header title bar visible
     const desktopHeader = document.querySelector('.desktop-header');
     if (desktopHeader) {
-      desktopHeader.style.display = 'none';
+      desktopHeader.style.display = 'block';
     }
 
     // 4. Set current user to admin (session bypass)
