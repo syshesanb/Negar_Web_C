@@ -1833,7 +1833,8 @@ function deleteSanad(id) {
   }
 }
 
-function editSanad(id) {
+function editSanad(id, fromMogh = false) {
+  AppState.openedFromMoghayerat = fromMogh;
   AppState.tempAttachments = null; // Clear attachments draft
   initVoucherAttachments(); // Guarantees AppState.sanadAttachments is initialized
   const s = AppState.sanads.find(x => x.id === id);
@@ -3135,6 +3136,7 @@ function isValidJalaliDate(dateStr) {
 }
 
 function openNewSanadForm() {
+  AppState.openedFromMoghayerat = false;
   AppState.tempAttachments = null; // Clear attachments draft
   initVoucherAttachments(); // Guarantees AppState.sanadAttachments is initialized
   const nextNo = AppState.sanads.length > 0 ? Math.max(...AppState.sanads.map(s => Number(s.id))) + 1 : 101;
@@ -3320,8 +3322,17 @@ function closeSanadEditor() {
 
   AppState.tempAttachments = null; // Discard attachments draft
   originalSanadState = null;
-  showForm('form-hesabdari-main');
-  switchHesabdariTab('sanad');
+  if (AppState.openedFromMoghayerat) {
+    AppState.openedFromMoghayerat = false;
+    showForm('form-hesabdari-main');
+    switchHesabdariTab('bank');
+    switchBankSubtab('reconcile');
+    renderMoghayeratReconcilePanel();
+  } else {
+    showForm('form-hesabdari-main');
+    switchHesabdariTab('sanad');
+    renderSanadListTable();
+  }
 }
 
 function saveSanadEntry() {
@@ -4914,8 +4925,7 @@ function openSanadFromMoghayerat(sanadNoStr, targetLineIdx) {
     AppState.sanads.push(s);
   }
 
-  AppState.openedFromMoghayerat = true;
-  editSanad(sanadId);
+  editSanad(sanadId, true);
 
   let focusIdx = 0;
   if (typeof targetLineIdx === 'number' && targetLineIdx >= 0 && targetLineIdx < AppState.sanadLines.length) {
