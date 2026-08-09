@@ -508,9 +508,15 @@ function switchRibbon(moduleId, tabEl) {
   AppState.currentModule = moduleId;
   AppState.currentForm = null;
 
-  // Update active ribbon tab
-  document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
-  if (tabEl) tabEl.classList.add('active');
+  // Update active status on sidebar & ribbon nav items
+  document.querySelectorAll('.ribbon-tab, .sidebar-nav-item').forEach(t => t.classList.remove('active'));
+  
+  if (tabEl) {
+    tabEl.classList.add('active');
+  } else {
+    const navItem = document.querySelector(`.sidebar-nav-item[onclick*="'${moduleId}'"]`);
+    if (navItem) navItem.classList.add('active');
+  }
 
   // Hide forms area, show tiles
   showTiles(moduleId);
@@ -519,12 +525,23 @@ function switchRibbon(moduleId, tabEl) {
 function showTiles(moduleId) {
   document.body.classList.remove('accounts-mode');
   // Hide forms area
-  document.getElementById('formsArea').style.display = 'none';
+  const formsArea = document.getElementById('formsArea');
+  if (formsArea) formsArea.style.display = 'none';
 
   // Hide all tile containers
   document.querySelectorAll('.tiles-container').forEach(t => {
     t.classList.remove('active');
     t.style.display = 'none';
+  });
+
+  // Ensure active class on matching sidebar nav item
+  document.querySelectorAll('.sidebar-nav-item').forEach(t => {
+    const onclickStr = t.getAttribute('onclick') || '';
+    if (onclickStr.includes(`'${moduleId}'`)) {
+      t.classList.add('active');
+    } else {
+      t.classList.remove('active');
+    }
   });
 
   // Show only selected module's tiles

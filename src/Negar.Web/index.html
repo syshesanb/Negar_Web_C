@@ -95,27 +95,80 @@
         <span>ساعت: <b id="headerTime">--:--:--</b></span>
       </div>
     </div>
-    <nav class="main-modules-ribbon" id="ribbonNav">
-      <div class="ribbon-tab active" onclick="switchRibbon('system',this)">⚙️ سیستم</div>
-      <div class="ribbon-tab" onclick="switchRibbon('users',this)">👥 کاربران</div>
-      <div class="ribbon-tab" onclick="switchRibbon('companies',this)">🏢 شرکت‌ها و سال‌ها</div>
-      <div class="ribbon-tab" onclick="switchRibbon('accounting',this)">📊 حسابداری</div>
-      <div class="ribbon-tab" onclick="switchRibbon('inventory',this)">📦 خرید و فروش و انبارداری</div>
-      <div class="ribbon-tab" onclick="switchRibbon('payroll',this)">👔 حقوق و دستمزد</div>
-      <div class="ribbon-tab" onclick="switchRibbon('assets',this)">🏛 اموال</div>
-      <div class="ribbon-tab" onclick="switchRibbon('automation',this)">✉️ اتوماسیون اداری</div>
-      <div class="ribbon-tab" onclick="switchRibbon('crm',this)">🤝 باشگاه مشتریان</div>
-      <div class="ribbon-tab" onclick="switchRibbon('treasury',this)">💰 خزانه‌داری</div>
-      <div class="ribbon-tab" onclick="switchRibbon('budget',this)">📈 بودجه و هزینه</div>
-      <div class="ribbon-tab" onclick="switchRibbon('production',this)">🏭 تولید</div>
-      <div class="ribbon-tab" onclick="switchRibbon('projects',this)">🏗 پروژه‌ها</div>
-      <div class="ribbon-tab" onclick="switchRibbon('kpi',this)">🎯 ارزیابی عملکرد</div>
-    </nav>
   </header>
 
-  <!-- Main Area: shows tiles OR form, never both at the same time -->
-  <div class="app-container">
-    <main class="main-content" id="mainContent">
+  <!-- APP LAYOUT WRAPPER -->
+  <div class="app-layout-wrapper">
+
+    <!-- RIGHT SIDEBAR PANEL -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo-icon">🏢</span>
+        <span class="sidebar-logo-text">ماژول‌های نگار</span>
+      </div>
+      <nav class="sidebar-nav-menu" id="sidebarNav">
+        <div class="sidebar-nav-item active" onclick="switchRibbon('system',this)">
+          <span class="sidebar-nav-icon">⚙️</span>
+          <span class="sidebar-nav-title">سیستم</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('users',this)">
+          <span class="sidebar-nav-icon">👥</span>
+          <span class="sidebar-nav-title">کاربران</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('companies',this)">
+          <span class="sidebar-nav-icon">🏢</span>
+          <span class="sidebar-nav-title">شرکت‌ها و سال‌ها</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('accounting',this)">
+          <span class="sidebar-nav-icon">📊</span>
+          <span class="sidebar-nav-title">حسابداری</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('inventory',this)">
+          <span class="sidebar-nav-icon">📦</span>
+          <span class="sidebar-nav-title">خرید و فروش و انبارداری</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('payroll',this)">
+          <span class="sidebar-nav-icon">👔</span>
+          <span class="sidebar-nav-title">حقوق و دستمزد</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('assets',this)">
+          <span class="sidebar-nav-icon">🏛</span>
+          <span class="sidebar-nav-title">اموال</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('automation',this)">
+          <span class="sidebar-nav-icon">✉️</span>
+          <span class="sidebar-nav-title">اتوماسیون اداری</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('crm',this)">
+          <span class="sidebar-nav-icon">🤝</span>
+          <span class="sidebar-nav-title">باشگاه مشتریان</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('treasury',this)">
+          <span class="sidebar-nav-icon">💰</span>
+          <span class="sidebar-nav-title">خزانه‌داری</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('budget',this)">
+          <span class="sidebar-nav-icon">📈</span>
+          <span class="sidebar-nav-title">بودجه و هزینه</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('production',this)">
+          <span class="sidebar-nav-icon">🏭</span>
+          <span class="sidebar-nav-title">تولید</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('projects',this)">
+          <span class="sidebar-nav-icon">🏗</span>
+          <span class="sidebar-nav-title">پروژه‌ها</span>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchRibbon('kpi',this)">
+          <span class="sidebar-nav-icon">🎯</span>
+          <span class="sidebar-nav-title">ارزیابی عملکرد</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- LEFT MAIN WORKSPACE CONTAINER -->
+    <div class="app-container">
+      <main class="main-content" id="mainContent">
 
       <!-- ================================================================
            TILES CONTAINERS (one per ribbon tab)
@@ -2518,6 +2571,7 @@
 
     </main>
   </div>
+</div> <!-- end app-layout-wrapper -->
 
 
 

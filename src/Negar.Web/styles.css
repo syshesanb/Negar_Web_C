@@ -112,8 +112,103 @@ body {
 .ribbon-tab:hover { background: var(--accent-light); color: var(--accent-color); }
 .ribbon-tab.active { background: var(--accent-color); color: #0f172a; font-weight: 800; }
 
-/* ── Main ── */
-.app-container { flex: 1; }
+/* ── Layout Wrapper & Right Sidebar Panel ── */
+.app-layout-wrapper {
+  display: flex;
+  min-height: calc(100vh - 36px);
+  background: var(--bg-main);
+  direction: rtl;
+}
+
+.app-sidebar {
+  width: 250px;
+  min-width: 250px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -3px 0 14px rgba(0, 0, 0, 0.35);
+  z-index: 90;
+  overflow-y: auto;
+  position: sticky;
+  top: 36px;
+  max-height: calc(100vh - 36px);
+}
+
+.sidebar-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logo-icon {
+  font-size: 1.3rem;
+}
+
+.sidebar-logo-text {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-nav-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px;
+  gap: 4px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(56, 189, 248, 0.12);
+  color: #f8fafc;
+  border-color: rgba(56, 189, 248, 0.25);
+  transform: translateX(-4px);
+}
+
+.sidebar-nav-item.active {
+  background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  font-weight: 800;
+  border-color: #38bdf8;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+
+.sidebar-nav-icon {
+  font-size: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+}
+
+.sidebar-nav-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Main Workspace ── */
+.app-container { flex: 1; min-width: 0; }
 .main-content { padding: 24px; max-width: 1400px; margin: 0 auto; }
 
 /* ── Tiles Container ── */
@@ -1069,3 +1164,13 @@ body.accounts-mode #tab-panel-shenavar.active .table-wrapper {
   z-index: 4;
 }
 
+
+/* Fix for comboboxes with constrained inline heights */
+select.form-select[style*='height: 24px'],
+select.form-select[style*='height:24px'] {
+  padding: 0 4px !important;
+}
+select.form-select[style*='height: 28px'],
+select.form-select[style*='height:28px'] {
+  padding: 0 6px !important;
+}
