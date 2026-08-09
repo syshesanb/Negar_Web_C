@@ -2068,96 +2068,230 @@ function editSanad(id, fromMogh = false) {
   renderSanadEditorLines();
 }
 
+function autoFormatDate(input) {
+  if (!input) return;
+  let v = input.value;
+  // Convert Persian & Arabic digits to standard English 0-9
+  v = v.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+       .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  
+  // Keep digits only
+  let digits = v.replace(/[^0-9]/g, '');
+  if (digits.length > 8) digits = digits.slice(0, 8);
+  
+  let formatted = digits;
+  if (digits.length >= 5) {
+    formatted = digits.slice(0, 4) + '/' + digits.slice(4, 6);
+    if (digits.length >= 7) {
+      formatted += '/' + digits.slice(6, 8);
+    }
+  }
+  
+  input.value = formatted;
+}
+
 function printVouchers() {
-  if (!selectedSanadId) {
-    alert('لطفاً ابتدا یک سند را از جدول انتخاب (کلیک) کنید.');
+  const modal = document.getElementById('printVouchersModal');
+  if (!modal) return;
+
+  // Set default values based on current sanads database
+  const sortedIds = AppState.sanads.map(s => s.id).sort((a, b) => a - b);
+  const minId = sortedIds.length > 0 ? sortedIds[0] : 101;
+  const maxId = sortedIds.length > 0 ? sortedIds[sortedIds.length - 1] : 105;
+
+  const sortedDates = AppState.sanads.map(s => s.date).sort();
+  const minDate = sortedDates.length > 0 ? sortedDates[0] : '1403/01/01';
+  const maxDate = sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : '1403/12/29';
+
+  const fromNoEl = document.getElementById('printFromSanadNo');
+  const toNoEl = document.getElementById('printToSanadNo');
+  const fromDateEl = document.getElementById('printFromDate');
+  const toDateEl = document.getElementById('printToDate');
+
+  if (fromNoEl) fromNoEl.value = minId;
+  if (toNoEl) toNoEl.value = maxId;
+  if (fromDateEl) fromDateEl.value = minDate;
+  if (toDateEl) toDateEl.value = maxDate;
+
+  // Set default radio: By Number
+  const radioNo = document.getElementById('printRangeByNo');
+  if (radioNo) radioNo.checked = true;
+  togglePrintRangeInputs();
+
+  modal.style.display = 'flex';
+}
+
+function closePrintVouchersModal() {
+  const modal = document.getElementById('printVouchersModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function togglePrintRangeInputs() {
+  const isByNo = document.getElementById('printRangeByNo')?.checked;
+  const containerNo = document.getElementById('printRangeNoContainer');
+  const containerDate = document.getElementById('printRangeDateContainer');
+
+  const fromNo = document.getElementById('printFromSanadNo');
+  const toNo = document.getElementById('printToSanadNo');
+  const fromDate = document.getElementById('printFromDate');
+  const toDate = document.getElementById('printToDate');
+  const btnFrom = document.getElementById('btnCalPrintFrom');
+  const btnTo = document.getElementById('btnCalPrintTo');
+
+  if (isByNo) {
+    if (fromNo) fromNo.disabled = false;
+    if (toNo) toNo.disabled = false;
+    if (containerNo) containerNo.style.opacity = '1';
+
+    if (fromDate) fromDate.disabled = true;
+    if (toDate) toDate.disabled = true;
+    if (btnFrom) btnFrom.disabled = true;
+    if (btnTo) btnTo.disabled = true;
+    if (containerDate) containerDate.style.opacity = '0.4';
+  } else {
+    if (fromNo) fromNo.disabled = true;
+    if (toNo) toNo.disabled = true;
+    if (containerNo) containerNo.style.opacity = '0.4';
+
+    if (fromDate) fromDate.disabled = false;
+    if (toDate) toDate.disabled = false;
+    if (btnFrom) btnFrom.disabled = false;
+    if (btnTo) btnTo.disabled = false;
+    if (containerDate) containerDate.style.opacity = '1';
+  }
+}
+
+function submitPrintVouchersRange() {
+  const isByNo = document.getElementById('printRangeByNo')?.checked;
+  let selectedVouchers = [];
+
+  if (isByNo) {
+    const fromNo = parseInt(document.getElementById('printFromSanadNo')?.value || '0', 10);
+    const toNo = parseInt(document.getElementById('printToSanadNo')?.value || '999999', 10);
+    selectedVouchers = AppState.sanads.filter(s => s.id >= fromNo && s.id <= toNo);
+  } else {
+    const fromDate = (document.getElementById('printFromDate')?.value || '').trim();
+    const toDate = (document.getElementById('printToDate')?.value || '').trim();
+    selectedVouchers = AppState.sanads.filter(s => s.date >= fromDate && s.date <= toDate);
+  }
+
+  if (selectedVouchers.length === 0) {
+    alert('هیچ سندی در محدوده تعیین‌شده یافت نشد.');
     return;
   }
-  const s = AppState.sanads.find(x => x.id === selectedSanadId);
-  if (!s) return;
 
+  closePrintVouchersModal();
+
+  // Open multi-voucher Print Preview window
   const printWindow = window.open('', '_blank');
-  // Load lines from the detailed database for printing
-  AppState.voucherDetails = AppState.voucherDetails || {};
-  const targetLines = AppState.voucherDetails[s.id] || [
-    { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
-    { account: '210101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
-  ];
+  if (!printWindow) return;
 
-  const linesHtml = targetLines.map((line, idx) => {
-    const acc = AppState.accounts.find(a => a.code === line.account);
-    const accName = acc ? acc.name : `حساب معین ${line.account}`;
+  AppState.voucherDetails = AppState.voucherDetails || {};
+
+  const vouchersHtml = selectedVouchers.map(s => {
+    const targetLines = AppState.voucherDetails[s.id] || [
+      { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
+      { account: '310101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
+    ];
+
+    const linesRows = targetLines.map((line, idx) => {
+      const acc = AppState.accounts.find(a => a.code === line.account);
+      const accName = acc ? acc.name : `حساب معین ${line.account}`;
+      return `
+        <tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td style="text-align:center;">${line.account}</td>
+          <td>${accName}</td>
+          <td>${line.desc || ''}</td>
+          <td style="text-align:left;">${Number(line.debit || 0).toLocaleString()}</td>
+          <td style="text-align:left;">${Number(line.credit || 0).toLocaleString()}</td>
+        </tr>
+      `;
+    }).join('');
+
     return `
-      <tr>
-        <td>${idx + 1}</td>
-        <td>${line.account}</td>
-        <td>${accName}</td>
-        <td>${line.desc || ''}</td>
-        <td style="text-align:left;">${Number(line.debit || 0).toLocaleString()}</td>
-        <td style="text-align:left;">${Number(line.credit || 0).toLocaleString()}</td>
-      </tr>
+      <div class="voucher-page">
+        <div class="voucher-header">
+          <div class="company-title">${SessionState.company?.name || 'شرکت نمونه نگار'}</div>
+          <div class="doc-title">سند حسابداری شماره #${s.id}</div>
+          <div class="doc-info">
+            <div>تاریخ: <b>${s.date}</b></div>
+            <div>شماره روز: <b>${s.dayOfYear || ''}</b></div>
+            <div>وضعیت: <b>${s.status}</b></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px; font-weight:bold; font-size:13px;">شرح کلی: ${s.desc}</div>
+
+        <table class="main-table">
+          <thead>
+            <tr>
+              <th style="width:40px; text-align:center;">ردیف</th>
+              <th style="width:100px; text-align:center;">کد حساب</th>
+              <th>عنوان حساب</th>
+              <th>شرح آرتیکل</th>
+              <th style="width:130px; text-align:left;">بدهکار (ریال)</th>
+              <th style="width:130px; text-align:left;">بستانکار (ریال)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${linesRows}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold; background:#f8fafc;">
+              <td colspan="4" style="text-align:right;">جمع کل سند:</td>
+              <td style="text-align:left;">${Number(s.debit).toLocaleString()}</td>
+              <td style="text-align:left;">${Number(s.credit).toLocaleString()}</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="signatures">
+          <div class="sig-box">تنظیم‌کننده</div>
+          <div class="sig-box">تاییدکننده</div>
+          <div class="sig-box">حسابدار ارشد</div>
+          <div class="sig-box">مدیر مالی</div>
+        </div>
+      </div>
     `;
-  }).join('');
+  }).join('<div class="page-break"></div>');
 
   printWindow.document.write(`
-    <html dir="rtl">
+    <!DOCTYPE html>
+    <html dir="rtl" lang="fa">
     <head>
-      <title>چاپ سند حسابداری #${s.id}</title>
+      <meta charset="UTF-8">
+      <title>پیش‌نمایش چاپ اسناد حسابداری</title>
       <style>
-        body { font-family: Tahoma, Arial, sans-serif; padding: 20px; color: #000; background: #fff; font-size: 12px; }
-        .header-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
-        .header-table td { border: none; padding: 4px; }
-        .voucher-title { font-size: 16px; font-weight: bold; text-align: center; margin: 10px 0; }
-        .main-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        .main-table th, .main-table td { border: 1px solid #000; padding: 8px; text-align: right; }
-        .main-table th { background-color: #f2f2f2; }
-        .signatures { display: flex; justify-content: space-between; margin-top: 60px; padding: 0 20px; }
-        .sig-box { text-align: center; width: 20%; border-top: 1px dashed #000; padding-top: 8px; }
+        @page { size: A4; margin: 15mm; }
+        body { font-family: Tahoma, 'IRANSans', Arial, sans-serif; padding: 20px; color: #0f172a; background: #fff; font-size: 12px; line-height: 1.5; }
+        .no-print-bar { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .no-print-btn { background: #0284c7; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 14px; }
+        .no-print-btn:hover { background: #0369a1; }
+        .voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; }
+        .voucher-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
+        .company-title { font-size: 16px; font-weight: bold; }
+        .doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }
+        .doc-info { font-size: 11px; text-align: left; }
+        .main-table { width: 100%; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
+        .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 8px 10px; text-align: right; }
+        .main-table th { background-color: #f1f5f9; font-weight: bold; }
+        .signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 10px; }
+        .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
+        .page-break { page-break-after: always; height: 0; }
         @media print {
-          .no-print { display: none; }
+          .no-print-bar { display: none !important; }
+          body { padding: 0; background: #fff; }
+          .voucher-page { border: none; padding: 0; margin-bottom: 0; }
         }
       </style>
     </head>
     <body>
-      <div class="no-print" style="margin-bottom: 20px; text-align: left;">
-        <button onclick="window.print()" style="padding: 8px 16px; font-size: 14px; cursor: pointer;">🖨️ چاپ سند</button>
+      <div class="no-print-bar">
+        <span>🖨️ پیش‌نمایش چاپ ${selectedVouchers.length} سند حسابداری انتخاب‌شده</span>
+        <button class="no-print-btn" onclick="window.print()">🖨️ تایید و چاپ اسناد</button>
       </div>
-      <table class="header-table">
-        <tr>
-          <td style="width: 33%;"><b>شرکت:</b> شرکت نمونه نگار</td>
-          <td style="width: 33%; text-align: center;"><div class="voucher-title">سند حسابداری (Voucher)</div></td>
-          <td style="width: 33%; text-align: left;"><b>شماره سند:</b> #${s.id}<br><b>تاریخ سند:</b> ${s.date}</td>
-        </tr>
-        <tr>
-          <td colspan="3"><b>شرح کلی سند:</b> ${s.desc}</td>
-        </tr>
-      </table>
-      <table class="main-table">
-        <thead>
-          <tr>
-            <th style="width: 5%;">ردیف</th>
-            <th style="width: 15%;">کد معین/تفصیلی</th>
-            <th style="width: 25%;">عنوان حساب</th>
-            <th style="width: 35%;">شرح ردیف</th>
-            <th style="width: 10%;">بدهکار (ریال)</th>
-            <th style="width: 10%;">بستانکار (ریال)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${linesHtml}
-          <tr style="font-weight: bold; background-color: #f9f9f9;">
-            <td colspan="4" style="text-align: left;">جمع کل:</td>
-            <td style="text-align: left;">${s.debit.toLocaleString()}</td>
-            <td style="text-align: left;">${s.credit.toLocaleString()}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="signatures">
-        <div class="sig-box">تنظیم کننده</div>
-        <div class="sig-box">تایید کننده</div>
-        <div class="sig-box">مدیر مالی</div>
-        <div class="sig-box">مدیر عامل</div>
-      </div>
+      ${vouchersHtml}
     </body>
     </html>
   `);
