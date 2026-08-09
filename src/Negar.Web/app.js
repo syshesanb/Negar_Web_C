@@ -1920,6 +1920,19 @@ function getJalaliDayOfYear(dateStr) {
   return dayOfYear;
 }
 
+function clearSanadListSearches() {
+  const ids = [
+    'searchSanadId', 'searchSanadDay', 'searchSanadDate',
+    'searchSanadDesc', 'searchSanadDebit', 'searchSanadCredit',
+    'searchSanadTaraz', 'searchSanadBakhsh', 'searchSanadStatus'
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderSanadListTable();
+}
+
 function renderSanadListTable() {
   const tbody = document.getElementById('sanadListTable');
   if (!tbody) return;
