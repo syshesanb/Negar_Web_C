@@ -2229,6 +2229,8 @@ function togglePrintRangeInputs() {
 
 function submitPrintVouchersRange() {
   const isByNo = document.getElementById('printRangeByNo')?.checked;
+  const levelComboValue = document.getElementById('printAccountLevelCombo')?.value || 'group_kol_moin';
+
   let selectedVouchers = [];
 
   if (isByNo) {
@@ -2287,25 +2289,7 @@ function submitPrintVouchersRange() {
       numDisplay = `${s.id}`;
     }
 
-    const targetLines = AppState.voucherDetails[s.id] || [
-      { account: '110101', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
-      { account: '310101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
-    ];
-
-    const linesRows = targetLines.map((line, idx) => {
-      const acc = AppState.accounts.find(a => a.code === line.account);
-      const accName = acc ? acc.name : `حساب معین ${line.account}`;
-      return `
-        <tr>
-          <td style="text-align:center;">${idx + 1}</td>
-          <td style="text-align:center;">${line.account}</td>
-          <td>${accName}</td>
-          <td>${line.desc || ''}</td>
-          <td style="text-align:left;">${Number(line.debit || 0).toLocaleString()}</td>
-          <td style="text-align:left;">${Number(line.credit || 0).toLocaleString()}</td>
-        </tr>
-      `;
-    }).join('');
+    const linesRows = buildVoucherLevelRows(s, levelComboValue);
 
     return `
       <div class="voucher-page">
@@ -2325,11 +2309,12 @@ function submitPrintVouchersRange() {
           <thead>
             <tr>
               <th style="width:40px; text-align:center;">ردیف</th>
-              <th style="width:100px; text-align:center;">کد حساب</th>
+              <th style="width:90px; text-align:center;">کد حساب</th>
               <th>عنوان حساب</th>
               <th>شرح آرتیکل</th>
-              <th style="width:130px; text-align:left;">بدهکار (ریال)</th>
-              <th style="width:130px; text-align:left;">بستانکار (ریال)</th>
+              <th style="width:120px; text-align:right;">مبلغ جزء (ریال)</th>
+              <th style="width:120px; text-align:right;">بدهکار (ریال)</th>
+              <th style="width:120px; text-align:right;">بستانکار (ریال)</th>
             </tr>
           </thead>
           <tbody>
@@ -2338,8 +2323,9 @@ function submitPrintVouchersRange() {
           <tfoot>
             <tr style="font-weight:bold; background:#f8fafc;">
               <td colspan="4" style="text-align:right;">جمع کل سند:</td>
-              <td style="text-align:left;">${Number(s.debit).toLocaleString()}</td>
-              <td style="text-align:left;">${Number(s.credit).toLocaleString()}</td>
+              <td style="text-align:right;"></td>
+              <td style="text-align:right;">${Number(s.debit).toLocaleString()}</td>
+              <td style="text-align:right;">${Number(s.credit).toLocaleString()}</td>
             </tr>
           </tfoot>
         </table>
@@ -2394,6 +2380,310 @@ function submitPrintVouchersRange() {
     </html>
   `);
   printWindow.document.close();
+}
+
+function buildVoucherLevelRows(s, levelComboValue) {
+  AppState.voucherDetails = AppState.voucherDetails || {};
+  const targetLines = AppState.voucherDetails[s.id] || [
+    { account: '110102', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
+    { account: '310101', desc: `آرتیکل بستانکار - بابت ${s.desc}`, debit: 0, credit: s.credit }
+  ];
+
+  const enriched = targetLines.map(line => {
+    const acc = AppState.accounts.find(a => a.code === line.account);
+    let moinCode = line.account;
+    let moinName = acc ? acc.name : `حساب معین ${line.account}`;
+    let kolCode = moinCode.length >= 4 ? moinCode.slice(0, 4) : moinCode;
+    let kolName = 'حساب کل';
+    let groupCode = moinCode.length >= 2 ? moinCode.slice(0, 2) : moinCode;
+    let groupName = 'گروه حساب‌ها';
+
+    if (acc) {
+      const parentKol = acc.parentId ? AppState.accounts.find(x => x.id === acc.parentId) : null;
+      if (parentKol) {
+        kolCode = parentKol.code;
+        kolName = parentKol.name;
+        const parentGroup = parentKol.parentId ? AppState.accounts.find(x => x.id === parentKol.parentId) : null;
+        if (parentGroup) {
+          groupCode = parentGroup.code;
+          groupName = parentGroup.name;
+        }
+      }
+    }
+
+    const shen = AppState.shenavars ? AppState.shenavars.find(sh => sh.code === line.shenavarCode) : null;
+    const tafsilCode = shen ? shen.code : '';
+    const tafsilName = shen ? shen.name : '';
+
+    return {
+      ...line,
+      moinCode,
+      moinName,
+      kolCode,
+      kolName,
+      groupCode,
+      groupName,
+      tafsilCode,
+      tafsilName
+    };
+  });
+
+  const rows = [];
+  let rowIdx = 1;
+
+  if (levelComboValue === 'group') {
+    const groupsMap = {};
+    enriched.forEach(l => {
+      if (!groupsMap[l.groupCode]) {
+        groupsMap[l.groupCode] = { code: l.groupCode, name: l.groupName, debit: 0, credit: 0 };
+      }
+      groupsMap[l.groupCode].debit += Number(l.debit || 0);
+      groupsMap[l.groupCode].credit += Number(l.credit || 0);
+    });
+
+    Object.values(groupsMap).forEach(g => {
+      rows.push(`
+        <tr>
+          <td style="text-align:center;">${rowIdx++}</td>
+          <td style="text-align:center;">${g.code}</td>
+          <td>${g.name}</td>
+          <td>حساب‌های گروه ${g.name}</td>
+          <td style="text-align:right;"></td>
+          <td style="text-align:right;">${g.debit > 0 ? g.debit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${g.credit > 0 ? g.credit.toLocaleString() : '0'}</td>
+        </tr>
+      `);
+    });
+
+  } else if (levelComboValue === 'kol') {
+    const kolsMap = {};
+    enriched.forEach(l => {
+      if (!kolsMap[l.kolCode]) {
+        kolsMap[l.kolCode] = { code: l.kolCode, name: l.kolName, debit: 0, credit: 0 };
+      }
+      kolsMap[l.kolCode].debit += Number(l.debit || 0);
+      kolsMap[l.kolCode].credit += Number(l.credit || 0);
+    });
+
+    Object.values(kolsMap).forEach(k => {
+      rows.push(`
+        <tr>
+          <td style="text-align:center;">${rowIdx++}</td>
+          <td style="text-align:center;">${k.code}</td>
+          <td>${k.name}</td>
+          <td>حساب کل ${k.name}</td>
+          <td style="text-align:right;"></td>
+          <td style="text-align:right;">${k.debit > 0 ? k.debit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${k.credit > 0 ? k.credit.toLocaleString() : '0'}</td>
+        </tr>
+      `);
+    });
+
+  } else if (levelComboValue === 'group_kol') {
+    const groupsMap = {};
+    enriched.forEach(l => {
+      if (!groupsMap[l.groupCode]) {
+        groupsMap[l.groupCode] = { code: l.groupCode, name: l.groupName, debit: 0, credit: 0, kols: {} };
+      }
+      groupsMap[l.groupCode].debit += Number(l.debit || 0);
+      groupsMap[l.groupCode].credit += Number(l.credit || 0);
+
+      if (!groupsMap[l.groupCode].kols[l.kolCode]) {
+        groupsMap[l.groupCode].kols[l.kolCode] = { code: l.kolCode, name: l.kolName, debit: 0, credit: 0 };
+      }
+      groupsMap[l.groupCode].kols[l.kolCode].debit += Number(l.debit || 0);
+      groupsMap[l.groupCode].kols[l.kolCode].credit += Number(l.credit || 0);
+    });
+
+    Object.values(groupsMap).forEach(g => {
+      rows.push(`
+        <tr style="background:#f1f5f9; font-weight:bold;">
+          <td style="text-align:center;">${rowIdx++}</td>
+          <td style="text-align:center;">${g.code}</td>
+          <td>${g.name}</td>
+          <td>جمع گروه ${g.name}</td>
+          <td style="text-align:right;"></td>
+          <td style="text-align:right;">${g.debit > 0 ? g.debit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${g.credit > 0 ? g.credit.toLocaleString() : '0'}</td>
+        </tr>
+      `);
+      Object.values(g.kols).forEach(k => {
+        const subAmt = k.debit > 0 ? k.debit : k.credit;
+        rows.push(`
+          <tr>
+            <td style="text-align:center;">${rowIdx++}</td>
+            <td style="text-align:center;">${k.code}</td>
+            <td style="padding-right:20px;">${k.name}</td>
+            <td>حساب کل ${k.name}</td>
+            <td style="text-align:right;">${Number(subAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;"></td>
+            <td style="text-align:right;"></td>
+          </tr>
+        `);
+      });
+    });
+
+  } else if (levelComboValue === 'group_kol_moin') {
+    const groupsMap = {};
+    enriched.forEach(l => {
+      if (!groupsMap[l.groupCode]) {
+        groupsMap[l.groupCode] = { code: l.groupCode, name: l.groupName, debit: 0, credit: 0, kols: {} };
+      }
+      groupsMap[l.groupCode].debit += Number(l.debit || 0);
+      groupsMap[l.groupCode].credit += Number(l.credit || 0);
+
+      if (!groupsMap[l.groupCode].kols[l.kolCode]) {
+        groupsMap[l.groupCode].kols[l.kolCode] = { code: l.kolCode, name: l.kolName, debit: 0, credit: 0, moins: [] };
+      }
+      groupsMap[l.groupCode].kols[l.kolCode].debit += Number(l.debit || 0);
+      groupsMap[l.groupCode].kols[l.kolCode].credit += Number(l.credit || 0);
+      groupsMap[l.groupCode].kols[l.kolCode].moins.push(l);
+    });
+
+    Object.values(groupsMap).forEach(g => {
+      rows.push(`
+        <tr style="background:#f1f5f9; font-weight:bold;">
+          <td style="text-align:center;">${rowIdx++}</td>
+          <td style="text-align:center;">${g.code}</td>
+          <td>${g.name}</td>
+          <td>جمع گروه ${g.name}</td>
+          <td style="text-align:right;"></td>
+          <td style="text-align:right;">${g.debit > 0 ? g.debit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${g.credit > 0 ? g.credit.toLocaleString() : '0'}</td>
+        </tr>
+      `);
+      Object.values(g.kols).forEach(k => {
+        const kolSubAmt = k.debit > 0 ? k.debit : k.credit;
+        rows.push(`
+          <tr style="font-weight:bold; background:rgba(241,245,249,0.4);">
+            <td style="text-align:center;">${rowIdx++}</td>
+            <td style="text-align:center;">${k.code}</td>
+            <td style="padding-right:15px;">${k.name}</td>
+            <td>جمع کل ${k.name}</td>
+            <td style="text-align:right;">${Number(kolSubAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;"></td>
+            <td style="text-align:right;"></td>
+          </tr>
+        `);
+        k.moins.forEach(m => {
+          const moinSubAmt = Number(m.debit || 0) > 0 ? Number(m.debit) : Number(m.credit || 0);
+          rows.push(`
+            <tr>
+              <td style="text-align:center;">${rowIdx++}</td>
+              <td style="text-align:center;">${m.moinCode}</td>
+              <td style="padding-right:30px;">${m.moinName}</td>
+              <td>${m.desc || ''}</td>
+              <td style="text-align:right;">${Number(moinSubAmt || 0).toLocaleString()}</td>
+              <td style="text-align:right;"></td>
+              <td style="text-align:right;"></td>
+            </tr>
+          `);
+        });
+      });
+    });
+
+  } else if (levelComboValue === 'kol_moin') {
+    const kolsMap = {};
+    enriched.forEach(l => {
+      if (!kolsMap[l.kolCode]) {
+        kolsMap[l.kolCode] = { code: l.kolCode, name: l.kolName, debit: 0, credit: 0, moins: [] };
+      }
+      kolsMap[l.kolCode].debit += Number(l.debit || 0);
+      kolsMap[l.kolCode].credit += Number(l.credit || 0);
+      kolsMap[l.kolCode].moins.push(l);
+    });
+
+    Object.values(kolsMap).forEach(k => {
+      rows.push(`
+        <tr style="background:#f1f5f9; font-weight:bold;">
+          <td style="text-align:center;">${rowIdx++}</td>
+          <td style="text-align:center;">${k.code}</td>
+          <td>${k.name}</td>
+          <td>جمع کل ${k.name}</td>
+          <td style="text-align:right;"></td>
+          <td style="text-align:right;">${k.debit > 0 ? k.debit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${k.credit > 0 ? k.credit.toLocaleString() : '0'}</td>
+        </tr>
+      `);
+      k.moins.forEach(m => {
+        const moinSubAmt = Number(m.debit || 0) > 0 ? Number(m.debit) : Number(m.credit || 0);
+        rows.push(`
+          <tr>
+            <td style="text-align:center;">${rowIdx++}</td>
+            <td style="text-align:center;">${m.moinCode}</td>
+            <td style="padding-right:20px;">${m.moinName}</td>
+            <td>${m.desc || ''}</td>
+            <td style="text-align:right;">${Number(moinSubAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;"></td>
+            <td style="text-align:right;"></td>
+          </tr>
+        `);
+      });
+    });
+
+  } else if (levelComboValue === 'kol_moin_tafsil') {
+    const kolsMap = {};
+    enriched.forEach(l => {
+      if (!kolsMap[l.kolCode]) {
+        kolsMap[l.kolCode] = { code: l.kolCode, name: l.kolName, debit: 0, credit: 0, moins: {} };
+      }
+      kolsMap[l.kolCode].debit += Number(l.debit || 0);
+      kolsMap[l.kolCode].credit += Number(l.credit || 0);
+
+      if (!kolsMap[l.kolCode].moins[l.moinCode]) {
+        kolsMap[l.kolCode].moins[l.moinCode] = { code: l.moinCode, name: l.moinName, debit: 0, credit: 0, tafsils: [] };
+      }
+      kolsMap[l.kolCode].moins[l.moinCode].debit += Number(l.debit || 0);
+      kolsMap[l.kolCode].moins[l.moinCode].credit += Number(l.credit || 0);
+      kolsMap[l.kolCode].moins[l.moinCode].tafsils.push(l);
+    });
+
+    Object.values(kolsMap).forEach(k => {
+      rows.push(`
+        <tr style="background:#f1f5f9; font-weight:bold;">
+          <td style="text-align:center;">${rowIdx++}</td>
+          <td style="text-align:center;">${k.code}</td>
+          <td>${k.name}</td>
+          <td>جمع کل ${k.name}</td>
+          <td style="text-align:right;"></td>
+          <td style="text-align:right;">${k.debit > 0 ? k.debit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${k.credit > 0 ? k.credit.toLocaleString() : '0'}</td>
+        </tr>
+      `);
+      Object.values(k.moins).forEach(m => {
+        const moinSubAmt = m.debit > 0 ? m.debit : m.credit;
+        rows.push(`
+          <tr style="font-weight:bold; background:rgba(241,245,249,0.4);">
+            <td style="text-align:center;">${rowIdx++}</td>
+            <td style="text-align:center;">${m.code}</td>
+            <td style="padding-right:15px;">${m.name}</td>
+            <td>جمع معین ${m.name}</td>
+            <td style="text-align:right;">${Number(moinSubAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;"></td>
+            <td style="text-align:right;"></td>
+          </tr>
+        `);
+        m.tafsils.forEach(t => {
+          const tafsilSubAmt = Number(t.debit || 0) > 0 ? Number(t.debit) : Number(t.credit || 0);
+          const fullCode = t.tafsilCode ? `${t.moinCode}/${t.tafsilCode}` : t.moinCode;
+          const fullTitle = t.tafsilName ? `${t.tafsilName}` : t.moinName;
+          rows.push(`
+            <tr>
+              <td style="text-align:center;">${rowIdx++}</td>
+              <td style="text-align:center;">${fullCode}</td>
+              <td style="padding-right:30px;">${fullTitle}</td>
+              <td>${t.desc || ''}</td>
+              <td style="text-align:right;">${Number(tafsilSubAmt || 0).toLocaleString()}</td>
+              <td style="text-align:right;"></td>
+              <td style="text-align:right;"></td>
+            </tr>
+          `);
+        });
+      });
+    });
+  }
+
+  return rows.join('');
 }
 
 function printJournalLedger() {

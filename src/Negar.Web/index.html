@@ -3299,6 +3299,23 @@
         </div>
       </fieldset>
 
+      <!-- GroupBox 2: Account Level Combination (انتخاب ترکیب سطوح سرفصل) -->
+      <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:16px; margin-bottom:20px; background:rgba(15, 23, 42, 0.6);">
+        <legend style="color:#f8fafc; font-weight:bold; font-size:0.88rem; padding:0 8px;">انتخاب ترکیب سطوح سرفصل</legend>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">ترکیب سطوح سرفصل:</span>
+          <select id="printAccountLevelCombo" class="form-input" style="height:32px; font-size:0.82rem; background:rgba(30,41,59,0.9); color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; flex:1;">
+            <option value="group">فقط گروه حسابها</option>
+            <option value="kol">فقط حسابهای کل</option>
+            <option value="group_kol">گروه و کل</option>
+            <option value="group_kol_moin" selected>گروه و کل و معین</option>
+            <option value="kol_moin">کل و معین</option>
+            <option value="kol_moin_tafsil">کل و معین و تفضیلی 1</option>
+          </select>
+        </div>
+      </fieldset>
+
       <!-- Footer Buttons: Confirm & Cancel -->
       <div style="display:flex; justify-content:flex-end; gap:10px;">
         <button type="button" class="btn btn-primary" onclick="submitPrintVouchersRange()" style="min-width:100px; padding:6px 16px; font-weight:bold;">تایید</button>
