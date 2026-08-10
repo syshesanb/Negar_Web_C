@@ -51,6 +51,9 @@ function doLogin() {
     if (found) {
       // ✅ Success
       currentUser = found;
+      try {
+        localStorage.setItem('negar_logged_in', 'true');
+      } catch(e) {}
       if (errorEl) errorEl.style.display = 'none';
 
       // Update header info

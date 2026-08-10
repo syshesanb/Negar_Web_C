@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>نگار تحت وب - سیستم یکپارچه مالی، حسابداری، انبارداری</title>
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    (function() {
+      try {
+        var isFormPage = window.location.search.indexOf('form=') !== -1;
+        var isLoggedIn = localStorage.getItem('negar_logged_in') === 'true';
+        if (isFormPage || isLoggedIn) {
+          document.write('<style>#loginOverlay{display:none !important;}#mainApp{display:block !important;}</style>');
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
 
