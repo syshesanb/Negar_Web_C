@@ -2452,10 +2452,10 @@ function submitPrintVouchersRange() {
               <th style="width:3%; text-align:center;">ردیف</th>
               <th style="width:7%; text-align:center;">کد حساب</th>
               <th style="width:15%; text-align:center;">عنوان حساب</th>
-              <th style="width:33%; text-align:right;">شرح آرتیکل</th>
-              <th style="width:14%; text-align:right; white-space:nowrap;">مبلغ جزء (ریال)</th>
-              <th style="width:14%; text-align:right; white-space:nowrap;">بدهکار (ریال)</th>
-              <th style="width:14%; text-align:right; white-space:nowrap;">بستانکار (ریال)</th>
+              <th style="width:33%; text-align:center;">شرح آرتیکل</th>
+              <th style="width:14%; text-align:center; white-space:nowrap;">مبلغ جزء (ریال)</th>
+              <th style="width:14%; text-align:center; white-space:nowrap;">بدهکار (ریال)</th>
+              <th style="width:14%; text-align:center; white-space:nowrap;">بستانکار (ریال)</th>
             </tr>
           </thead>
           <tbody>
@@ -2601,7 +2601,7 @@ function submitPrintVouchersRange() {
         .doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }
         .main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
         .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 5px 3px; text-align: right; word-wrap: break-word; overflow-wrap: break-word; }
-        .main-table th { background-color: #f1f5f9; font-weight: bold; }
+        .main-table th { background-color: #f1f5f9; font-weight: bold; text-align: center !important; }
         .main-table td:nth-child(5), .main-table td:nth-child(6), .main-table td:nth-child(7) { white-space: nowrap !important; text-align: right; direction: ltr; font-size: 11px; }
         .signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 10px; }
         .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
