@@ -1711,7 +1711,8 @@ body.accounts-mode #form-hesabdari-main .hesabdari-subtabs-bar {
   flex-shrink: 0;
   width: 100% !important;
 }
-body.accounts-mode .hesabdari-tab-panel.active {
+body.accounts-mode #tab-panel-accounts.active,
+body.accounts-mode #tab-panel-shenavar.active {
   display: flex !important;
   flex-direction: column;
   flex: 1 1 0;
@@ -1719,42 +1720,37 @@ body.accounts-mode .hesabdari-tab-panel.active {
   overflow: hidden;
   width: 100% !important;
 }
-body.accounts-mode .hesabdari-tab-panel.active > .card.form-card {
+body.accounts-mode #tab-panel-accounts.active > .card.form-card,
+body.accounts-mode #tab-panel-shenavar.active > .card.form-card {
   display: flex !important;
   flex-direction: column;
-  width: 100% !important;
-  box-sizing: border-box;
-}
-body.accounts-mode .hesabdari-tab-panel.active > .card.form-card:only-child,
-body.accounts-mode .hesabdari-tab-panel.active > .card.form-card:last-child {
   flex: 1 1 0;
   min-height: 0;
   overflow: hidden;
   margin-bottom: 0;
+  width: 100% !important;
 }
-body.accounts-mode .hesabdari-tab-panel.active > .card.form-card:first-child:not(:only-child) {
-  flex-shrink: 0;
-  flex-grow: 0;
-  margin-bottom: 10px;
-}
-body.accounts-mode .hesabdari-tab-panel.active .table-wrapper {
+body.accounts-mode #tab-panel-accounts.active .table-wrapper,
+body.accounts-mode #tab-panel-shenavar.active .table-wrapper {
   flex: 1 1 0;
   overflow-y: auto;
   overflow-x: auto;
   min-height: 0;
 }
 
-/* Sticky search-filter row and column header rows for ALL accounting tab tables */
-body.accounts-mode .hesabdari-tab-panel.active table thead th {
+/* Sticky search-filter row (first thead row) */
+#tab-panel-accounts .table-wrapper thead th,
+#tab-panel-shenavar .table-wrapper thead th {
   position: sticky;
   top: 0;
   z-index: 5;
   background: var(--bg-secondary);
   box-shadow: 0 1px 0 var(--border-color);
 }
-body.accounts-mode .hesabdari-tab-panel.active table thead tr.table-search-row ~ tr th,
-body.accounts-mode .hesabdari-tab-panel.active table thead tr:nth-child(2) th {
-  top: 36px;
+/* Sticky column-title row (second thead row) sits below search row */
+#tab-panel-accounts .table-wrapper thead tr:nth-child(2) th,
+#tab-panel-shenavar .table-wrapper thead tr:nth-child(2) th {
+  top: 40px;
   z-index: 4;
 }
 
