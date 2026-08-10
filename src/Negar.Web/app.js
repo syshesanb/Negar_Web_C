@@ -2394,8 +2394,8 @@ function submitPrintVouchersRange() {
     const linesRows = buildVoucherLevelRows(s, levelComboValue);
 
     const totalWords = numberToPersianWords(s.debit || 0);
-    const pageNo = idx + 1;
-    const totalPages = selectedVouchers.length;
+    const voucherCurrentPage = 1;
+    const voucherTotalPages = 1;
 
     return `
       <div class="voucher-page">
@@ -2411,7 +2411,7 @@ function submitPrintVouchersRange() {
             <div>شماره سند: <b>${numDisplay}</b></div>
             <div>تاریخ: <b>${s.date}</b></div>
             <div>وضعیت: <b>${s.status}</b></div>
-            <div>صفحه: <b>صفحه ${pageNo} از ${totalPages}</b></div>
+            <div>صفحه: <b>${voucherCurrentPage} از ${voucherTotalPages}</b></div>
           </div>
         </div>
 
