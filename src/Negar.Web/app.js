@@ -67,21 +67,11 @@ function doLogin() {
         mainApp.style.display = 'block';
         mainApp.classList.add('app-fade-in');
 
-        // Initialize session: default to first company and its active (or latest) fiscal year
-        if (AppState.companies.length > 0) {
-          switchActiveCompany(AppState.companies[0]);
-          const activeYears = AppState.fiscalYears
-            .filter(fy => fy.company === SessionState.company.code)
-            .sort((a, b) => Number(b.year) - Number(a.year));
-          const activeOne = activeYears.find(fy => fy.status === 'فعال') || activeYears[0];
-          if (activeOne) SessionState.year = activeOne.year;
-        }
-
-        // Update header and status bar with user + company + year
+        // Update header info (Username/Role)
         updateHeaderBar();
 
-        // Show main tiles
-        showTiles('system');
+        // Show "Switch Company / Fiscal Year" form so user explicitly selects company and year
+        showForm('form-switch-company');
       }, 400);
 
     } else {
