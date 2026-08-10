@@ -2822,13 +2822,7 @@ function submitPrintVouchersRange() {
     printWindow.document.body.appendChild(a);
     a.click();
     printWindow.document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
-      </script>
-    </body>
-    </html>
-  `);
-  printWindow.document.close();
 }
 
 function toPersianDigitsStr(str) {
