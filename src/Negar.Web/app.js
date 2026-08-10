@@ -3177,72 +3177,261 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
 }
 
 function printJournalLedger() {
-  const printWindow = window.open('', '_blank');
-  let totalDebit = 0;
-  let totalCredit = 0;
+  const modal = document.getElementById('printJournalModal');
+  if (!modal) return;
 
-  const rowsHtml = AppState.sanads.map((s, idx) => {
-    totalDebit += s.debit;
-    totalCredit += s.credit;
-    return `
-      <tr>
-        <td>${idx + 1}</td>
-        <td>#${s.id}</td>
-        <td>${s.date}</td>
-        <td>${s.desc}</td>
-        <td style="text-align:left;">${s.debit.toLocaleString()}</td>
-        <td style="text-align:left;">${s.credit.toLocaleString()}</td>
-        <td>${s.status}</td>
-      </tr>
-    `;
+  const activeYear = String(SessionState.year || SessionState.fiscalYear || AppState.fiscalYear || '1403');
+  const titleEl = document.getElementById('printJournalModalTitle');
+  if (titleEl) {
+    titleEl.innerHTML = `🖨️ تنظیمات و محدوده چاپ دفتر روزنامه سال جاری : ${activeYear}`;
+  }
+
+  // Set default values from current year sanads
+  const currentYearSanads = AppState.sanads.filter(s => {
+    const sYear = (s.date || '').slice(0, 4);
+    return !sYear || sYear === activeYear;
+  });
+
+  const sortedIds = currentYearSanads.map(s => s.id).sort((a, b) => a - b);
+  const minId = sortedIds.length > 0 ? sortedIds[0] : 101;
+  const maxId = sortedIds.length > 0 ? sortedIds[sortedIds.length - 1] : 999;
+
+  const sortedDates = currentYearSanads.map(s => s.date).sort();
+  const minDate = sortedDates.length > 0 ? sortedDates[0] : `${activeYear}/01/01`;
+  const maxDate = sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : `${activeYear}/12/29`;
+
+  const fromNoEl = document.getElementById('printJrnFromSanadNo');
+  const toNoEl = document.getElementById('printJrnToSanadNo');
+  const fromDateEl = document.getElementById('printJrnFromDate');
+  const toDateEl = document.getElementById('printJrnToDate');
+
+  if (fromNoEl) fromNoEl.value = minId;
+  if (toNoEl) toNoEl.value = maxId;
+  if (fromDateEl) fromDateEl.value = minDate;
+  if (toDateEl) toDateEl.value = maxDate;
+
+  // Set default radio
+  const radioNo = document.getElementById('printJrnRangeByNo');
+  if (radioNo) radioNo.checked = true;
+  togglePrintJournalRangeInputs();
+  togglePrintJournalFontState();
+
+  modal.style.display = 'flex';
+}
+
+function closePrintJournalModal() {
+  const modal = document.getElementById('printJournalModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function togglePrintJournalRangeInputs() {
+  const isByNo = document.getElementById('printJrnRangeByNo')?.checked;
+  const noContainer = document.getElementById('printJrnRangeNoContainer');
+  const dateContainer = document.getElementById('printJrnRangeDateContainer');
+  if (noContainer) { noContainer.style.opacity = isByNo ? '1' : '0.4'; noContainer.style.pointerEvents = isByNo ? 'auto' : 'none'; }
+  if (dateContainer) { dateContainer.style.opacity = isByNo ? '0.4' : '1'; dateContainer.style.pointerEvents = isByNo ? 'none' : 'auto'; }
+}
+
+function togglePrintJournalFontState() {
+  const useDefault = document.getElementById('printJrnUseDefaultFonts')?.checked;
+  const container = document.getElementById('printJrnFontsContainer');
+  if (container) { container.style.opacity = useDefault ? '0.4' : '1'; container.style.pointerEvents = useDefault ? 'none' : 'auto'; }
+}
+
+function submitPrintJournalRange() {
+  const isByNo = document.getElementById('printJrnRangeByNo')?.checked;
+  const activeYear = String(SessionState.year || SessionState.fiscalYear || AppState.fiscalYear || '1403');
+  const yearStart = `${activeYear}/01/01`;
+  const yearEnd = `${activeYear}/12/29`;
+
+  let selectedSanads = [];
+
+  if (isByNo) {
+    const numType = document.getElementById('printJrnNumType')?.value || 'sanadNo';
+    const fromSanad = parseInt(document.getElementById('printJrnFromSanadNo')?.value || '0', 10);
+    const toSanad = parseInt(document.getElementById('printJrnToSanadNo')?.value || '999999', 10);
+    const fromDay = parseInt(document.getElementById('printJrnFromDayNo')?.value || '0', 10);
+    const toDay = parseInt(document.getElementById('printJrnToDayNo')?.value || '999999', 10);
+
+    selectedSanads = AppState.sanads.filter(s => {
+      const sYear = (s.date || '').slice(0, 4);
+      if (sYear && sYear !== activeYear) return false;
+      if (!s.dayOfYear) s.dayOfYear = getJalaliDayOfYear(s.date);
+      if (numType === 'sanadNo') return s.id >= fromSanad && s.id <= toSanad;
+      if (numType === 'dayNo') return s.dayOfYear >= fromDay && s.dayOfYear <= toDay;
+      if (numType === 'bothNo') return (s.id >= fromSanad && s.id <= toSanad) && (s.dayOfYear >= fromDay && s.dayOfYear <= toDay);
+      return true;
+    });
+  } else {
+    const fromDateRaw = (document.getElementById('printJrnFromDate')?.value || '').trim();
+    const toDateRaw = (document.getElementById('printJrnToDate')?.value || '').trim();
+    const fromDate = fromDateRaw < yearStart ? yearStart : fromDateRaw;
+    const toDate = toDateRaw > yearEnd ? yearEnd : toDateRaw;
+    selectedSanads = AppState.sanads.filter(s => {
+      const sYear = (s.date || '').slice(0, 4);
+      if (sYear && sYear !== activeYear) return false;
+      return s.date >= fromDate && s.date <= toDate;
+    });
+  }
+
+  if (selectedSanads.length === 0) {
+    alert('هیچ سندی در محدوده تعیین‌شده یافت نشد.');
+    return;
+  }
+
+  closePrintJournalModal();
+
+  // Read settings
+  const pageSize = document.getElementById('printJrnPageSize')?.value || 'A4';
+  const orientation = document.getElementById('printJrnPageOrientation')?.value || 'landscape';
+  const colorMode = document.getElementById('printJrnColorMode')?.value || 'color';
+  const numberType = document.getElementById('printJrnNumberType')?.value || 'fa';
+  const useDefaultFonts = document.getElementById('printJrnUseDefaultFonts')?.checked !== false;
+
+  // Column visibility
+  const showRow = document.getElementById('jrnColRow')?.checked !== false;
+  const showSanadNo = document.getElementById('jrnColSanadNo')?.checked !== false;
+  const showDayNo = document.getElementById('jrnColDayNo')?.checked !== false;
+  const showDate = document.getElementById('jrnColDate')?.checked !== false;
+  const showDesc = document.getElementById('jrnColDesc')?.checked !== false;
+  const showDebit = document.getElementById('jrnColDebit')?.checked !== false;
+  const showCredit = document.getElementById('jrnColCredit')?.checked !== false;
+  const showStatus = document.getElementById('jrnColStatus')?.checked !== false;
+
+  // Font settings
+  const compF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontCompFamily')?.value || 'Tahoma');
+  const compS = useDefaultFonts ? '16px' : (document.getElementById('jrnFontCompSize')?.value || '16px');
+  const compC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontCompColor')?.value || '#0f172a');
+  const titleF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTitleFamily')?.value || 'Tahoma');
+  const titleS = useDefaultFonts ? '18px' : (document.getElementById('jrnFontTitleSize')?.value || '18px');
+  const titleC = useDefaultFonts ? '#0284c7' : (document.getElementById('jrnFontTitleColor')?.value || '#0284c7');
+  const thF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontThFamily')?.value || 'Tahoma');
+  const thS = useDefaultFonts ? '12px' : (document.getElementById('jrnFontThSize')?.value || '12px');
+  const thC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontThColor')?.value || '#0f172a');
+  const tdF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTdFamily')?.value || 'Tahoma');
+  const tdS = useDefaultFonts ? '11px' : (document.getElementById('jrnFontTdSize')?.value || '11px');
+  const tdC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontTdColor')?.value || '#0f172a');
+  const totF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTotalFamily')?.value || 'Tahoma');
+  const totS = useDefaultFonts ? '11px' : (document.getElementById('jrnFontTotalSize')?.value || '11px');
+  const totC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontTotalColor')?.value || '#0f172a');
+
+  const isBw = colorMode === 'bw';
+  const headerBg = isBw ? '#e5e5e5' : '#e2e8f0';
+  const titleColor = isBw ? '#000000' : titleC;
+
+  // Build company info
+  const compCode = SessionState.company?.code;
+  const compDetails = AppState.companyDetails ? AppState.companyDetails[compCode] : null;
+  const companyName = SessionState.company?.name || 'شرکت نمونه نگار';
+  const logoSrc = (compDetails && compDetails.logo) ? compDetails.logo : (typeof currentCompLogoBase64 !== 'undefined' ? currentCompLogoBase64 : '');
+  let logoHtml = logoSrc
+    ? `<img src="${logoSrc}" alt="آرم" style="max-height:48px; max-width:110px; object-fit:contain;" />`
+    : `<div style="width:42px;height:42px;border-radius:8px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;">🏢</div>`;
+
+  // Build header row
+  const thCols = [];
+  if (showRow) thCols.push('<th style="width:4%;text-align:center;">ردیف</th>');
+  if (showSanadNo) thCols.push('<th style="width:8%;text-align:center;">شماره سند</th>');
+  if (showDayNo) thCols.push('<th style="width:6%;text-align:center;">شماره روز</th>');
+  if (showDate) thCols.push('<th style="width:10%;text-align:center;">تاریخ</th>');
+  if (showDesc) thCols.push('<th>شرح سند</th>');
+  if (showDebit) thCols.push('<th style="width:13%;text-align:center;">جمع بدهکار (ریال)</th>');
+  if (showCredit) thCols.push('<th style="width:13%;text-align:center;">جمع بستانکار (ریال)</th>');
+  if (showStatus) thCols.push('<th style="width:8%;text-align:center;">وضعیت</th>');
+
+  let totalDebit = 0, totalCredit = 0;
+
+  const rows = selectedSanads.map((s, idx) => {
+    if (!s.dayOfYear) s.dayOfYear = getJalaliDayOfYear(s.date);
+    totalDebit += (s.debit || 0);
+    totalCredit += (s.credit || 0);
+    const numFmt = n => formatNumberForPrint(String(n), numberType);
+    const dateFmt = d => formatNumberForPrint(d, numberType);
+    const tdCols = [];
+    if (showRow) tdCols.push(`<td style="text-align:center;">${numFmt(idx + 1)}</td>`);
+    if (showSanadNo) tdCols.push(`<td style="text-align:center;">${numFmt(s.id)}</td>`);
+    if (showDayNo) tdCols.push(`<td style="text-align:center;">${numFmt(s.dayOfYear || '')}</td>`);
+    if (showDate) tdCols.push(`<td style="text-align:center;">${dateFmt(s.date)}</td>`);
+    if (showDesc) tdCols.push(`<td style="text-align:right;">${s.desc || ''}</td>`);
+    if (showDebit) tdCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;">${numFmt(Number(s.debit || 0).toLocaleString())}</td>`);
+    if (showCredit) tdCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;">${numFmt(Number(s.credit || 0).toLocaleString())}</td>`);
+    if (showStatus) tdCols.push(`<td style="text-align:center;">${s.status || ''}</td>`);
+    return `<tr>${tdCols.join('')}</tr>`;
   }).join('');
+
+  // Total row
+  const totCols = [];
+  if (showRow) totCols.push('<td></td>');
+  if (showSanadNo) totCols.push('<td></td>');
+  if (showDayNo) totCols.push('<td></td>');
+  if (showDate) totCols.push('<td></td>');
+  if (showDesc) totCols.push(`<td style="text-align:right;font-weight:bold;">جمع کل دفتر روزنامه</td>`);
+  if (showDebit) totCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${formatNumberForPrint(totalDebit.toLocaleString(), numberType)}</td>`);
+  if (showCredit) totCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${formatNumberForPrint(totalCredit.toLocaleString(), numberType)}</td>`);
+  if (showStatus) totCols.push('<td></td>');
+
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
 
   printWindow.document.write(`
     <html dir="rtl">
     <head>
-      <title>چاپ دفتر روزنامه</title>
+      <title>دفتر روزنامه - ${activeYear}</title>
       <style>
-        body { font-family: Tahoma, Arial, sans-serif; padding: 20px; color: #000; background: #fff; font-size: 12px; }
-        .title { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 20px; }
-        .main-table { width: 100%; border-collapse: collapse; }
-        .main-table th, .main-table td { border: 1px solid #000; padding: 8px; text-align: right; }
-        .main-table th { background-color: #f2f2f2; }
-        @media print {
-          .no-print { display: none; }
-        }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        body { font-family: '${tdF}', Tahoma, Arial, sans-serif; padding: 0; margin: 0; color: #000; background: #fff; font-size: ${tdS}; }
+        @page { size: ${pageSize} ${orientation}; margin: 12mm; }
+        .no-print { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #1e293b; color: #f8fafc; flex-wrap: wrap; }
+        .no-print button { border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .btn-pdf { background: #dc2626; color: #fff; }
+        .btn-print { background: #0284c7; color: #fff; }
+        .report-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 14px; padding: 10px 14px 10px 14px; }
+        .company-name { font-family: '${compF}', Tahoma; font-size: ${compS}; font-weight: bold; color: ${isBw ? '#000' : compC}; }
+        .report-title { font-family: '${titleF}', Tahoma; font-size: ${titleS}; font-weight: bold; color: ${titleColor}; text-align: center; }
+        .report-sub { font-size: 11px; color: #475569; text-align: center; margin-top: 3px; }
+        .main-table { width: 100%; border-collapse: collapse; margin: 0 14px; width: calc(100% - 28px); }
+        .main-table th { font-family: '${thF}', Tahoma; font-size: ${thS}; color: ${isBw ? '#000' : thC}; background-color: ${headerBg} !important; border: 1px solid ${isBw ? '#000' : '#94a3b8'}; padding: 5px 4px; text-align: center; }
+        .main-table td { font-family: '${tdF}', Tahoma; font-size: ${tdS}; color: ${isBw ? '#000' : tdC}; border: 1px solid ${isBw ? '#888' : '#cbd5e1'}; padding: 4px 5px; }
+        .main-table tr:nth-child(even) td { background-color: ${isBw ? '#f5f5f5' : '#f8fafc'}; }
+        .total-row td { font-family: '${totF}', Tahoma; font-size: ${totS}; color: ${isBw ? '#000' : totC}; background-color: ${isBw ? '#e0e0e0' : '#e2e8f0'} !important; font-weight: bold; border: 1px solid ${isBw ? '#000' : '#94a3b8'}; padding: 5px 4px; }
+        @media print { .no-print { display: none !important; } body { padding: 0; } }
       </style>
     </head>
-    <body>
-      <div class="no-print" style="margin-bottom: 20px; text-align: left;">
-        <button onclick="window.print()" style="padding: 8px 16px; font-size: 14px; cursor: pointer;">🖨️ چاپ دفتر روزنامه</button>
+    <body${isBw ? ' style="filter:grayscale(100%) contrast(120%);"' : ''}>
+      <div class="no-print">
+        <span style="font-weight:bold;color:#38bdf8;">📒 دفتر روزنامه - ${activeYear} (${selectedSanads.length} سند)</span>
+        <button class="btn-pdf" onclick="exportJrnToPDF()">📄 ذخیره PDF</button>
+        <button class="btn-print" onclick="window.print()">🖨️ چاپ</button>
       </div>
-      <div class="title">دفتر روزنامه اسناد حسابداری - شرکت نمونه نگار</div>
+      <div class="report-header">
+        <div>${logoHtml}</div>
+        <div style="text-align:center;">
+          <div class="company-name">${companyName}</div>
+          <div class="report-title">دفتر روزنامه</div>
+          <div class="report-sub">سال مالی ${activeYear} &nbsp;|&nbsp; تعداد اسناد: ${selectedSanads.length}</div>
+        </div>
+        <div style="font-size:11px;color:#475569;text-align:left;">
+          <div>تاریخ چاپ: ${new Date().toLocaleDateString('fa-IR')}</div>
+        </div>
+      </div>
       <table class="main-table">
-        <thead>
-          <tr>
-            <th style="width: 5%;">ردیف</th>
-            <th style="width: 10%;">شماره سند</th>
-            <th style="width: 15%;">تاریخ</th>
-            <th style="width: 40%;">شرح سند</th>
-            <th style="width: 10%;">جمع بدهکار (ریال)</th>
-            <th style="width: 10%;">جمع بستانکار (ریال)</th>
-            <th style="width: 10%;">وضعیت</th>
-          </tr>
-        </thead>
+        <thead><tr>${thCols.join('')}</tr></thead>
         <tbody>
-          ${rowsHtml}
-          <tr style="font-weight: bold; background-color: #f2f2f2;">
-            <td colspan="4" style="text-align: left;">جمع کل دفتر:</td>
-            <td style="text-align: left;">${totalDebit.toLocaleString()}</td>
-            <td style="text-align: left;">${totalCredit.toLocaleString()}</td>
-            <td></td>
-          </tr>
+          ${rows}
+          <tr class="total-row">${totCols.join('')}</tr>
         </tbody>
       </table>
     </body>
     </html>
   `);
   printWindow.document.close();
+
+  printWindow.exportJrnToPDF = function() {
+    const oldTitle = printWindow.document.title;
+    printWindow.document.title = `دفتر_روزنامه_${activeYear}`;
+    printWindow.print();
+    setTimeout(() => { printWindow.document.title = oldTitle; }, 1000);
+  };
 }
 
 function copyActiveVoucher() {

@@ -3674,10 +3674,258 @@
     </div>
   </div>
 
+  <!-- Modal: Print Journal Ledger Setup (پاپ‌آپ تنظیمات چاپ دفتر روزنامه) -->
+  <div id="printJournalModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); z-index:3000; align-items:center; justify-content:center;">
+    <div class="modal-content card" style="width:1080px; max-width:98vw; max-height:96vh; border:1px solid rgba(56, 189, 248, 0.4); box-shadow:0 12px 36px rgba(0,0,0,0.8); background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-radius:12px; padding:18px 22px; overflow-y:auto;">
+      
+      <!-- Modal Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:14px;">
+        <h3 id="printJournalModalTitle" style="margin:0; font-size:1.02rem; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+          🖨️ تنظیمات و محدوده چاپ دفتر روزنامه سال جاری : 1403
+        </h3>
+        <button type="button" class="btn btn-outline" style="padding:2px 8px; border:none; color:var(--text-muted); font-size:1.1rem; cursor:pointer;" onclick="closePrintJournalModal()">✕</button>
+      </div>
+
+      <!-- 2-Column Grid Layout Container -->
+      <div style="display:grid; grid-template-columns: 1fr 1.05fr; gap:16px; margin-bottom:12px; align-items:start;">
+        
+        <!-- Right Column: Print Range & Filters -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          
+          <!-- GroupBox 1: Print Range -->
+          <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:10px 14px; margin-bottom:0; background:rgba(15, 23, 42, 0.6);">
+            <legend style="color:#f8fafc; font-weight:bold; font-size:0.85rem; padding:0 8px;">محدوده انتخاب اسناد جهت چاپ دفتر روزنامه</legend>
+
+            <!-- Option 1: By Voucher Numbers -->
+            <div style="margin-bottom:10px;">
+              <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:#f1f5f9; margin-bottom:8px; font-size:0.84rem;">
+                <input type="radio" id="printJrnRangeByNo" name="printJrnRangeType" value="no" checked onchange="togglePrintJournalRangeInputs()">
+                <span>انتخاب بازه بر اساس شماره اسناد</span>
+              </label>
+              
+              <div id="printJrnRangeNoContainer" style="display:flex; flex-direction:column; gap:8px; padding-right:20px; transition:opacity 0.2s ease;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">انتخاب نوع شماره سند:</span>
+                  <select id="printJrnNumType" class="form-select" style="height:30px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; flex:1; cursor:pointer; position:relative; z-index:10;">
+                    <option value="sanadNo" style="background:#1e293b; color:#f8fafc;">استفاده از شماره سند</option>
+                    <option value="dayNo" style="background:#1e293b; color:#f8fafc;">استفاده از شماره روز</option>
+                    <option value="bothNo" style="background:#1e293b; color:#f8fafc;">استفاده از هر دو شماره</option>
+                  </select>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                      <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">از شماره سند:</span>
+                      <input type="number" id="printJrnFromSanadNo" class="form-input" min="1" step="1" style="width:100%; text-align:center; font-weight:bold; height:26px; font-size:0.8rem;" value="101" onfocus="this.select()" />
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                      <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">تا شماره سند:</span>
+                      <input type="number" id="printJrnToSanadNo" class="form-input" min="1" step="1" style="width:100%; text-align:center; font-weight:bold; height:26px; font-size:0.8rem;" value="999" onfocus="this.select()" />
+                    </div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                      <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">از شماره روزانه:</span>
+                      <input type="number" id="printJrnFromDayNo" class="form-input" min="1" step="1" style="width:100%; text-align:center; font-weight:bold; height:26px; font-size:0.8rem;" value="1" onfocus="this.select()" />
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                      <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">تا شماره روزانه:</span>
+                      <input type="number" id="printJrnToDayNo" class="form-input" min="1" step="1" style="width:100%; text-align:center; font-weight:bold; height:26px; font-size:0.8rem;" value="365" onfocus="this.select()" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:8px 0;" />
+
+            <!-- Option 2: By Dates -->
+            <div>
+              <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:#f1f5f9; margin-bottom:6px; font-size:0.84rem;">
+                <input type="radio" id="printJrnRangeByDate" name="printJrnRangeType" value="date" onchange="togglePrintJournalRangeInputs()">
+                <span>انتخاب بازه بر اساس تاریخ اسناد</span>
+              </label>
+              
+              <div id="printJrnRangeDateContainer" style="display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding-right:20px; opacity:0.4; transition:opacity 0.2s ease;">
+                <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                  <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">از تاریخ :</span>
+                  <input type="text" id="printJrnFromDate" class="form-input" style="width:100px; text-align:center; height:26px; font-size:0.8rem;" placeholder="1403/01/01" maxlength="10" oninput="autoFormatDate(this)" />
+                  <button type="button" class="btn btn-outline date-picker-btn" style="padding:1px 6px; height:26px; font-size:0.8rem;" onclick="openPrintDateCal('printJrnFromDate', this)">...</button>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                  <span style="font-size:0.8rem; color:var(--text-muted); white-space:nowrap;">تا تاریخ :</span>
+                  <input type="text" id="printJrnToDate" class="form-input" style="width:100px; text-align:center; height:26px; font-size:0.8rem;" placeholder="1403/12/29" maxlength="10" oninput="autoFormatDate(this)" />
+                  <button type="button" class="btn btn-outline date-picker-btn" style="padding:1px 6px; height:26px; font-size:0.8rem;" onclick="openPrintDateCal('printJrnToDate', this)">...</button>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- GroupBox 2: Paper Size & Orientation -->
+          <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:10px 14px; margin-bottom:0; background:rgba(15, 23, 42, 0.6);">
+            <legend style="color:#f8fafc; font-weight:bold; font-size:0.85rem; padding:0 8px;">تنظیمات صفحه</legend>
+            <div style="display:flex; gap:14px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">📐 اندازه کاغذ:</span>
+                <select id="printJrnPageSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; cursor:pointer;">
+                  <option value="A4" selected>A4</option>
+                  <option value="A5">A5</option>
+                  <option value="Letter">Letter</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">🔄 جهت صفحه:</span>
+                <select id="printJrnPageOrientation" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; cursor:pointer;">
+                  <option value="landscape" selected>افقی</option>
+                  <option value="portrait">عمودی</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">🎨 حالت رنگ:</span>
+                <select id="printJrnColorMode" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; cursor:pointer;">
+                  <option value="color" selected>رنگی</option>
+                  <option value="bw">سیاه و سفید</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">🔢 نوع اعداد:</span>
+                <select id="printJrnNumberType" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; cursor:pointer;">
+                  <option value="fa" selected>فارسی</option>
+                  <option value="en">انگلیسی</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- GroupBox 3: Show/Hide Columns -->
+          <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:10px 14px; margin-bottom:0; background:rgba(15, 23, 42, 0.6);">
+            <legend style="color:#f8fafc; font-weight:bold; font-size:0.85rem; padding:0 8px;">انتخاب ستون‌های نمایش</legend>
+            <div style="display:flex; flex-wrap:wrap; gap:12px;">
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColRow" checked> ردیف</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColSanadNo" checked> شماره سند</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDayNo" checked> شماره روز</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDate" checked> تاریخ</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDesc" checked> شرح سند</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDebit" checked> جمع بدهکار</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColCredit" checked> جمع بستانکار</label>
+              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColStatus" checked> وضعیت</label>
+            </div>
+          </fieldset>
+        </div>
+
+        <!-- Left Column: Font Settings -->
+        <div style="display:flex; flex-direction:column; gap:10px; height:100%;">
+          <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:12px 14px; height:100%; background:rgba(15, 23, 42, 0.6); box-sizing:border-box;">
+            <legend style="color:#f8fafc; font-weight:bold; font-size:0.85rem; padding:0 8px;">تنظیم فونت قسمتهای مختلف گزارش</legend>
+
+            <!-- Default Fonts Checkbox -->
+            <div style="margin-bottom:10px;">
+              <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:#38bdf8; font-size:0.84rem;">
+                <input type="checkbox" id="printJrnUseDefaultFonts" checked onchange="togglePrintJournalFontState()">
+                <span>استفاده از فونت‌های پیش‌فرض در گزارش</span>
+              </label>
+            </div>
+
+            <!-- Font Rows Container -->
+            <div id="printJrnFontsContainer" style="display:flex; flex-direction:column; gap:6px; opacity:0.4; pointer-events:none; transition:opacity 0.2s ease;">
+              <!-- Header Labels -->
+              <div style="display:grid; grid-template-columns: 190px 1fr 90px 50px; gap:8px; font-weight:bold; font-size:0.78rem; color:var(--text-muted); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;">
+                <span>بخش مربوطه در گزارش</span>
+                <span>نام فونت</span>
+                <span>سایز فونت</span>
+                <span style="text-align:center;">رنگ</span>
+              </div>
+
+              <!-- Font options helper macro (repeated for each section) -->
+              <!-- 1. Company Name -->
+              <div style="display:grid; grid-template-columns: 190px 1fr 90px 50px; gap:8px; align-items:center;">
+                <span style="font-size:0.78rem; color:#f1f5f9; white-space:nowrap;">فونت نام شرکت:</span>
+                <select id="jrnFontCompFamily" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="Tahoma" selected>Tahoma - نگار</option><option value="B Titr">B Titr - نگار</option><option value="B Jadid">B Jadid - نگار</option><option value="IRANSans">IRANSans - نگار</option><option value="Vazirmatn">Vazirmatn - نگار</option><option value="B Nazanin">B Nazanin - نگار</option><option value="Arial">Arial - نگار</option>
+                </select>
+                <select id="jrnFontCompSize" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="12px">12 px</option><option value="14px">14 px</option><option value="16px" selected>16 px</option><option value="18px">18 px</option><option value="20px">20 px</option>
+                </select>
+                <div style="display:flex; justify-content:center;">
+                  <input type="color" id="jrnFontCompColor" value="#0f172a" style="width:30px; height:24px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" />
+                </div>
+              </div>
+
+              <!-- 2. Report Title -->
+              <div style="display:grid; grid-template-columns: 190px 1fr 90px 50px; gap:8px; align-items:center;">
+                <span style="font-size:0.78rem; color:#f1f5f9; white-space:nowrap;">فونت عنوان گزارش:</span>
+                <select id="jrnFontTitleFamily" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="Tahoma" selected>Tahoma - نگار</option><option value="B Titr">B Titr - نگار</option><option value="B Jadid">B Jadid - نگار</option><option value="IRANSans">IRANSans - نگار</option><option value="Vazirmatn">Vazirmatn - نگار</option><option value="B Nazanin">B Nazanin - نگار</option><option value="Arial">Arial - نگار</option>
+                </select>
+                <select id="jrnFontTitleSize" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="14px">14 px</option><option value="16px">16 px</option><option value="18px" selected>18 px</option><option value="20px">20 px</option><option value="22px">22 px</option>
+                </select>
+                <div style="display:flex; justify-content:center;">
+                  <input type="color" id="jrnFontTitleColor" value="#0284c7" style="width:30px; height:24px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" />
+                </div>
+              </div>
+
+              <!-- 3. Table Header -->
+              <div style="display:grid; grid-template-columns: 190px 1fr 90px 50px; gap:8px; align-items:center;">
+                <span style="font-size:0.78rem; color:#f1f5f9; white-space:nowrap;">فونت عنوان سر ستونها:</span>
+                <select id="jrnFontThFamily" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="Tahoma" selected>Tahoma - نگار</option><option value="B Titr">B Titr - نگار</option><option value="B Jadid">B Jadid - نگار</option><option value="IRANSans">IRANSans - نگار</option><option value="Vazirmatn">Vazirmatn - نگار</option><option value="B Nazanin">B Nazanin - نگار</option><option value="Arial">Arial - نگار</option>
+                </select>
+                <select id="jrnFontThSize" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="10px">10 px</option><option value="11px">11 px</option><option value="12px" selected>12 px</option><option value="13px">13 px</option><option value="14px">14 px</option>
+                </select>
+                <div style="display:flex; justify-content:center;">
+                  <input type="color" id="jrnFontThColor" value="#0f172a" style="width:30px; height:24px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" />
+                </div>
+              </div>
+
+              <!-- 4. Table Rows -->
+              <div style="display:grid; grid-template-columns: 190px 1fr 90px 50px; gap:8px; align-items:center;">
+                <span style="font-size:0.78rem; color:#f1f5f9; white-space:nowrap;">فونت ردیف‌های دفتر:</span>
+                <select id="jrnFontTdFamily" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="Tahoma" selected>Tahoma - نگار</option><option value="B Titr">B Titr - نگار</option><option value="B Jadid">B Jadid - نگار</option><option value="IRANSans">IRANSans - نگار</option><option value="Vazirmatn">Vazirmatn - نگار</option><option value="B Nazanin">B Nazanin - نگار</option><option value="Arial">Arial - نگار</option>
+                </select>
+                <select id="jrnFontTdSize" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="9px">9 px</option><option value="10px">10 px</option><option value="11px" selected>11 px</option><option value="12px">12 px</option><option value="13px">13 px</option>
+                </select>
+                <div style="display:flex; justify-content:center;">
+                  <input type="color" id="jrnFontTdColor" value="#0f172a" style="width:30px; height:24px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" />
+                </div>
+              </div>
+
+              <!-- 5. Summary/Total Row -->
+              <div style="display:grid; grid-template-columns: 190px 1fr 90px 50px; gap:8px; align-items:center;">
+                <span style="font-size:0.78rem; color:#f1f5f9; white-space:nowrap;">فونت ردیف جمع کل:</span>
+                <select id="jrnFontTotalFamily" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="Tahoma" selected>Tahoma - نگار</option><option value="B Titr">B Titr - نگار</option><option value="B Jadid">B Jadid - نگار</option><option value="IRANSans">IRANSans - نگار</option><option value="Vazirmatn">Vazirmatn - نگار</option><option value="B Nazanin">B Nazanin - نگار</option><option value="Arial">Arial - نگار</option>
+                </select>
+                <select id="jrnFontTotalSize" class="form-select" style="height:26px; font-size:0.78rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:1px 4px;">
+                  <option value="10px">10 px</option><option value="11px" selected>11 px</option><option value="12px">12 px</option><option value="13px">13 px</option>
+                </select>
+                <div style="display:flex; justify-content:center;">
+                  <input type="color" id="jrnFontTotalColor" value="#0f172a" style="width:30px; height:24px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn btn-primary" onclick="submitPrintJournalRange()" style="min-width:110px; padding:6px 18px; font-weight:bold; font-size:0.88rem;">تایید</button>
+        <button type="button" class="btn btn-outline" onclick="closePrintJournalModal()" style="min-width:110px; padding:6px 18px; font-size:0.88rem;">لغو</button>
+      </div>
+
+    </div>
+  </div>
+
   <style>
     #shenavarModalOverlay.active, #bankModalOverlay.active { display:flex !important; }
   </style>
 
 </body>
 </html>
-
