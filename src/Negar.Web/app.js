@@ -2380,8 +2380,6 @@ function submitPrintVouchersRange() {
           </div>
         </div>
 
-        <div style="margin-bottom:10px; font-weight:bold; font-size:13px;">شرح کلی: ${s.desc}</div>
-
         <table class="main-table">
           <thead>
             <tr>
@@ -2408,6 +2406,12 @@ function submitPrintVouchersRange() {
             </tr>
           </tfoot>
         </table>
+
+        <!-- Independent Description Box below Total Amount line -->
+        <div style="border:1px solid #94a3b8; border-radius:6px; padding:10px 14px; margin-top:12px; margin-bottom:24px; background:#f8fafc; font-size:12px; line-height:1.6; text-align:right;">
+          <span style="font-weight:bold; color:#0f172a;">شرح سند:</span>
+          <span style="color:#1e293b; margin-right:6px;">${s.desc || ''}</span>
+        </div>
 
         <div class="signatures">
           <div class="sig-box">تنظیم‌کننده</div>
