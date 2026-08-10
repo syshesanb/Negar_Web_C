@@ -2449,13 +2449,13 @@ function submitPrintVouchersRange() {
         <table class="main-table">
           <thead>
             <tr>
-              <th style="width:40px; text-align:center;">ردیف</th>
-              <th style="width:90px; text-align:center;">کد حساب</th>
-              <th>عنوان حساب</th>
-              <th>شرح آرتیکل</th>
-              <th style="width:120px; text-align:right;">مبلغ جزء (ریال)</th>
-              <th style="width:120px; text-align:right;">بدهکار (ریال)</th>
-              <th style="width:120px; text-align:right;">بستانکار (ریال)</th>
+              <th style="width:4%; text-align:center;">ردیف</th>
+              <th style="width:8%; text-align:center;">کد حساب</th>
+              <th style="width:18%; text-align:right;">عنوان حساب</th>
+              <th style="width:34%; text-align:right;">شرح آرتیکل</th>
+              <th style="width:12%; text-align:right;">مبلغ جزء (ریال)</th>
+              <th style="width:12%; text-align:right;">بدهکار (ریال)</th>
+              <th style="width:12%; text-align:right;">بستانکار (ریال)</th>
             </tr>
           </thead>
           <tbody>
@@ -2599,9 +2599,8 @@ function submitPrintVouchersRange() {
         .header-left { width: 30%; text-align: left; }
         .company-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
         .doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }
-        .doc-info { font-size: 11px; text-align: left; }
-        .main-table { width: 100%; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
-        .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 8px 10px; text-align: right; }
+        .main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
+        .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: right; word-wrap: break-word; overflow-wrap: break-word; }
         .main-table th { background-color: #f1f5f9; font-weight: bold; }
         .signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 10px; }
         .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
