@@ -2466,19 +2466,41 @@ function submitPrintVouchersRange() {
       <title>پیش‌نمایش چاپ اسناد حسابداری</title>
       <style>
         @page { size: A4 portrait; margin: 15mm; }
-        body { font-family: Tahoma, 'IRANSans', Arial, sans-serif; padding: 20px; color: #0f172a; background: #e2e8f0; font-size: 12px; line-height: 1.5; }
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          font-family: Tahoma, 'IRANSans', Arial, sans-serif;
+          color: #0f172a;
+          background: #e2e8f0;
+          font-size: 12px;
+          line-height: 1.5;
+        }
         .no-print-bar {
           background: #0f172a;
           color: #fff;
           padding: 12px 18px;
-          border-radius: 10px;
-          margin-bottom: 24px;
+          border-radius: 0 0 10px 10px;
+          margin-bottom: 0;
           display: flex;
           flex-wrap: wrap;
           justify-content: space-between;
           align-items: center;
           gap: 12px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+          flex-shrink: 0;
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+        #printableArea {
+          flex: 1 1 auto;
+          overflow-y: auto;
+          padding: 20px;
+          box-sizing: border-box;
         }
         .toolbar-title { font-size: 14px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 6px; }
         .toolbar-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
@@ -2487,12 +2509,14 @@ function submitPrintVouchersRange() {
         .toolbar-select { background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 6px; padding: 5px 8px; font-size: 12px; font-family: inherit; cursor: pointer; }
         .toolbar-select:focus { border-color: #38bdf8; outline: none; }
         .no-print-btn { border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
-        .print-btn { background: #0284c7; color: #fff; }
-        .print-btn:hover { background: #0369a1; }
-        .pdf-btn { background: #dc2626; color: #fff; }
-        .pdf-btn:hover { background: #b91c1c; }
+        .excel-btn { background: #16a34a; color: #fff; }
+        .excel-btn:hover { background: #15803d; }
         .word-btn { background: #2563eb; color: #fff; }
         .word-btn:hover { background: #1d4ed8; }
+        .pdf-btn { background: #dc2626; color: #fff; }
+        .pdf-btn:hover { background: #b91c1c; }
+        .print-btn { background: #0284c7; color: #fff; }
+        .print-btn:hover { background: #0369a1; }
         
         .voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .voucher-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
@@ -2510,9 +2534,19 @@ function submitPrintVouchersRange() {
         .page-break { page-break-after: always; height: 0; }
         
         @media print {
+          html, body {
+            height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+            padding: 0 !important;
+            background: #fff !important;
+          }
           .no-print-bar { display: none !important; }
-          body { padding: 0; background: #fff; }
-          .voucher-page { border: none; padding: 0; margin-bottom: 0; box-shadow: none; }
+          #printableArea {
+            overflow: visible !important;
+            padding: 0 !important;
+          }
+          .voucher-page { border: none !important; padding: 0 !important; margin-bottom: 0 !important; box-shadow: none !important; }
         }
       </style>
     </head>
@@ -2551,6 +2585,7 @@ function submitPrintVouchersRange() {
           </div>
 
           <!-- Exports & Print -->
+          <button class="no-print-btn excel-btn" onclick="exportToExcel()">📊 خروجی اکسل</button>
           <button class="no-print-btn word-btn" onclick="exportToWord()">📝 خروجی Word</button>
           <button class="no-print-btn pdf-btn" onclick="exportToPDF()">📄 ذخیره به صورت PDF</button>
           <button class="no-print-btn print-btn" onclick="window.print()">🖨️ تنظیمات چاپگر و چاپ</button>
@@ -2619,6 +2654,41 @@ function submitPrintVouchersRange() {
           const a = document.createElement('a');
           a.href = url;
           a.download = 'اسناد_حسابداری.doc';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        function exportToExcel() {
+          const content = document.getElementById('printableArea').innerHTML;
+          const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
+            "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
+            "<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>" +
+            "<x:Name>اسناد حسابداری</x:Name>" +
+            "<x:WorksheetOptions><x:DisplayRightToLeft/></x:WorksheetOptions>" +
+            "</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->" +
+            "<style>" +
+            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 15px; }" +
+            "table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 20px; }" +
+            "th, td { border: 1px solid #333; padding: 6px 10px; text-align: right; }" +
+            "th { background-color: #f1f5f9; font-weight: bold; }" +
+            ".company-title { font-size: 16px; font-weight: bold; }" +
+            ".doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }" +
+            ".signatures { display: flex; justify-content: space-between; margin-top: 30px; }" +
+            ".sig-box { text-align: center; width: 22%; border-top: 1px solid #000; padding-top: 5px; }" +
+            "</style></head><body>";
+          const footer = "</body></html>";
+          const sourceHTML = header + content + footer;
+
+          const blob = new Blob(['\\ufeff' + sourceHTML], {
+            type: 'application/vnd.ms-excel;charset=utf-8'
+          });
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'اسناد_حسابداری.xls';
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
