@@ -587,18 +587,36 @@ function closeModuleFlyoutPanel() {
   if (panel) panel.style.display = 'none';
 }
 
+function openPageTab(url, formKey) {
+  const comp = SessionState.company || (AppState.companies && AppState.companies.length > 0 ? AppState.companies[0] : null);
+  const openMode = (comp && comp.pageOpenMode) ? comp.pageOpenMode : 'unique';
+
+  let targetName = '_blank';
+  if (openMode === 'unique') {
+    targetName = 'negar_tab_' + (formKey || 'main');
+  } else {
+    targetName = 'negar_tab_' + (formKey || 'main') + '_' + Date.now();
+  }
+
+  const win = window.open(url, targetName);
+  if (win) {
+    win.focus();
+  }
+  return win;
+}
+
 function executeCardInNewTab(onclickAttr) {
   if (onclickAttr.includes('openHesabdariMain')) {
     const match = onclickAttr.match(/openHesabdariMain\(['"]([^'"]+)['"]\)/);
     const mode = match ? match[1] : 'coding';
-    window.open(`index.html?form=form-hesabdari-main&mode=${mode}`, '_blank');
+    openPageTab(`index.html?form=form-hesabdari-main&mode=${mode}`, 'hesabdari_' + mode);
   } else if (onclickAttr.includes('showForm')) {
     const match = onclickAttr.match(/showForm\(['"]([^'"]+)['"]\)/);
     if (match && match[1]) {
-      window.open(`index.html?form=${match[1]}`, '_blank');
+      openPageTab(`index.html?form=${match[1]}`, match[1]);
     }
   } else {
-    window.open(`index.html`, '_blank');
+    openPageTab(`index.html`, 'main');
   }
 }
 
@@ -651,9 +669,8 @@ function showTiles(moduleId) {
 function showForm(formId) {
   // If we are in the main dashboard tab (not inside a sub-tab)
   if (!AppState.isTabMode) {
-    // Open in a new tab!
     const url = `index.html?form=${formId}`;
-    window.open(url, '_blank');
+    openPageTab(url, formId);
     return;
   }
 
@@ -747,7 +764,7 @@ function showForm(formId) {
 // ============================
 function openHesabdariMain(mode) {
   if (!AppState.isTabMode) {
-    window.open(`index.html?form=form-hesabdari-main&mode=${mode}`, '_blank');
+    openPageTab(`index.html?form=form-hesabdari-main&mode=${mode}`, 'hesabdari_' + mode);
     return;
   }
   showForm('form-hesabdari-main');
@@ -4670,6 +4687,7 @@ function openCompanyForm(companyId) {
     if (document.getElementById('compCEO')) document.getElementById('compCEO').value = '';
     if (document.getElementById('compCeoNationalId')) document.getElementById('compCeoNationalId').value = '';
     if (document.getElementById('compCeoPhone')) document.getElementById('compCeoPhone').value = '';
+    if (document.getElementById('compPageOpenMode')) document.getElementById('compPageOpenMode').value = 'unique';
   } else {
     // EDIT mode: load existing data
     const company = AppState.companies.find(c => c.id === companyId);
@@ -4706,6 +4724,7 @@ function openCompanyForm(companyId) {
     if (document.getElementById('compCEO')) document.getElementById('compCEO').value = company.ceo || '';
     if (document.getElementById('compCeoNationalId')) document.getElementById('compCeoNationalId').value = company.ceoNationalId || '';
     if (document.getElementById('compCeoPhone')) document.getElementById('compCeoPhone').value = company.ceoPhone || '';
+    if (document.getElementById('compPageOpenMode')) document.getElementById('compPageOpenMode').value = company.pageOpenMode || 'unique';
   }
 
   // Reset active tab to General when opening
@@ -4732,6 +4751,7 @@ function saveCompany() {
   const address = document.getElementById('compAddress')?.value?.trim();
   const notes = document.getElementById('compNotes')?.value?.trim();
   const activeYear = document.getElementById('compActiveYear')?.value;
+  const pageOpenMode = document.getElementById('compPageOpenMode')?.value || 'unique';
 
   // New fields:
   const legalType = document.getElementById('compLegalType')?.value;
@@ -4788,12 +4808,16 @@ function saveCompany() {
   if (!name) { alert('نام شرکت الزامی است.'); document.getElementById('compName').focus(); return; }
 
   const newCompanyData = {
-    code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear,
+    code, name, ecoCode, phone, fax, postalCode, email, website, address, notes, activeYear, pageOpenMode,
     legalType, regNo, nationalId, regDate, activity, factoryAddress, currency, 
     modyanUniqueId, insuranceCode, vatRate, modyanPrivateKey,
     licenseNo, licenseExpiry, shenaseSenfi, ceo, ceoNationalId, ceoPhone,
     logo, bankAccounts, signatories
   };
+
+  if (SessionState.company && SessionState.company.code === code) {
+    SessionState.company.pageOpenMode = pageOpenMode;
+  }
 
   if (editingId) {
     // UPDATE existing company
