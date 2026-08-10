@@ -2608,21 +2608,27 @@ function submitPrintVouchersRange() {
         .page-break { page-break-after: always; height: 0; }
         
         /* Black & White Mode Styles */
-        body.bw-mode, body.bw-mode * {
+        body.bw-mode #printableArea {
+          filter: grayscale(100%) contrast(120%) !important;
+        }
+        body.bw-mode #printableArea * {
           color: #000000 !important;
           border-color: #000000 !important;
         }
         body.bw-mode .main-table th {
           background-color: #e5e5e5 !important;
+          background: #e5e5e5 !important;
           color: #000000 !important;
         }
         body.bw-mode .company-title,
         body.bw-mode .doc-title,
-        body.bw-mode .total-words {
+        body.bw-mode .total-words,
+        body.bw-mode span {
           color: #000000 !important;
         }
         body.bw-mode .voucher-desc-box {
           background-color: #f8f8f8 !important;
+          background: #f8f8f8 !important;
           border-color: #000000 !important;
         }
 
@@ -2630,6 +2636,9 @@ function submitPrintVouchersRange() {
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+          }
+          body.bw-mode #printableArea {
+            filter: grayscale(100%) contrast(120%) !important;
           }
           html, body {
             height: auto !important;
