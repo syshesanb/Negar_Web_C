@@ -2231,6 +2231,56 @@ function togglePrintRangeInputs() {
   updatePrintNumTypeState();
 }
 
+function numberToPersianWords(num) {
+  num = parseInt(num, 10);
+  if (isNaN(num) || num === 0) return 'صفر ریال';
+
+  const yekan = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
+  const dahgan = ['', '', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+  const dahYek = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
+  const sadgan = ['', 'یکصد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
+
+  const levels = ['', ' هزار', ' میلیون', ' میلیارد', ' تریلیون'];
+
+  function convertThreeDigits(n) {
+    if (n === 0) return '';
+    let parts = [];
+    const s = Math.floor(n / 100);
+    const d = Math.floor((n % 100) / 10);
+    const y = n % 10;
+
+    if (s > 0) parts.push(sadgan[s]);
+
+    if (d === 1) {
+      parts.push(dahYek[y]);
+    } else {
+      if (d > 1) parts.push(dahgan[d]);
+      if (y > 0) parts.push(yekan[y]);
+    }
+    return parts.join(' و ');
+  }
+
+  let resultParts = [];
+  let levelIdx = 0;
+  let temp = Math.abs(num);
+
+  while (temp > 0) {
+    const chunk = temp % 1000;
+    if (chunk > 0) {
+      const chunkWords = convertThreeDigits(chunk);
+      if (chunkWords) {
+        const levelName = levels[levelIdx] || '';
+        resultParts.unshift(chunkWords + levelName);
+      }
+    }
+    temp = Math.floor(temp / 1000);
+    levelIdx++;
+  }
+
+  const result = resultParts.join(' و ') + ' ریال';
+  return (num < 0 ? 'منفی ' : '') + result;
+}
+
 function submitPrintVouchersRange() {
   const isByNo = document.getElementById('printRangeByNo')?.checked;
   const levelComboValue = document.getElementById('printAccountLevelCombo')?.value || 'group_kol_moin';
@@ -2311,6 +2361,8 @@ function submitPrintVouchersRange() {
 
     const linesRows = buildVoucherLevelRows(s, levelComboValue);
 
+    const totalWords = numberToPersianWords(s.debit || 0);
+
     return `
       <div class="voucher-page">
         <div class="voucher-header">
@@ -2347,7 +2399,9 @@ function submitPrintVouchersRange() {
           </tbody>
           <tfoot>
             <tr style="font-weight:bold; background:#f8fafc;">
-              <td colspan="4" style="text-align:right;">جمع کل سند:</td>
+              <td colspan="4" style="text-align:right;">
+                جمع کل سند: <span style="color:#0284c7; margin-right:6px; font-size:11px;">(${totalWords})</span>
+              </td>
               <td style="text-align:right;"></td>
               <td style="text-align:right;">${Number(s.debit).toLocaleString()}</td>
               <td style="text-align:right;">${Number(s.credit).toLocaleString()}</td>
