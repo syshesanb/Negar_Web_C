@@ -805,25 +805,20 @@ function switchHesabdariTab(tabId) {
     }
   });
 
-  // 2. Update sub-tab panels
+  // 2. Update sub-tab panels (all panels use uniform 100% full-width block layout)
   const panels = document.querySelectorAll('.hesabdari-tab-panel');
   panels.forEach(panel => {
     if (panel.id === 'tab-panel-' + tabId) {
       panel.classList.add('active');
-      // accounts & shenavar panels need flex for fixed-height layout; others use block
-      panel.style.display = (tabId === 'accounts' || tabId === 'shenavar') ? 'flex' : 'block';
+      panel.style.display = 'block';
     } else {
       panel.classList.remove('active');
       panel.style.display = 'none';
     }
   });
 
-  // Toggle body class so accounts & shenavar fixed-layout CSS applies only on those tabs
-  if (tabId === 'accounts' || tabId === 'shenavar') {
-    document.body.classList.add('accounts-mode');
-  } else {
-    document.body.classList.remove('accounts-mode');
-  }
+  // Ensure body is free of flex constraints so all tabs have identical 100% full-width layout
+  document.body.classList.remove('accounts-mode');
 
   // 3. Render dynamic content for specific tab
   if (tabId === 'accounts') renderAccountsTable();
