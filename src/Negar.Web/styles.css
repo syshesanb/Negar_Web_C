@@ -1457,8 +1457,15 @@ tr.tree-level-1 {
 }
 
 /* ══════════════════════════════════════════════════════
-   HESABDARI SUB-TABS (Fixed Top Dedicated Navigation Bar)
+   HESABDARI SUB-TABS (Independent Fixed Top Panel)
 ══════════════════════════════════════════════════════ */
+#form-hesabdari-main {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
 .hesabdari-subtabs-bar {
   display: flex;
   align-items: center;
@@ -1473,12 +1480,14 @@ tr.tree-level-1 {
   white-space: nowrap;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box;
   position: sticky;
   top: 0;
   z-index: 100;
   flex-shrink: 0;
 }
+
 .subtab-item {
   padding: 8px 16px;
   font-size: 0.84rem;
@@ -1490,12 +1499,15 @@ tr.tree-level-1 {
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+  flex-shrink: 0;
 }
+
 .subtab-item:hover {
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
   border-color: rgba(56, 189, 248, 0.4);
 }
+
 .subtab-item.active {
   background: #0284c7;
   color: #ffffff;
@@ -1507,12 +1519,20 @@ tr.tree-level-1 {
 .hesabdari-tab-panel {
   display: none;
   width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
+
 .hesabdari-tab-panel.active {
   display: block;
+}
+
+.hesabdari-tab-panel .table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 
 /* ── Treeview Datagrid Simulation ── */
