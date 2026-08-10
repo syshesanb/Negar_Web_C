@@ -5085,18 +5085,38 @@ function applyCompanySwitch() {
   const company = AppState.companies.find(c => c.code === selectedCompanyCodeForSwitch);
   if (!company) return;
 
-  // Update session
+  // 1. Update active year for company
+  company.activeYear = selectedYearForSwitch;
+
+  // 2. Update statuses in AppState.fiscalYears
+  AppState.fiscalYears.forEach(fy => {
+    if (fy.company === company.code) {
+      fy.status = (fy.year === selectedYearForSwitch) ? 'فعال' : 'بسته';
+    }
+  });
+
+  // 3. Update session
   switchActiveCompany(company);
   SessionState.year = selectedYearForSwitch;
 
-  // Update header and status bar
+  // 4. Save session to localStorage
+  try {
+    localStorage.setItem('negar_active_company', company.code);
+    localStorage.setItem('negar_active_year', selectedYearForSwitch);
+  } catch (e) {}
+
+  // 5. Update header status bar immediately
   updateHeaderBar();
 
   // Feedback toast
   alert(`✅ شرکت و سال مالی با موفقیت انتخاب شد.\n\nشرکت فعال: ${company.name}\nسال مالی فعال: ${selectedYearForSwitch}`);
 
-  // Go to main tiles
-  goBack();
+  // Go to main system dashboard/tiles
+  if (AppState.isTabMode) {
+    AppState.isTabMode = false;
+  }
+  AppState.currentForm = null;
+  showTiles('system');
 }
 
 function renderSwitchYearOnlyForm() {
@@ -5135,17 +5155,30 @@ function applyYearOnlySwitch() {
     return;
   }
 
-  // Update session
   SessionState.year = selectedYear;
 
-  // Update header
+  if (SessionState.company) {
+    SessionState.company.activeYear = selectedYear;
+    AppState.fiscalYears.forEach(fy => {
+      if (fy.company === SessionState.company.code) {
+        fy.status = (fy.year === selectedYear) ? 'فعال' : 'بسته';
+      }
+    });
+  }
+
+  try {
+    localStorage.setItem('negar_active_year', selectedYear);
+  } catch (e) {}
+
   updateHeaderBar();
 
-  // Feedback
   alert(`✅ سال مالی جاری با موفقیت به "${selectedYear}" تغییر یافت.`);
 
-  // Go back to tiles
-  goBack();
+  if (AppState.isTabMode) {
+    AppState.isTabMode = false;
+  }
+  AppState.currentForm = null;
+  showTiles('system');
 }
 
 function updateHeaderBar() {
@@ -5157,6 +5190,11 @@ function updateHeaderBar() {
   const headerYear = document.getElementById('headerYear');
   if (headerComp && company) headerComp.textContent = company.name;
   if (headerYear && year)    headerYear.textContent  = 'سال مالی: ' + year;
+
+  const subComp = document.getElementById('hesabdariCompany');
+  const subYear = document.getElementById('hesabdariYear');
+  if (subComp && company) subComp.textContent = company.name;
+  if (subYear && year) subYear.textContent = 'سال مالی: ' + year;
 }
 
 function updateSystemClock() {
@@ -5187,6 +5225,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const formParam = urlParams.get('form');
   const modeParam = urlParams.get('mode');
 
+  let savedCompCode = null;
+  let savedYear = null;
+  try {
+    savedCompCode = localStorage.getItem('negar_active_company');
+    savedYear = localStorage.getItem('negar_active_year');
+  } catch(e) {}
+
   if (formParam) {
     // 1. Mark as tab mode
     AppState.isTabMode = true;
@@ -5211,7 +5256,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerUser = document.getElementById('headerUsername');
     if (headerUser) headerUser.textContent = currentUser.fullName + ' (' + currentUser.username + ')';
 
-    if (AppState.companies.length > 0) {
+    if (savedCompCode && AppState.companies.some(c => c.code === savedCompCode)) {
+      const comp = AppState.companies.find(c => c.code === savedCompCode);
+      switchActiveCompany(comp);
+      SessionState.year = savedYear || comp.activeYear || '1403';
+    } else if (AppState.companies.length > 0) {
       switchActiveCompany(AppState.companies[0]);
       const activeYears = AppState.fiscalYears
         .filter(fy => fy.company === SessionState.company.code)
