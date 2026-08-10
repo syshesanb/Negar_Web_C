@@ -2145,6 +2145,24 @@ function selectPrintRangeByNo() {
   }
 }
 
+function onFocusPrintSanadNo() {
+  selectPrintRangeByNo();
+  const combo = document.getElementById('printSanadNumType');
+  if (combo && combo.value === 'dayNo') {
+    combo.value = 'bothNo';
+    updatePrintNumTypeState();
+  }
+}
+
+function onFocusPrintDayNo() {
+  selectPrintRangeByNo();
+  const combo = document.getElementById('printSanadNumType');
+  if (combo && combo.value === 'sanadNo') {
+    combo.value = 'bothNo';
+    updatePrintNumTypeState();
+  }
+}
+
 function updatePrintNumTypeState() {
   const isByNo = document.getElementById('printRangeByNo')?.checked;
   const numTypeSelect = document.getElementById('printSanadNumType');
@@ -2158,13 +2176,14 @@ function updatePrintNumTypeState() {
   const fromDay = document.getElementById('printFromDayNo');
   const toDay = document.getElementById('printToDayNo');
 
+  // Keep all number inputs enabled so manual typing is always allowed
+  if (fromSanad) fromSanad.disabled = false;
+  if (toSanad) toSanad.disabled = false;
+  if (fromDay) fromDay.disabled = false;
+  if (toDay) toDay.disabled = false;
+
   if (!isByNo) {
     if (numTypeSelect) numTypeSelect.disabled = true;
-    if (fromSanad) fromSanad.disabled = true;
-    if (toSanad) toSanad.disabled = true;
-    if (fromDay) fromDay.disabled = true;
-    if (toDay) toDay.disabled = true;
-
     if (rowSanad) rowSanad.style.opacity = '0.4';
     if (rowDay) rowDay.style.opacity = '0.4';
     return;
@@ -2173,30 +2192,15 @@ function updatePrintNumTypeState() {
   if (numTypeSelect) numTypeSelect.disabled = false;
 
   if (numType === 'sanadNo') {
-    // Item 1: Enable Sanad No row only
-    if (fromSanad) fromSanad.disabled = false;
-    if (toSanad) toSanad.disabled = false;
-    if (fromDay) fromDay.disabled = true;
-    if (toDay) toDay.disabled = true;
-
+    // Item 1: Sanad No row highlighted
     if (rowSanad) rowSanad.style.opacity = '1';
-    if (rowDay) rowDay.style.opacity = '0.4';
+    if (rowDay) rowDay.style.opacity = '0.65';
   } else if (numType === 'dayNo') {
-    // Item 2: Enable Day No row only
-    if (fromSanad) fromSanad.disabled = true;
-    if (toSanad) toSanad.disabled = true;
-    if (fromDay) fromDay.disabled = false;
-    if (toDay) toDay.disabled = false;
-
-    if (rowSanad) rowSanad.style.opacity = '0.4';
+    // Item 2: Day No row highlighted
+    if (rowSanad) rowSanad.style.opacity = '0.65';
     if (rowDay) rowDay.style.opacity = '1';
   } else if (numType === 'bothNo') {
-    // Item 3: Enable Both rows
-    if (fromSanad) fromSanad.disabled = false;
-    if (toSanad) toSanad.disabled = false;
-    if (fromDay) fromDay.disabled = false;
-    if (toDay) toDay.disabled = false;
-
+    // Item 3: Both rows highlighted
     if (rowSanad) rowSanad.style.opacity = '1';
     if (rowDay) rowDay.style.opacity = '1';
   }

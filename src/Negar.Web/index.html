@@ -3251,11 +3251,11 @@
             <div id="rowSanadNoInputs" style="display:flex; align-items:center; gap:12px; transition:opacity 0.2s ease;">
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:0.82rem; color:var(--text-muted);">از شماره سند:</span>
-                <input type="number" id="printFromSanadNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="101" onfocus="selectPrintRangeByNo()" />
+                <input type="number" id="printFromSanadNo" class="form-input" min="1" step="1" style="width:95px; text-align:center; font-weight:bold; height:28px;" value="101" onfocus="this.select(); onFocusPrintSanadNo()" />
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:0.82rem; color:var(--text-muted);">تا شماره سند:</span>
-                <input type="number" id="printToSanadNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="105" onfocus="selectPrintRangeByNo()" />
+                <input type="number" id="printToSanadNo" class="form-input" min="1" step="1" style="width:95px; text-align:center; font-weight:bold; height:28px;" value="105" onfocus="this.select(); onFocusPrintSanadNo()" />
               </div>
             </div>
 
@@ -3263,11 +3263,11 @@
             <div id="rowDayNoInputs" style="display:flex; align-items:center; gap:12px; transition:opacity 0.2s ease;">
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:0.82rem; color:var(--text-muted);">از شماره روزانه:</span>
-                <input type="number" id="printFromDayNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="1" onfocus="selectPrintRangeByNo()" />
+                <input type="number" id="printFromDayNo" class="form-input" min="1" step="1" style="width:95px; text-align:center; font-weight:bold; height:28px;" value="1" onfocus="this.select(); onFocusPrintDayNo()" />
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:0.82rem; color:var(--text-muted);">تا شماره روزانه:</span>
-                <input type="number" id="printToDayNo" class="form-input" style="width:90px; text-align:center; font-weight:bold; height:28px;" value="365" onfocus="selectPrintRangeByNo()" />
+                <input type="number" id="printToDayNo" class="form-input" min="1" step="1" style="width:95px; text-align:center; font-weight:bold; height:28px;" value="365" onfocus="this.select(); onFocusPrintDayNo()" />
               </div>
             </div>
 
