@@ -3285,16 +3285,19 @@ function submitPrintJournalRange() {
   const orientation = document.getElementById('printJrnPageOrientation')?.value || 'landscape';
   const colorMode = document.getElementById('printJrnColorMode')?.value || 'color';
   const numberType = document.getElementById('printJrnNumberType')?.value || 'fa';
+  const pageMargin = document.getElementById('printJrnPageMargin')?.value || '10mm';
   const useDefaultFonts = document.getElementById('printJrnUseDefaultFonts')?.checked !== false;
 
   // Column visibility
-  const showRow    = document.getElementById('jrnColRow')?.checked !== false;
-  const showSanadNo= document.getElementById('jrnColSanadNo')?.checked !== false;
-  const showDayNo  = document.getElementById('jrnColDayNo')?.checked !== false;
-  const showDate   = document.getElementById('jrnColDate')?.checked !== false;
-  const showStatus = document.getElementById('jrnColStatus')?.checked !== false;
-  const showDebit  = document.getElementById('jrnColDebit')?.checked !== false;
-  const showCredit = document.getElementById('jrnColCredit')?.checked !== false;
+  const showRow        = document.getElementById('jrnColRow')?.checked !== false;
+  const showSanadNo    = document.getElementById('jrnColSanadNo')?.checked !== false;
+  const showDayNo      = document.getElementById('jrnColDayNo')?.checked !== false;
+  const showDate       = document.getElementById('jrnColDate')?.checked !== false;
+  const showStatus     = document.getElementById('jrnColStatus')?.checked !== false;
+  const showDebit      = document.getElementById('jrnColDebit')?.checked !== false;
+  const showCredit     = document.getElementById('jrnColCredit')?.checked !== false;
+  const showCombined   = document.getElementById('jrnColCombined')?.checked === true;
+  const showVoucherDesc= document.getElementById('jrnColVoucherDesc')?.checked === true;
 
   // Font settings
   const compF  = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontCompFamily')?.value || 'Tahoma');
@@ -3343,16 +3346,17 @@ function submitPrintJournalRange() {
   // Build table header columns
   // ────────────────────────────────────────
   const colDefs = [];
-  if (showRow)     colDefs.push({ label: 'ردیف',              width: '4%',  align: 'center' });
-  if (showSanadNo) colDefs.push({ label: 'شماره سند',         width: '7%',  align: 'center' });
-  if (showDayNo)   colDefs.push({ label: 'شماره روز',         width: '6%',  align: 'center' });
-  if (showDate)    colDefs.push({ label: 'تاریخ',             width: '9%',  align: 'center' });
-  if (showStatus)  colDefs.push({ label: 'وضعیت',             width: '7%',  align: 'center' });
-  colDefs.push({ label: 'کد حساب',   width: '7%',  align: 'center' });
-  colDefs.push({ label: 'نام حساب',  width: '18%', align: 'right'  });
-  colDefs.push({ label: 'شرح آرتیکل',width: '25%', align: 'right'  });
-  if (showDebit)   colDefs.push({ label: 'بدهکار (ریال)',     width: '10%', align: 'left'   });
-  if (showCredit)  colDefs.push({ label: 'بستانکار (ریال)',   width: '10%', align: 'left'   });
+  if (showRow)      colDefs.push({ label: 'ردیف',                        width: '4%',  align: 'center' });
+  if (showSanadNo)  colDefs.push({ label: 'شماره سند',                    width: '7%',  align: 'center' });
+  if (showDayNo)    colDefs.push({ label: 'شماره روز',                    width: '6%',  align: 'center' });
+  if (showCombined) colDefs.push({ label: 'شماره سند / شماره روز',        width: '9%',  align: 'center' });
+  if (showDate)     colDefs.push({ label: 'تاریخ',                        width: '9%',  align: 'center' });
+  if (showStatus)   colDefs.push({ label: 'وضعیت',                        width: '7%',  align: 'center' });
+  colDefs.push({ label: 'کد حساب',    width: '7%',  align: 'center' });
+  colDefs.push({ label: 'نام حساب',   width: '18%', align: 'right'  });
+  colDefs.push({ label: 'شرح آرتیکل', width: '25%', align: 'right'  });
+  if (showDebit)    colDefs.push({ label: 'بدهکار (ریال)',                 width: '10%', align: 'left'   });
+  if (showCredit)   colDefs.push({ label: 'بستانکار (ریال)',               width: '10%', align: 'left'   });
 
   const thHtml = colDefs.map(c =>
     `<th style="width:${c.width};text-align:${c.align};">${c.label}</th>`
@@ -3391,26 +3395,29 @@ function submitPrintJournalRange() {
         : `&nbsp;&nbsp;&nbsp;&nbsp;${line.desc || ''}`;
 
       const tds = [];
-      if (showRow)     tds.push(`<td style="text-align:center;">${numFmt(rowSeq)}</td>`);
-      if (showSanadNo) tds.push(isFirst
+      if (showRow)      tds.push(`<td style="text-align:center;">${numFmt(rowSeq)}</td>`);
+      if (showSanadNo)  tds.push(isFirst
         ? `<td style="text-align:center;font-weight:bold;">${numFmt(s.id)}</td>`
         : `<td style="text-align:center;color:#94a3b8;">↑</td>`);
-      if (showDayNo)   tds.push(isFirst
+      if (showDayNo)    tds.push(isFirst
         ? `<td style="text-align:center;">${numFmt(s.dayOfYear || '')}</td>`
         : `<td></td>`);
-      if (showDate)    tds.push(isFirst
+      if (showCombined) tds.push(isFirst
+        ? `<td style="text-align:center;font-weight:bold;direction:ltr;">${numFmt(s.dayOfYear || '')}/${numFmt(s.id)}</td>`
+        : `<td style="text-align:center;color:#94a3b8;">↑</td>`);
+      if (showDate)     tds.push(isFirst
         ? `<td style="text-align:center;">${dateFmt(s.date)}</td>`
         : `<td></td>`);
-      if (showStatus)  tds.push(isFirst
+      if (showStatus)   tds.push(isFirst
         ? `<td style="text-align:center;">${s.status || ''}</td>`
         : `<td></td>`);
       tds.push(`<td style="text-align:center;direction:ltr;">${accCode}</td>`);
       tds.push(`<td style="text-align:right;">${accNameDisplay}</td>`);
       tds.push(`<td style="text-align:right;">${descDisplay}</td>`);
-      if (showDebit)   tds.push(isDebit
+      if (showDebit)    tds.push(isDebit
         ? `<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(line.debit)}</td>`
         : `<td></td>`);
-      if (showCredit)  tds.push(!isDebit
+      if (showCredit)   tds.push(!isDebit
         ? `<td style="text-align:left;direction:ltr;white-space:nowrap;">${monFmt(line.credit)}</td>`
         : `<td></td>`);
 
@@ -3422,20 +3429,24 @@ function submitPrintJournalRange() {
     if (lines.length > 0) {
       grandDebit  += vDebit;
       grandCredit += vCredit;
-      const emptyColCount = colDefs.length - (showDebit ? 1 : 0) - (showCredit ? 1 : 0) - 1;
-      // Build subtotal columns
       const subCols = [];
-      let filledCount = 0;
-      if (showRow)     { subCols.push('<td></td>'); filledCount++; }
-      if (showSanadNo) { subCols.push(`<td style="text-align:center;font-weight:bold;">${numFmt(s.id)}</td>`); filledCount++; }
-      if (showDayNo)   { subCols.push('<td></td>'); filledCount++; }
-      if (showDate)    { subCols.push('<td></td>'); filledCount++; }
-      if (showStatus)  { subCols.push('<td></td>'); filledCount++; }
-      // account code + name + desc merged as label
+      if (showRow)      subCols.push('<td></td>');
+      if (showSanadNo)  subCols.push(`<td style="text-align:center;font-weight:bold;">${numFmt(s.id)}</td>`);
+      if (showDayNo)    subCols.push('<td></td>');
+      if (showCombined) subCols.push(`<td style="text-align:center;font-weight:bold;direction:ltr;">${numFmt(s.dayOfYear || '')}/${numFmt(s.id)}</td>`);
+      if (showDate)     subCols.push('<td></td>');
+      if (showStatus)   subCols.push('<td></td>');
       subCols.push('<td colspan="3" style="text-align:right;font-weight:bold;">جمع سند</td>');
-      if (showDebit)   subCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(vDebit)}</td>`);
-      if (showCredit)  subCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(vCredit)}</td>`);
+      if (showDebit)    subCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(vDebit)}</td>`);
+      if (showCredit)   subCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(vCredit)}</td>`);
       bodyHtml += `<tr class="subtotal-row">${subCols.join('')}</tr>`;
+
+      // Voucher description row (شرح سند) — shown below subtotal if requested
+      if (showVoucherDesc && s.desc) {
+        const descColspan = colDefs.length;
+        bodyHtml += `<tr class="voucher-desc-row"><td colspan="${descColspan}" style="text-align:right;padding:4px 10px;font-style:italic;color:${isBw ? '#333' : '#1e40af'};background:${isBw ? '#f5f5f5' : '#eff6ff'} !important;border:1px solid ${isBw ? '#ccc' : '#bfdbfe'};font-size:${tdS};">📝 شرح سند: ${s.desc}</td></tr>`;
+      }
+
       // Separator row
       bodyHtml += `<tr class="sep-row"><td colspan="${colDefs.length}" style="height:6px;border:none;background:transparent;"></td></tr>`;
     }
@@ -3467,7 +3478,7 @@ function submitPrintJournalRange() {
       <style>
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
         body { font-family: '${tdF}', Tahoma, Arial, sans-serif; padding: 0; margin: 0; color: #000; background: #fff; font-size: ${tdS}; }
-        @page { size: ${pageSize} ${orientation}; margin: 10mm; }
+        @page { size: ${pageSize} ${orientation}; margin: ${pageMargin}; }
 
         .no-print { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #1e293b; color: #f8fafc; flex-wrap: wrap; position: sticky; top: 0; z-index: 99; }
         .no-print button { border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }

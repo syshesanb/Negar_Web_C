@@ -3796,6 +3796,16 @@
                   <option value="en">انگلیسی</option>
                 </select>
               </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.82rem; color:var(--text-muted); white-space:nowrap;">📏 حاشیه صفحه:</span>
+                <select id="printJrnPageMargin" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.35); border-radius:4px; padding:2px 8px; cursor:pointer;">
+                  <option value="5mm">بدون حاشیه (5mm)</option>
+                  <option value="10mm" selected>کم (10mm)</option>
+                  <option value="15mm">متوسط (15mm)</option>
+                  <option value="20mm">زیاد (20mm)</option>
+                  <option value="25mm">خیلی زیاد (25mm)</option>
+                </select>
+              </div>
             </div>
           </fieldset>
 
@@ -3807,10 +3817,13 @@
               <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColSanadNo" checked> شماره سند</label>
               <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDayNo" checked> شماره روز</label>
               <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDate" checked> تاریخ</label>
-              <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDesc" checked> شرح سند</label>
+              <label title="نمایش ترکیبی شماره سند / شماره روز  مثلاً: 5/101" style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#38bdf8; cursor:pointer; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;"><input type="checkbox" id="jrnColCombined"> شماره سند/شماره روز</label>
               <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColDebit" checked> جمع بدهکار</label>
               <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColCredit" checked> جمع بستانکار</label>
               <label style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#f1f5f9; cursor:pointer;"><input type="checkbox" id="jrnColStatus" checked> وضعیت</label>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+              <label title="نمایش شرح سند در زیر ردیف جمع هر سند" style="display:flex; align-items:center; gap:5px; font-size:0.82rem; color:#fbbf24; cursor:pointer; border:1px solid rgba(251,191,36,0.3); border-radius:4px; padding:2px 6px;"><input type="checkbox" id="jrnColVoucherDesc"> شرح سند (زیر جمع سند)</label>
             </div>
           </fieldset>
         </div>
