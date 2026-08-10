@@ -588,21 +588,40 @@ function closeModuleFlyoutPanel() {
 }
 
 function openPageTab(url, formKey) {
+  // Synchronize AppState.companies from localStorage if updated in another tab
+  try {
+    const savedCompanies = localStorage.getItem('negar_companies');
+    if (savedCompanies) {
+      AppState.companies = JSON.parse(savedCompanies);
+    }
+  } catch(e) {}
+
   const comp = SessionState.company || (AppState.companies && AppState.companies.length > 0 ? AppState.companies[0] : null);
   const openMode = (comp && comp.pageOpenMode) ? comp.pageOpenMode : 'unique';
 
-  let targetName = '_blank';
   if (openMode === 'unique') {
-    targetName = 'negar_tab_' + (formKey || 'main');
-  } else {
-    targetName = 'negar_tab_' + (formKey || 'main') + '_' + Date.now();
-  }
+    // If we are ALREADY on this form in the current tab, don't open another tab!
+    const currentFormKey = AppState.currentForm || (new URLSearchParams(window.location.search).get('form')) || 'main';
+    if (currentFormKey === formKey) {
+      window.focus();
+      return window;
+    }
 
-  const win = window.open(url, targetName);
-  if (win) {
-    win.focus();
+    const targetName = 'negar_tab_' + (formKey || 'main');
+    const win = window.open(url, targetName);
+    if (win) {
+      win.focus();
+    }
+    return win;
+  } else {
+    // Duplicate mode: always open a new tab with unique target
+    const targetName = 'negar_tab_' + (formKey || 'main') + '_' + Date.now();
+    const win = window.open(url, targetName);
+    if (win) {
+      win.focus();
+    }
+    return win;
   }
-  return win;
 }
 
 function executeCardInNewTab(onclickAttr) {
@@ -4841,6 +4860,10 @@ function saveCompany() {
     alert(`شرکت جدید "${name}" با موفقیت ثبت شد.`);
   }
 
+  try {
+    localStorage.setItem('negar_companies', JSON.stringify(AppState.companies));
+  } catch(e) {}
+
   closeCompanyForm();
   renderCompaniesTable();
 }
@@ -5223,6 +5246,17 @@ function updateSystemClock() {
 // Init on page load
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
+  // Load companies list from localStorage if updated previously
+  try {
+    const savedCompanies = localStorage.getItem('negar_companies');
+    if (savedCompanies) {
+      const parsed = JSON.parse(savedCompanies);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        AppState.companies = parsed;
+      }
+    }
+  } catch(e) {}
+
   // Initialize dbAccounts with default accounts mapped to company 1001
   dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
   // Save a pristine template of default accounts before any user modification
@@ -5245,8 +5279,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch(e) {}
 
   if (formParam) {
-    // 1. Mark as tab mode
+    // 1. Mark as tab mode & set window name for target resolution
     AppState.isTabMode = true;
+    window.name = 'negar_tab_' + formParam;
 
     // 2. Bypass login overlay
     const overlay = document.getElementById('loginOverlay');
