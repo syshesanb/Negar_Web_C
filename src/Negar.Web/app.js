@@ -2271,6 +2271,22 @@ function submitPrintVouchersRange() {
 
   AppState.voucherDetails = AppState.voucherDetails || {};
 
+  const compCode = SessionState.company?.code;
+  const compDetails = AppState.companyDetails ? AppState.companyDetails[compCode] : null;
+  const companyName = SessionState.company?.name || 'شرکت نمونه نگار';
+  const logoSrc = (compDetails && compDetails.logo) ? compDetails.logo : (typeof currentCompLogoBase64 !== 'undefined' ? currentCompLogoBase64 : '');
+
+  let logoHtml = '';
+  if (logoSrc) {
+    logoHtml = `<img src="${logoSrc}" alt="آرم شرکت" style="max-height:55px; max-width:130px; object-fit:contain;" />`;
+  } else {
+    logoHtml = `
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="width:48px; height:48px; border-radius:8px; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 6px rgba(0,0,0,0.12);">🏢</div>
+      </div>
+    `;
+  }
+
   const numType = document.getElementById('printSanadNumType')?.value || 'sanadNo';
 
   const vouchersHtml = selectedVouchers.map(s => {
@@ -2294,9 +2310,14 @@ function submitPrintVouchersRange() {
     return `
       <div class="voucher-page">
         <div class="voucher-header">
-          <div class="company-title">${SessionState.company?.name || 'شرکت نمونه نگار'}</div>
-          <div class="doc-title">سند حسابداری</div>
-          <div class="doc-info">
+          <div class="header-right">
+            ${logoHtml}
+          </div>
+          <div class="header-center">
+            <div class="company-title">${companyName}</div>
+            <div class="doc-title">سند حسابداری</div>
+          </div>
+          <div class="header-left doc-info">
             <div>شماره سند: <b>${numDisplay}</b></div>
             <div>تاریخ: <b>${s.date}</b></div>
             <div>وضعیت: <b>${s.status}</b></div>
@@ -2354,7 +2375,10 @@ function submitPrintVouchersRange() {
         .no-print-btn:hover { background: #0369a1; }
         .voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; }
         .voucher-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
-        .company-title { font-size: 16px; font-weight: bold; }
+        .header-right { width: 30%; display: flex; align-items: center; justify-content: flex-start; }
+        .header-center { width: 40%; text-align: center; }
+        .header-left { width: 30%; text-align: left; }
+        .company-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
         .doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }
         .doc-info { font-size: 11px; text-align: left; }
         .main-table { width: 100%; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
