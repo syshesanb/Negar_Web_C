@@ -2374,6 +2374,7 @@ function submitPrintVouchersRange() {
   }
 
   const numType = document.getElementById('printSanadNumType')?.value || 'sanadNo';
+  const numberType = document.getElementById('printNumberTypeCombo')?.value || 'fa';
 
   const vouchersHtml = selectedVouchers.map((s, idx) => {
     if (!s.dayOfYear) {
@@ -2391,11 +2392,19 @@ function submitPrintVouchersRange() {
       numDisplay = `${s.id}`;
     }
 
-    const linesRows = buildVoucherLevelRows(s, levelComboValue);
+    const numDisplayFormatted = formatNumberForPrint(numDisplay, numberType);
+    const dateFormatted = formatNumberForPrint(s.date, numberType);
+
+    const linesRows = buildVoucherLevelRows(s, levelComboValue, numberType);
 
     const totalWords = numberToPersianWords(s.debit || 0);
+    const totalWordsFormatted = numberType === 'fa' ? toPersianDigitsStr(totalWords) : totalWords;
     const voucherCurrentPage = 1;
     const voucherTotalPages = 1;
+    const pageStr = formatNumberForPrint(`${voucherCurrentPage} از ${voucherTotalPages}`, numberType);
+
+    const debitFormatted = formatNumberForPrint(Number(s.debit).toLocaleString(), numberType);
+    const creditFormatted = formatNumberForPrint(Number(s.credit).toLocaleString(), numberType);
 
     return `
       <div class="voucher-page">
@@ -2408,10 +2417,10 @@ function submitPrintVouchersRange() {
             <div class="doc-title">سند حسابداری</div>
           </div>
           <div class="header-left doc-info">
-            <div>شماره سند: <b>${numDisplay}</b></div>
-            <div>تاریخ: <b>${s.date}</b></div>
+            <div>شماره سند: <b>${numDisplayFormatted}</b></div>
+            <div>تاریخ: <b>${dateFormatted}</b></div>
             <div>وضعیت: <b>${s.status}</b></div>
-            <div>صفحه: <b>${voucherCurrentPage} از ${voucherTotalPages}</b></div>
+            <div>صفحه: <b>${pageStr}</b></div>
           </div>
         </div>
 
@@ -2433,11 +2442,11 @@ function submitPrintVouchersRange() {
           <tfoot>
             <tr style="font-weight:bold; background:#f8fafc;">
               <td colspan="4" style="text-align:right;">
-                جمع کل سند: <span style="color:#0284c7; margin-right:6px; font-size:11px;">(${totalWords})</span>
+                جمع کل سند: <span style="color:#0284c7; margin-right:6px; font-size:11px;">(${totalWordsFormatted})</span>
               </td>
               <td style="text-align:right;"></td>
-              <td style="text-align:right;">${Number(s.debit).toLocaleString()}</td>
-              <td style="text-align:right;">${Number(s.credit).toLocaleString()}</td>
+              <td style="text-align:right;">${debitFormatted}</td>
+              <td style="text-align:right;">${creditFormatted}</td>
             </tr>
           </tfoot>
         </table>
@@ -2701,7 +2710,22 @@ function submitPrintVouchersRange() {
   printWindow.document.close();
 }
 
-function buildVoucherLevelRows(s, levelComboValue) {
+function toPersianDigitsStr(str) {
+  if (str === null || str === undefined) return '';
+  const faDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  return String(str).replace(/[0-9]/g, w => faDigits[parseInt(w, 10)]);
+}
+
+function formatNumberForPrint(val, numberType) {
+  if (val === null || val === undefined) return '';
+  const str = String(val);
+  if (numberType === 'fa') {
+    return toPersianDigitsStr(str);
+  }
+  return str;
+}
+
+function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
   AppState.voucherDetails = AppState.voucherDetails || {};
   const targetLines = AppState.voucherDetails[s.id] || [
     { account: '110102', desc: `آرتیکل بدهکار - بابت ${s.desc}`, debit: s.debit, credit: 0 },
@@ -2763,13 +2787,13 @@ function buildVoucherLevelRows(s, levelComboValue) {
     Object.values(groupsMap).forEach(g => {
       rows.push(`
         <tr>
-          <td style="text-align:center;">${rowIdx++}</td>
-          <td style="text-align:center;">${g.code}</td>
+          <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+          <td style="text-align:center;">${formatNumberForPrint(g.code, numberType)}</td>
           <td>${g.name}</td>
           <td>حساب‌های گروه ${g.name}</td>
           <td style="text-align:right;"></td>
-          <td style="text-align:right;">${g.debit > 0 ? g.debit.toLocaleString() : '0'}</td>
-          <td style="text-align:right;">${g.credit > 0 ? g.credit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${g.debit > 0 ? formatNumberForPrint(g.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
+          <td style="text-align:right;">${g.credit > 0 ? formatNumberForPrint(g.credit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
         </tr>
       `);
     });
@@ -2787,13 +2811,13 @@ function buildVoucherLevelRows(s, levelComboValue) {
     Object.values(kolsMap).forEach(k => {
       rows.push(`
         <tr>
-          <td style="text-align:center;">${rowIdx++}</td>
-          <td style="text-align:center;">${k.code}</td>
+          <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+          <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
           <td>${k.name}</td>
           <td>حساب کل ${k.name}</td>
           <td style="text-align:right;"></td>
-          <td style="text-align:right;">${k.debit > 0 ? k.debit.toLocaleString() : '0'}</td>
-          <td style="text-align:right;">${k.credit > 0 ? k.credit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${k.debit > 0 ? formatNumberForPrint(k.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
+          <td style="text-align:right;">${k.credit > 0 ? formatNumberForPrint(k.credit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
         </tr>
       `);
     });
@@ -2817,24 +2841,24 @@ function buildVoucherLevelRows(s, levelComboValue) {
     Object.values(groupsMap).forEach(g => {
       rows.push(`
         <tr style="background:#f1f5f9; font-weight:bold;">
-          <td style="text-align:center;">${rowIdx++}</td>
-          <td style="text-align:center;">${g.code}</td>
+          <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+          <td style="text-align:center;">${formatNumberForPrint(g.code, numberType)}</td>
           <td>${g.name}</td>
           <td>جمع گروه ${g.name}</td>
           <td style="text-align:right;"></td>
-          <td style="text-align:right;">${g.debit > 0 ? g.debit.toLocaleString() : '0'}</td>
-          <td style="text-align:right;">${g.credit > 0 ? g.credit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${g.debit > 0 ? formatNumberForPrint(g.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
+          <td style="text-align:right;">${g.credit > 0 ? formatNumberForPrint(g.credit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
         </tr>
       `);
       Object.values(g.kols).forEach(k => {
         const subAmt = k.debit > 0 ? k.debit : k.credit;
         rows.push(`
           <tr>
-            <td style="text-align:center;">${rowIdx++}</td>
-            <td style="text-align:center;">${k.code}</td>
+            <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+            <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
             <td style="padding-right:20px;">${k.name}</td>
             <td>حساب کل ${k.name}</td>
-            <td style="text-align:right;">${Number(subAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;">${formatNumberForPrint(Number(subAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
             <td style="text-align:right;"></td>
           </tr>
@@ -2862,24 +2886,24 @@ function buildVoucherLevelRows(s, levelComboValue) {
     Object.values(groupsMap).forEach(g => {
       rows.push(`
         <tr style="background:#f1f5f9; font-weight:bold;">
-          <td style="text-align:center;">${rowIdx++}</td>
-          <td style="text-align:center;">${g.code}</td>
+          <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+          <td style="text-align:center;">${formatNumberForPrint(g.code, numberType)}</td>
           <td>${g.name}</td>
           <td>جمع گروه ${g.name}</td>
           <td style="text-align:right;"></td>
-          <td style="text-align:right;">${g.debit > 0 ? g.debit.toLocaleString() : '0'}</td>
-          <td style="text-align:right;">${g.credit > 0 ? g.credit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${g.debit > 0 ? formatNumberForPrint(g.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
+          <td style="text-align:right;">${g.credit > 0 ? formatNumberForPrint(g.credit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
         </tr>
       `);
       Object.values(g.kols).forEach(k => {
         const kolSubAmt = k.debit > 0 ? k.debit : k.credit;
         rows.push(`
           <tr style="font-weight:bold; background:rgba(241,245,249,0.4);">
-            <td style="text-align:center;">${rowIdx++}</td>
-            <td style="text-align:center;">${k.code}</td>
+            <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+            <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
             <td style="padding-right:15px;">${k.name}</td>
             <td>جمع کل ${k.name}</td>
-            <td style="text-align:right;">${Number(kolSubAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;">${formatNumberForPrint(Number(kolSubAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
             <td style="text-align:right;"></td>
           </tr>
@@ -2888,11 +2912,11 @@ function buildVoucherLevelRows(s, levelComboValue) {
           const moinSubAmt = Number(m.debit || 0) > 0 ? Number(m.debit) : Number(m.credit || 0);
           rows.push(`
             <tr>
-              <td style="text-align:center;">${rowIdx++}</td>
-              <td style="text-align:center;">${m.moinCode}</td>
+              <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+              <td style="text-align:center;">${formatNumberForPrint(m.moinCode, numberType)}</td>
               <td style="padding-right:30px;">${m.moinName}</td>
               <td>${m.desc || ''}</td>
-              <td style="text-align:right;">${Number(moinSubAmt || 0).toLocaleString()}</td>
+              <td style="text-align:right;">${formatNumberForPrint(Number(moinSubAmt || 0).toLocaleString(), numberType)}</td>
               <td style="text-align:right;"></td>
               <td style="text-align:right;"></td>
             </tr>
@@ -2915,24 +2939,24 @@ function buildVoucherLevelRows(s, levelComboValue) {
     Object.values(kolsMap).forEach(k => {
       rows.push(`
         <tr style="background:#f1f5f9; font-weight:bold;">
-          <td style="text-align:center;">${rowIdx++}</td>
-          <td style="text-align:center;">${k.code}</td>
+          <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+          <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
           <td>${k.name}</td>
           <td>جمع کل ${k.name}</td>
           <td style="text-align:right;"></td>
-          <td style="text-align:right;">${k.debit > 0 ? k.debit.toLocaleString() : '0'}</td>
-          <td style="text-align:right;">${k.credit > 0 ? k.credit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${k.debit > 0 ? formatNumberForPrint(k.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
+          <td style="text-align:right;">${k.credit > 0 ? formatNumberForPrint(k.credit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
         </tr>
       `);
       k.moins.forEach(m => {
         const moinSubAmt = Number(m.debit || 0) > 0 ? Number(m.debit) : Number(m.credit || 0);
         rows.push(`
           <tr>
-            <td style="text-align:center;">${rowIdx++}</td>
-            <td style="text-align:center;">${m.moinCode}</td>
+            <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+            <td style="text-align:center;">${formatNumberForPrint(m.moinCode, numberType)}</td>
             <td style="padding-right:20px;">${m.moinName}</td>
             <td>${m.desc || ''}</td>
-            <td style="text-align:right;">${Number(moinSubAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;">${formatNumberForPrint(Number(moinSubAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
             <td style="text-align:right;"></td>
           </tr>
@@ -2960,24 +2984,24 @@ function buildVoucherLevelRows(s, levelComboValue) {
     Object.values(kolsMap).forEach(k => {
       rows.push(`
         <tr style="background:#f1f5f9; font-weight:bold;">
-          <td style="text-align:center;">${rowIdx++}</td>
-          <td style="text-align:center;">${k.code}</td>
+          <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+          <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
           <td>${k.name}</td>
           <td>جمع کل ${k.name}</td>
           <td style="text-align:right;"></td>
-          <td style="text-align:right;">${k.debit > 0 ? k.debit.toLocaleString() : '0'}</td>
-          <td style="text-align:right;">${k.credit > 0 ? k.credit.toLocaleString() : '0'}</td>
+          <td style="text-align:right;">${k.debit > 0 ? formatNumberForPrint(k.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
+          <td style="text-align:right;">${k.credit > 0 ? formatNumberForPrint(k.credit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
         </tr>
       `);
       Object.values(k.moins).forEach(m => {
         const moinSubAmt = m.debit > 0 ? m.debit : m.credit;
         rows.push(`
           <tr style="font-weight:bold; background:rgba(241,245,249,0.4);">
-            <td style="text-align:center;">${rowIdx++}</td>
-            <td style="text-align:center;">${m.code}</td>
+            <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+            <td style="text-align:center;">${formatNumberForPrint(m.code, numberType)}</td>
             <td style="padding-right:15px;">${m.name}</td>
             <td>جمع معین ${m.name}</td>
-            <td style="text-align:right;">${Number(moinSubAmt || 0).toLocaleString()}</td>
+            <td style="text-align:right;">${formatNumberForPrint(Number(moinSubAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
             <td style="text-align:right;"></td>
           </tr>
@@ -2988,11 +3012,11 @@ function buildVoucherLevelRows(s, levelComboValue) {
           const fullTitle = t.tafsilName ? `${t.tafsilName}` : t.moinName;
           rows.push(`
             <tr>
-              <td style="text-align:center;">${rowIdx++}</td>
-              <td style="text-align:center;">${fullCode}</td>
+              <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
+              <td style="text-align:center;">${formatNumberForPrint(fullCode, numberType)}</td>
               <td style="padding-right:30px;">${fullTitle}</td>
               <td>${t.desc || ''}</td>
-              <td style="text-align:right;">${Number(tafsilSubAmt || 0).toLocaleString()}</td>
+              <td style="text-align:right;">${formatNumberForPrint(Number(tafsilSubAmt || 0).toLocaleString(), numberType)}</td>
               <td style="text-align:right;"></td>
               <td style="text-align:right;"></td>
             </tr>
