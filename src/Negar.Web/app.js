@@ -2608,6 +2608,10 @@ function submitPrintVouchersRange() {
         .page-break { page-break-after: always; height: 0; }
         
         @media print {
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           html, body {
             height: auto !important;
             overflow: visible !important;
@@ -2707,15 +2711,27 @@ function submitPrintVouchersRange() {
 
         function exportToWord() {
           const content = document.getElementById('printableArea').innerHTML;
+          const stylesHtml = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
           const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
             "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
             "<style>" +
-            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; }" +
-            "table { border-collapse: collapse; width: 100%; margin-top: 15px; margin-bottom: 20px; }" +
-            "th, td { border: 1px solid #333; padding: 8px; text-align: right; }" +
-            "th { background-color: #f1f5f9; font-weight: bold; }" +
-            ".signatures { display: flex; justify-content: space-between; margin-top: 30px; }" +
-            ".sig-box { text-align: center; width: 22%; border-top: 1px solid #000; padding-top: 5px; }" +
+            stylesHtml + "\n" +
+            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; background: #fff; color: #0f172a; }\n" +
+            ".voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; }\n" +
+            ".voucher-header { display: table; width: 100%; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }\n" +
+            ".header-right { display: table-cell; width: 30%; text-align: right; vertical-align: middle; }\n" +
+            ".header-center { display: table-cell; width: 40%; text-align: center; vertical-align: middle; }\n" +
+            ".header-left { display: table-cell; width: 30%; text-align: left; vertical-align: middle; }\n" +
+            ".company-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }\n" +
+            ".doc-title { font-size: 18px; font-weight: bold; color: #0284c7 !important; }\n" +
+            ".main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }\n" +
+            ".main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 4px; text-align: right; word-wrap: break-word; }\n" +
+            ".main-table th { background-color: #e2e8f0 !important; font-weight: bold; text-align: center !important; }\n" +
+            ".main-table td:nth-child(3) { text-align: center !important; }\n" +
+            ".main-table td:nth-child(5), .main-table td:nth-child(6), .main-table td:nth-child(7) { white-space: nowrap !important; text-align: right; direction: ltr; font-size: 11px; }\n" +
+            ".voucher-desc-box { border: 1px solid #94a3b8; border-radius: 6px; padding: 10px 14px; margin-top: 12px; margin-bottom: 24px; background: #f8fafc; font-size: 12px; text-align: right; }\n" +
+            ".signatures { display: table; width: 100%; margin-top: 40px; }\n" +
+            ".sig-box { display: table-cell; text-align: center; width: 25%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }\n" +
             "</style></head><body>";
           const footer = "</body></html>";
           const sourceHTML = header + content + footer;
@@ -2736,6 +2752,7 @@ function submitPrintVouchersRange() {
 
         function exportToExcel() {
           const content = document.getElementById('printableArea').innerHTML;
+          const stylesHtml = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
           const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
             "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
             "<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>" +
@@ -2743,14 +2760,16 @@ function submitPrintVouchersRange() {
             "<x:WorksheetOptions><x:DisplayRightToLeft/></x:WorksheetOptions>" +
             "</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->" +
             "<style>" +
-            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 15px; }" +
-            "table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 20px; }" +
-            "th, td { border: 1px solid #333; padding: 6px 10px; text-align: right; }" +
-            "th { background-color: #f1f5f9; font-weight: bold; }" +
-            ".company-title { font-size: 16px; font-weight: bold; }" +
-            ".doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }" +
-            ".signatures { display: flex; justify-content: space-between; margin-top: 30px; }" +
-            ".sig-box { text-align: center; width: 22%; border-top: 1px solid #000; padding-top: 5px; }" +
+            stylesHtml + "\n" +
+            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 15px; background: #fff; }\n" +
+            ".main-table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 20px; }\n" +
+            ".main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 10px; text-align: right; }\n" +
+            ".main-table th { background-color: #e2e8f0 !important; font-weight: bold; text-align: center !important; }\n" +
+            ".main-table td:nth-child(3) { text-align: center !important; }\n" +
+            ".company-title { font-size: 16px; font-weight: bold; }\n" +
+            ".doc-title { font-size: 18px; font-weight: bold; color: #0284c7 !important; }\n" +
+            ".signatures { display: table; width: 100%; margin-top: 30px; }\n" +
+            ".sig-box { display: table-cell; text-align: center; width: 25%; border-top: 1px solid #000; padding-top: 5px; }\n" +
             "</style></head><body>";
           const footer = "</body></html>";
           const sourceHTML = header + content + footer;
