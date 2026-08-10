@@ -2607,6 +2607,25 @@ function submitPrintVouchersRange() {
         .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
         .page-break { page-break-after: always; height: 0; }
         
+        /* Black & White Mode Styles */
+        body.bw-mode, body.bw-mode * {
+          color: #000000 !important;
+          border-color: #000000 !important;
+        }
+        body.bw-mode .main-table th {
+          background-color: #e5e5e5 !important;
+          color: #000000 !important;
+        }
+        body.bw-mode .company-title,
+        body.bw-mode .doc-title,
+        body.bw-mode .total-words {
+          color: #000000 !important;
+        }
+        body.bw-mode .voucher-desc-box {
+          background-color: #f8f8f8 !important;
+          border-color: #000000 !important;
+        }
+
         @media print {
           * {
             -webkit-print-color-adjust: exact !important;
@@ -2662,6 +2681,15 @@ function submitPrintVouchersRange() {
             </select>
           </div>
 
+          <!-- Color Mode Combo -->
+          <div class="toolbar-group">
+            <label>🎨 حالت رنگ:</label>
+            <select id="pageColorModeSelect" class="toolbar-select" onchange="changePageColorMode(this.value)">
+              <option value="color" selected>رنگی</option>
+              <option value="bw">سیاه و سفید</option>
+            </select>
+          </div>
+
           <!-- Exports & Print -->
           <button class="no-print-btn excel-btn" onclick="exportToExcel()">📊 خروجی اکسل</button>
           <button class="no-print-btn word-btn" onclick="exportToWord()">📝 خروجی Word</button>
@@ -2673,120 +2701,129 @@ function submitPrintVouchersRange() {
       <div id="printableArea">
         ${vouchersHtml}
       </div>
+    </body>
+    </html>
+  `);
 
-      <script>
-        function changePageSize(size) {
-          let styleEl = document.getElementById('dynamicPageStyle');
-          if (!styleEl) {
-            styleEl = document.createElement('style');
-            styleEl.id = 'dynamicPageStyle';
-            document.head.appendChild(styleEl);
-          }
-          const orientation = document.getElementById('pageOrientationSelect')?.value || 'portrait';
-          const margin = document.getElementById('pageMarginSelect')?.value || 'normal';
-          
-          let marginVal = '15mm';
-          if (margin === 'narrow') marginVal = '5mm';
-          if (margin === 'zero') marginVal = '0mm';
+  printWindow.document.close();
 
-          styleEl.innerHTML = '@page { size: ' + size + ' ' + orientation + '; margin: ' + marginVal + '; }';
-        }
+  // Attach interactive toolbar functions directly onto printWindow object to guarantee execution
+  printWindow.changePageSize = function(size) {
+    let styleEl = printWindow.document.getElementById('dynamicPageStyle');
+    if (!styleEl) {
+      styleEl = printWindow.document.createElement('style');
+      styleEl.id = 'dynamicPageStyle';
+      printWindow.document.head.appendChild(styleEl);
+    }
+    const orientation = printWindow.document.getElementById('pageOrientationSelect')?.value || 'portrait';
+    const margin = printWindow.document.getElementById('pageMarginSelect')?.value || 'normal';
+    let marginVal = '15mm';
+    if (margin === 'narrow') marginVal = '5mm';
+    if (margin === 'zero') marginVal = '0mm';
+    styleEl.innerHTML = '@page { size: ' + size + ' ' + orientation + '; margin: ' + marginVal + '; }';
+  };
 
-        function changePageOrientation(orientation) {
-          const size = document.getElementById('pageSizeSelect')?.value || 'A4';
-          changePageSize(size);
-        }
+  printWindow.changePageOrientation = function(orientation) {
+    const size = printWindow.document.getElementById('pageSizeSelect')?.value || 'A4';
+    printWindow.changePageSize(size);
+  };
 
-        function changePageMargin(margin) {
-          const size = document.getElementById('pageSizeSelect')?.value || 'A4';
-          changePageSize(size);
-        }
+  printWindow.changePageMargin = function(margin) {
+    const size = printWindow.document.getElementById('pageSizeSelect')?.value || 'A4';
+    printWindow.changePageSize(size);
+  };
 
-        function exportToPDF() {
-          const oldTitle = document.title;
-          document.title = 'اسناد_حسابداری_' + new Date().toISOString().slice(0, 10);
-          window.print();
-          setTimeout(() => { document.title = oldTitle; }, 1000);
-        }
+  printWindow.changePageColorMode = function(mode) {
+    if (mode === 'bw') {
+      printWindow.document.body.classList.add('bw-mode');
+    } else {
+      printWindow.document.body.classList.remove('bw-mode');
+    }
+  };
 
-        function exportToWord() {
-          const content = document.getElementById('printableArea').innerHTML;
-          const stylesHtml = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
-          const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
-            "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
-            "<style>" +
-            stylesHtml + "\n" +
-            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; background: #fff; color: #0f172a; }\n" +
-            ".voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; }\n" +
-            ".voucher-header { display: table; width: 100%; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }\n" +
-            ".header-right { display: table-cell; width: 30%; text-align: right; vertical-align: middle; }\n" +
-            ".header-center { display: table-cell; width: 40%; text-align: center; vertical-align: middle; }\n" +
-            ".header-left { display: table-cell; width: 30%; text-align: left; vertical-align: middle; }\n" +
-            ".company-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }\n" +
-            ".doc-title { font-size: 18px; font-weight: bold; color: #0284c7 !important; }\n" +
-            ".main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }\n" +
-            ".main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 4px; text-align: right; word-wrap: break-word; }\n" +
-            ".main-table th { background-color: #e2e8f0 !important; font-weight: bold; text-align: center !important; }\n" +
-            ".main-table td:nth-child(3) { text-align: center !important; }\n" +
-            ".main-table td:nth-child(5), .main-table td:nth-child(6), .main-table td:nth-child(7) { white-space: nowrap !important; text-align: right; direction: ltr; font-size: 11px; }\n" +
-            ".voucher-desc-box { border: 1px solid #94a3b8; border-radius: 6px; padding: 10px 14px; margin-top: 12px; margin-bottom: 24px; background: #f8fafc; font-size: 12px; text-align: right; }\n" +
-            ".signatures { display: table; width: 100%; margin-top: 40px; }\n" +
-            ".sig-box { display: table-cell; text-align: center; width: 25%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }\n" +
-            "</style></head><body>";
-          const footer = "</body></html>";
-          const sourceHTML = header + content + footer;
+  printWindow.exportToPDF = function() {
+    const oldTitle = printWindow.document.title;
+    printWindow.document.title = 'اسناد_حسابداری_' + new Date().toISOString().slice(0, 10);
+    printWindow.print();
+    setTimeout(function() { printWindow.document.title = oldTitle; }, 1000);
+  };
 
-          const blob = new Blob(['\\ufeff' + sourceHTML], {
-            type: 'application/msword'
-          });
+  printWindow.exportToWord = function() {
+    const content = printWindow.document.getElementById('printableArea').innerHTML;
+    const isBw = printWindow.document.body.classList.contains('bw-mode');
+    const thBg = isBw ? '#e5e5e5' : '#e2e8f0';
+    const titleColor = isBw ? '#000000' : '#0284c7';
+    
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
+      "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
+      "<style>" +
+      "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; background: #fff; color: #0f172a; }\n" +
+      ".voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; }\n" +
+      ".voucher-header { display: table; width: 100%; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }\n" +
+      ".header-right { display: table-cell; width: 30%; text-align: right; vertical-align: middle; }\n" +
+      ".header-center { display: table-cell; width: 40%; text-align: center; vertical-align: middle; }\n" +
+      ".header-left { display: table-cell; width: 30%; text-align: left; vertical-align: middle; }\n" +
+      ".company-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }\n" +
+      ".doc-title { font-size: 18px; font-weight: bold; color: " + titleColor + " !important; }\n" +
+      ".main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }\n" +
+      ".main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 4px; text-align: right; word-wrap: break-word; }\n" +
+      ".main-table th { background-color: " + thBg + " !important; font-weight: bold; text-align: center !important; }\n" +
+      ".main-table td:nth-child(3) { text-align: center !important; }\n" +
+      ".main-table td:nth-child(5), .main-table td:nth-child(6), .main-table td:nth-child(7) { white-space: nowrap !important; text-align: right; direction: ltr; font-size: 11px; }\n" +
+      ".voucher-desc-box { border: 1px solid #94a3b8; border-radius: 6px; padding: 10px 14px; margin-top: 12px; margin-bottom: 24px; background: #f8fafc; font-size: 12px; text-align: right; }\n" +
+      ".signatures { display: table; width: 100%; margin-top: 40px; }\n" +
+      ".sig-box { display: table-cell; text-align: center; width: 25%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }\n" +
+      "</style></head><body>";
+    const footer = "</body></html>";
+    const sourceHTML = header + content + footer;
 
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'اسناد_حسابداری.doc';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
+    const blob = new Blob(['\ufeff' + sourceHTML], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = printWindow.document.createElement('a');
+    a.href = url;
+    a.download = 'اسناد_حسابداری.doc';
+    printWindow.document.body.appendChild(a);
+    a.click();
+    printWindow.document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
-        function exportToExcel() {
-          const content = document.getElementById('printableArea').innerHTML;
-          const stylesHtml = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
-          const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
-            "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
-            "<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>" +
-            "<x:Name>اسناد حسابداری</x:Name>" +
-            "<x:WorksheetOptions><x:DisplayRightToLeft/></x:WorksheetOptions>" +
-            "</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->" +
-            "<style>" +
-            stylesHtml + "\n" +
-            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 15px; background: #fff; }\n" +
-            ".main-table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 20px; }\n" +
-            ".main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 10px; text-align: right; }\n" +
-            ".main-table th { background-color: #e2e8f0 !important; font-weight: bold; text-align: center !important; }\n" +
-            ".main-table td:nth-child(3) { text-align: center !important; }\n" +
-            ".company-title { font-size: 16px; font-weight: bold; }\n" +
-            ".doc-title { font-size: 18px; font-weight: bold; color: #0284c7 !important; }\n" +
-            ".signatures { display: table; width: 100%; margin-top: 30px; }\n" +
-            ".sig-box { display: table-cell; text-align: center; width: 25%; border-top: 1px solid #000; padding-top: 5px; }\n" +
-            "</style></head><body>";
-          const footer = "</body></html>";
-          const sourceHTML = header + content + footer;
+  printWindow.exportToExcel = function() {
+    const content = printWindow.document.getElementById('printableArea').innerHTML;
+    const isBw = printWindow.document.body.classList.contains('bw-mode');
+    const thBg = isBw ? '#e5e5e5' : '#e2e8f0';
+    const titleColor = isBw ? '#000000' : '#0284c7';
 
-          const blob = new Blob(['\\ufeff' + sourceHTML], {
-            type: 'application/vnd.ms-excel;charset=utf-8'
-          });
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
+      "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
+      "<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>" +
+      "<x:Name>اسناد حسابداری</x:Name>" +
+      "<x:WorksheetOptions><x:DisplayRightToLeft/></x:WorksheetOptions>" +
+      "</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->" +
+      "<style>" +
+      "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 15px; background: #fff; }\n" +
+      ".main-table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 20px; }\n" +
+      ".main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 10px; text-align: right; }\n" +
+      ".main-table th { background-color: " + thBg + " !important; font-weight: bold; text-align: center !important; }\n" +
+      ".main-table td:nth-child(3) { text-align: center !important; }\n" +
+      ".company-title { font-size: 16px; font-weight: bold; }\n" +
+      ".doc-title { font-size: 18px; font-weight: bold; color: " + titleColor + " !important; }\n" +
+      ".signatures { display: table; width: 100%; margin-top: 30px; }\n" +
+      ".sig-box { display: table-cell; text-align: center; width: 25%; border-top: 1px solid #000; padding-top: 5px; }\n" +
+      "</style></head><body>";
+    const footer = "</body></html>";
+    const sourceHTML = header + content + footer;
 
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'اسناد_حسابداری.xls';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
+    const blob = new Blob(['\ufeff' + sourceHTML], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = printWindow.document.createElement('a');
+    a.href = url;
+    a.download = 'اسناد_حسابداری.xls';
+    printWindow.document.body.appendChild(a);
+    a.click();
+    printWindow.document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
       </script>
     </body>
     </html>
