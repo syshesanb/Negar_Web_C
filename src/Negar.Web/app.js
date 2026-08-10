@@ -2449,13 +2449,13 @@ function submitPrintVouchersRange() {
         <table class="main-table">
           <thead>
             <tr>
-              <th style="width:4%; text-align:center;">ردیف</th>
-              <th style="width:8%; text-align:center;">کد حساب</th>
-              <th style="width:18%; text-align:right;">عنوان حساب</th>
-              <th style="width:34%; text-align:right;">شرح آرتیکل</th>
-              <th style="width:12%; text-align:right;">مبلغ جزء (ریال)</th>
-              <th style="width:12%; text-align:right;">بدهکار (ریال)</th>
-              <th style="width:12%; text-align:right;">بستانکار (ریال)</th>
+              <th style="width:3%; text-align:center;">ردیف</th>
+              <th style="width:7%; text-align:center;">کد حساب</th>
+              <th style="width:15%; text-align:center;">عنوان حساب</th>
+              <th style="width:33%; text-align:right;">شرح آرتیکل</th>
+              <th style="width:14%; text-align:right; white-space:nowrap;">مبلغ جزء (ریال)</th>
+              <th style="width:14%; text-align:right; white-space:nowrap;">بدهکار (ریال)</th>
+              <th style="width:14%; text-align:right; white-space:nowrap;">بستانکار (ریال)</th>
             </tr>
           </thead>
           <tbody>
@@ -2466,9 +2466,9 @@ function submitPrintVouchersRange() {
               <td colspan="4" style="text-align:right;">
                 جمع کل سند: <span style="color:#0284c7; margin-right:6px; font-size:11px;">(${totalWordsFormatted})</span>
               </td>
-              <td style="text-align:right;"></td>
-              <td style="text-align:right;">${debitFormatted}</td>
-              <td style="text-align:right;">${creditFormatted}</td>
+              <td style="text-align:right; white-space:nowrap;"></td>
+              <td style="text-align:right; white-space:nowrap;">${debitFormatted}</td>
+              <td style="text-align:right; white-space:nowrap;">${creditFormatted}</td>
             </tr>
           </tfoot>
         </table>
@@ -2600,8 +2600,9 @@ function submitPrintVouchersRange() {
         .company-title { font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
         .doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }
         .main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
-        .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: right; word-wrap: break-word; overflow-wrap: break-word; }
+        .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 5px 3px; text-align: right; word-wrap: break-word; overflow-wrap: break-word; }
         .main-table th { background-color: #f1f5f9; font-weight: bold; }
+        .main-table td:nth-child(5), .main-table td:nth-child(6), .main-table td:nth-child(7) { white-space: nowrap !important; text-align: right; direction: ltr; font-size: 11px; }
         .signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 10px; }
         .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
         .page-break { page-break-after: always; height: 0; }
@@ -2853,7 +2854,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
         <tr>
           <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
           <td style="text-align:center;">${formatNumberForPrint(g.code, numberType)}</td>
-          <td>${g.name}</td>
+          <td style="text-align:center;">${g.name}</td>
           <td>حساب‌های گروه ${g.name}</td>
           <td style="text-align:right;"></td>
           <td style="text-align:right;">${g.debit > 0 ? formatNumberForPrint(g.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
@@ -2877,7 +2878,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
         <tr>
           <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
           <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
-          <td>${k.name}</td>
+          <td style="text-align:center;">${k.name}</td>
           <td>حساب کل ${k.name}</td>
           <td style="text-align:right;"></td>
           <td style="text-align:right;">${k.debit > 0 ? formatNumberForPrint(k.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
@@ -2907,7 +2908,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
         <tr style="background:#f1f5f9; font-weight:bold;">
           <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
           <td style="text-align:center;">${formatNumberForPrint(g.code, numberType)}</td>
-          <td>${g.name}</td>
+          <td style="text-align:center;">${g.name}</td>
           <td>جمع گروه ${g.name}</td>
           <td style="text-align:right;"></td>
           <td style="text-align:right;">${g.debit > 0 ? formatNumberForPrint(g.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
@@ -2920,7 +2921,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
           <tr>
             <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
             <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
-            <td style="padding-right:20px;">${k.name}</td>
+            <td style="text-align:center;">${k.name}</td>
             <td>حساب کل ${k.name}</td>
             <td style="text-align:right;">${formatNumberForPrint(Number(subAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
@@ -2952,7 +2953,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
         <tr style="background:#f1f5f9; font-weight:bold;">
           <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
           <td style="text-align:center;">${formatNumberForPrint(g.code, numberType)}</td>
-          <td>${g.name}</td>
+          <td style="text-align:center;">${g.name}</td>
           <td>جمع گروه ${g.name}</td>
           <td style="text-align:right;"></td>
           <td style="text-align:right;">${g.debit > 0 ? formatNumberForPrint(g.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
@@ -2965,7 +2966,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
           <tr style="font-weight:bold; background:rgba(241,245,249,0.4);">
             <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
             <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
-            <td style="padding-right:15px;">${k.name}</td>
+            <td style="text-align:center;">${k.name}</td>
             <td>جمع کل ${k.name}</td>
             <td style="text-align:right;">${formatNumberForPrint(Number(kolSubAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
@@ -2978,7 +2979,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
             <tr>
               <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
               <td style="text-align:center;">${formatNumberForPrint(m.moinCode, numberType)}</td>
-              <td style="padding-right:30px;">${m.moinName}</td>
+              <td style="text-align:center;">${m.moinName}</td>
               <td>${m.desc || ''}</td>
               <td style="text-align:right;">${formatNumberForPrint(Number(moinSubAmt || 0).toLocaleString(), numberType)}</td>
               <td style="text-align:right;"></td>
@@ -3005,7 +3006,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
         <tr style="background:#f1f5f9; font-weight:bold;">
           <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
           <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
-          <td>${k.name}</td>
+          <td style="text-align:center;">${k.name}</td>
           <td>جمع کل ${k.name}</td>
           <td style="text-align:right;"></td>
           <td style="text-align:right;">${k.debit > 0 ? formatNumberForPrint(k.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
@@ -3018,7 +3019,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
           <tr>
             <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
             <td style="text-align:center;">${formatNumberForPrint(m.moinCode, numberType)}</td>
-            <td style="padding-right:20px;">${m.moinName}</td>
+            <td style="text-align:center;">${m.moinName}</td>
             <td>${m.desc || ''}</td>
             <td style="text-align:right;">${formatNumberForPrint(Number(moinSubAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
@@ -3050,7 +3051,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
         <tr style="background:#f1f5f9; font-weight:bold;">
           <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
           <td style="text-align:center;">${formatNumberForPrint(k.code, numberType)}</td>
-          <td>${k.name}</td>
+          <td style="text-align:center;">${k.name}</td>
           <td>جمع کل ${k.name}</td>
           <td style="text-align:right;"></td>
           <td style="text-align:right;">${k.debit > 0 ? formatNumberForPrint(k.debit.toLocaleString(), numberType) : formatNumberForPrint(0, numberType)}</td>
@@ -3063,7 +3064,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
           <tr style="font-weight:bold; background:rgba(241,245,249,0.4);">
             <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
             <td style="text-align:center;">${formatNumberForPrint(m.code, numberType)}</td>
-            <td style="padding-right:15px;">${m.name}</td>
+            <td style="text-align:center;">${m.name}</td>
             <td>جمع معین ${m.name}</td>
             <td style="text-align:right;">${formatNumberForPrint(Number(moinSubAmt || 0).toLocaleString(), numberType)}</td>
             <td style="text-align:right;"></td>
@@ -3078,7 +3079,7 @@ function buildVoucherLevelRows(s, levelComboValue, numberType = 'fa') {
             <tr>
               <td style="text-align:center;">${formatNumberForPrint(rowIdx++, numberType)}</td>
               <td style="text-align:center;">${formatNumberForPrint(fullCode, numberType)}</td>
-              <td style="padding-right:30px;">${fullTitle}</td>
+              <td style="text-align:center;">${fullTitle}</td>
               <td>${t.desc || ''}</td>
               <td style="text-align:right;">${formatNumberForPrint(Number(tafsilSubAmt || 0).toLocaleString(), numberType)}</td>
               <td style="text-align:right;"></td>
