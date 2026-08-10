@@ -2128,20 +2128,26 @@ function printVouchers() {
   const modal = document.getElementById('printVouchersModal');
   if (!modal) return;
 
-  const currentFiscalYear = SessionState.fiscalYear || AppState.fiscalYear || '1403';
+  const activeYear = String(SessionState.year || SessionState.fiscalYear || AppState.fiscalYear || '1403');
   const titleEl = document.getElementById('printVouchersModalTitle');
   if (titleEl) {
-    titleEl.innerHTML = `🖨️ تنظیمات و محدوده چاپ اسناد حسابداری سال جاری : ${currentFiscalYear}`;
+    titleEl.innerHTML = `🖨️ تنظیمات و محدوده چاپ اسناد حسابداری سال جاری : ${activeYear}`;
   }
 
-  // Set default values based on current sanads database
-  const sortedIds = AppState.sanads.map(s => s.id).sort((a, b) => a - b);
+  // Filter sanads strictly belonging to the active current fiscal year
+  const currentYearSanads = AppState.sanads.filter(s => {
+    const sYear = (s.date || '').slice(0, 4);
+    return !sYear || sYear === activeYear || (s.fiscalYear && String(s.fiscalYear) === activeYear);
+  });
+
+  // Set default values based on current active year sanads database
+  const sortedIds = currentYearSanads.map(s => s.id).sort((a, b) => a - b);
   const minId = sortedIds.length > 0 ? sortedIds[0] : 101;
   const maxId = sortedIds.length > 0 ? sortedIds[sortedIds.length - 1] : 105;
 
-  const sortedDates = AppState.sanads.map(s => s.date).sort();
-  const minDate = sortedDates.length > 0 ? sortedDates[0] : '1403/01/01';
-  const maxDate = sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : '1403/12/29';
+  const sortedDates = currentYearSanads.map(s => s.date).sort();
+  const minDate = sortedDates.length > 0 ? sortedDates[0] : `${activeYear}/01/01`;
+  const maxDate = sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : `${activeYear}/12/29`;
 
   const fromNoEl = document.getElementById('printFromSanadNo');
   const toNoEl = document.getElementById('printToSanadNo');
@@ -2341,6 +2347,11 @@ function submitPrintVouchersRange() {
 
   let selectedVouchers = [];
 
+  // Always restrict to current fiscal year only
+  const activeYear = String(SessionState.year || SessionState.fiscalYear || AppState.fiscalYear || '1403');
+  const yearStart = `${activeYear}/01/01`;
+  const yearEnd = `${activeYear}/12/29`;
+
   if (isByNo) {
     const numType = document.getElementById('printSanadNumType')?.value || 'sanadNo';
     const fromSanad = parseInt(document.getElementById('printFromSanadNo')?.value || '0', 10);
@@ -2349,6 +2360,11 @@ function submitPrintVouchersRange() {
     const toDay = parseInt(document.getElementById('printToDayNo')?.value || '999999', 10);
 
     selectedVouchers = AppState.sanads.filter(s => {
+      // First: restrict to current year only
+      const sDate = (s.date || '');
+      const sYear = sDate.slice(0, 4);
+      if (sYear && sYear !== activeYear) return false;
+
       if (!s.dayOfYear) s.dayOfYear = getJalaliDayOfYear(s.date);
 
       if (numType === 'sanadNo') {
@@ -2361,9 +2377,16 @@ function submitPrintVouchersRange() {
       return true;
     });
   } else {
-    const fromDate = (document.getElementById('printFromDate')?.value || '').trim();
-    const toDate = (document.getElementById('printToDate')?.value || '').trim();
-    selectedVouchers = AppState.sanads.filter(s => s.date >= fromDate && s.date <= toDate);
+    const fromDateRaw = (document.getElementById('printFromDate')?.value || '').trim();
+    const toDateRaw = (document.getElementById('printToDate')?.value || '').trim();
+    // Clamp date range to current fiscal year boundaries
+    const fromDate = fromDateRaw < yearStart ? yearStart : fromDateRaw;
+    const toDate = toDateRaw > yearEnd ? yearEnd : toDateRaw;
+    selectedVouchers = AppState.sanads.filter(s => {
+      const sYear = (s.date || '').slice(0, 4);
+      if (sYear && sYear !== activeYear) return false;
+      return s.date >= fromDate && s.date <= toDate;
+    });
   }
 
   if (selectedVouchers.length === 0) {
