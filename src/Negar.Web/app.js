@@ -3252,7 +3252,6 @@ function submitPrintJournalRange() {
     const toSanad = parseInt(document.getElementById('printJrnToSanadNo')?.value || '999999', 10);
     const fromDay = parseInt(document.getElementById('printJrnFromDayNo')?.value || '0', 10);
     const toDay = parseInt(document.getElementById('printJrnToDayNo')?.value || '999999', 10);
-
     selectedSanads = AppState.sanads.filter(s => {
       const sYear = (s.date || '').slice(0, 4);
       if (sYear && sYear !== activeYear) return false;
@@ -3289,87 +3288,175 @@ function submitPrintJournalRange() {
   const useDefaultFonts = document.getElementById('printJrnUseDefaultFonts')?.checked !== false;
 
   // Column visibility
-  const showRow = document.getElementById('jrnColRow')?.checked !== false;
-  const showSanadNo = document.getElementById('jrnColSanadNo')?.checked !== false;
-  const showDayNo = document.getElementById('jrnColDayNo')?.checked !== false;
-  const showDate = document.getElementById('jrnColDate')?.checked !== false;
-  const showDesc = document.getElementById('jrnColDesc')?.checked !== false;
-  const showDebit = document.getElementById('jrnColDebit')?.checked !== false;
-  const showCredit = document.getElementById('jrnColCredit')?.checked !== false;
+  const showRow    = document.getElementById('jrnColRow')?.checked !== false;
+  const showSanadNo= document.getElementById('jrnColSanadNo')?.checked !== false;
+  const showDayNo  = document.getElementById('jrnColDayNo')?.checked !== false;
+  const showDate   = document.getElementById('jrnColDate')?.checked !== false;
   const showStatus = document.getElementById('jrnColStatus')?.checked !== false;
+  const showDebit  = document.getElementById('jrnColDebit')?.checked !== false;
+  const showCredit = document.getElementById('jrnColCredit')?.checked !== false;
 
   // Font settings
-  const compF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontCompFamily')?.value || 'Tahoma');
-  const compS = useDefaultFonts ? '16px' : (document.getElementById('jrnFontCompSize')?.value || '16px');
-  const compC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontCompColor')?.value || '#0f172a');
-  const titleF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTitleFamily')?.value || 'Tahoma');
-  const titleS = useDefaultFonts ? '18px' : (document.getElementById('jrnFontTitleSize')?.value || '18px');
-  const titleC = useDefaultFonts ? '#0284c7' : (document.getElementById('jrnFontTitleColor')?.value || '#0284c7');
-  const thF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontThFamily')?.value || 'Tahoma');
-  const thS = useDefaultFonts ? '12px' : (document.getElementById('jrnFontThSize')?.value || '12px');
-  const thC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontThColor')?.value || '#0f172a');
-  const tdF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTdFamily')?.value || 'Tahoma');
-  const tdS = useDefaultFonts ? '11px' : (document.getElementById('jrnFontTdSize')?.value || '11px');
-  const tdC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontTdColor')?.value || '#0f172a');
-  const totF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTotalFamily')?.value || 'Tahoma');
-  const totS = useDefaultFonts ? '11px' : (document.getElementById('jrnFontTotalSize')?.value || '11px');
-  const totC = useDefaultFonts ? '#0f172a' : (document.getElementById('jrnFontTotalColor')?.value || '#0f172a');
+  const compF  = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontCompFamily')?.value || 'Tahoma');
+  const compS  = useDefaultFonts ? '16px'   : (document.getElementById('jrnFontCompSize')?.value   || '16px');
+  const compC  = useDefaultFonts ? '#0f172a': (document.getElementById('jrnFontCompColor')?.value  || '#0f172a');
+  const titleF = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTitleFamily')?.value|| 'Tahoma');
+  const titleS = useDefaultFonts ? '18px'   : (document.getElementById('jrnFontTitleSize')?.value  || '18px');
+  const titleC = useDefaultFonts ? '#0284c7': (document.getElementById('jrnFontTitleColor')?.value || '#0284c7');
+  const thF    = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontThFamily')?.value   || 'Tahoma');
+  const thS    = useDefaultFonts ? '12px'   : (document.getElementById('jrnFontThSize')?.value     || '12px');
+  const thC    = useDefaultFonts ? '#0f172a': (document.getElementById('jrnFontThColor')?.value    || '#0f172a');
+  const tdF    = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTdFamily')?.value   || 'Tahoma');
+  const tdS    = useDefaultFonts ? '11px'   : (document.getElementById('jrnFontTdSize')?.value     || '11px');
+  const tdC    = useDefaultFonts ? '#0f172a': (document.getElementById('jrnFontTdColor')?.value    || '#0f172a');
+  const totF   = useDefaultFonts ? 'Tahoma' : (document.getElementById('jrnFontTotalFamily')?.value|| 'Tahoma');
+  const totS   = useDefaultFonts ? '11px'   : (document.getElementById('jrnFontTotalSize')?.value  || '11px');
+  const totC   = useDefaultFonts ? '#0f172a': (document.getElementById('jrnFontTotalColor')?.value || '#0f172a');
 
   const isBw = colorMode === 'bw';
-  const headerBg = isBw ? '#e5e5e5' : '#e2e8f0';
-  const titleColor = isBw ? '#000000' : titleC;
+  const headerBg  = isBw ? '#e5e5e5' : '#e2e8f0';
+  const subTotBg  = isBw ? '#f0f0f0' : '#f0f9ff';
+  const grandBg   = isBw ? '#d8d8d8' : '#dbeafe';
+  const titleColor= isBw ? '#000000' : titleC;
 
-  // Build company info
-  const compCode = SessionState.company?.code;
+  // Helper: get account name from code
+  const getAccName = (code) => {
+    const acc = AppState.accounts ? AppState.accounts.find(a => a.code === String(code)) : null;
+    return acc ? acc.name : (code || '');
+  };
+
+  // Company info
+  const compCode    = SessionState.company?.code;
   const compDetails = AppState.companyDetails ? AppState.companyDetails[compCode] : null;
   const companyName = SessionState.company?.name || 'شرکت نمونه نگار';
-  const logoSrc = (compDetails && compDetails.logo) ? compDetails.logo : (typeof currentCompLogoBase64 !== 'undefined' ? currentCompLogoBase64 : '');
-  let logoHtml = logoSrc
-    ? `<img src="${logoSrc}" alt="آرم" style="max-height:48px; max-width:110px; object-fit:contain;" />`
+  const logoSrc = (compDetails && compDetails.logo) ? compDetails.logo
+    : (typeof currentCompLogoBase64 !== 'undefined' ? currentCompLogoBase64 : '');
+  const logoHtml = logoSrc
+    ? `<img src="${logoSrc}" alt="آرم" style="max-height:48px;max-width:110px;object-fit:contain;" />`
     : `<div style="width:42px;height:42px;border-radius:8px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;">🏢</div>`;
 
-  // Build header row
-  const thCols = [];
-  if (showRow) thCols.push('<th style="width:4%;text-align:center;">ردیف</th>');
-  if (showSanadNo) thCols.push('<th style="width:8%;text-align:center;">شماره سند</th>');
-  if (showDayNo) thCols.push('<th style="width:6%;text-align:center;">شماره روز</th>');
-  if (showDate) thCols.push('<th style="width:10%;text-align:center;">تاریخ</th>');
-  if (showDesc) thCols.push('<th>شرح سند</th>');
-  if (showDebit) thCols.push('<th style="width:13%;text-align:center;">جمع بدهکار (ریال)</th>');
-  if (showCredit) thCols.push('<th style="width:13%;text-align:center;">جمع بستانکار (ریال)</th>');
-  if (showStatus) thCols.push('<th style="width:8%;text-align:center;">وضعیت</th>');
+  const numFmt = n  => formatNumberForPrint(String(n), numberType);
+  const monFmt = n  => formatNumberForPrint(Number(n || 0).toLocaleString(), numberType);
+  const dateFmt= d  => formatNumberForPrint(d || '', numberType);
 
-  let totalDebit = 0, totalCredit = 0;
+  // ────────────────────────────────────────
+  // Build table header columns
+  // ────────────────────────────────────────
+  const colDefs = [];
+  if (showRow)     colDefs.push({ label: 'ردیف',              width: '4%',  align: 'center' });
+  if (showSanadNo) colDefs.push({ label: 'شماره سند',         width: '7%',  align: 'center' });
+  if (showDayNo)   colDefs.push({ label: 'شماره روز',         width: '6%',  align: 'center' });
+  if (showDate)    colDefs.push({ label: 'تاریخ',             width: '9%',  align: 'center' });
+  if (showStatus)  colDefs.push({ label: 'وضعیت',             width: '7%',  align: 'center' });
+  colDefs.push({ label: 'کد حساب',   width: '7%',  align: 'center' });
+  colDefs.push({ label: 'نام حساب',  width: '18%', align: 'right'  });
+  colDefs.push({ label: 'شرح آرتیکل',width: '25%', align: 'right'  });
+  if (showDebit)   colDefs.push({ label: 'بدهکار (ریال)',     width: '10%', align: 'left'   });
+  if (showCredit)  colDefs.push({ label: 'بستانکار (ریال)',   width: '10%', align: 'left'   });
 
-  const rows = selectedSanads.map((s, idx) => {
+  const thHtml = colDefs.map(c =>
+    `<th style="width:${c.width};text-align:${c.align};">${c.label}</th>`
+  ).join('');
+
+  // ────────────────────────────────────────
+  // Build rows: article-by-article
+  // ────────────────────────────────────────
+  let grandDebit = 0, grandCredit = 0;
+  let rowSeq = 0; // running article row number
+  let bodyHtml = '';
+
+  AppState.voucherDetails = AppState.voucherDetails || {};
+
+  selectedSanads.forEach(s => {
     if (!s.dayOfYear) s.dayOfYear = getJalaliDayOfYear(s.date);
-    totalDebit += (s.debit || 0);
-    totalCredit += (s.credit || 0);
-    const numFmt = n => formatNumberForPrint(String(n), numberType);
-    const dateFmt = d => formatNumberForPrint(d, numberType);
-    const tdCols = [];
-    if (showRow) tdCols.push(`<td style="text-align:center;">${numFmt(idx + 1)}</td>`);
-    if (showSanadNo) tdCols.push(`<td style="text-align:center;">${numFmt(s.id)}</td>`);
-    if (showDayNo) tdCols.push(`<td style="text-align:center;">${numFmt(s.dayOfYear || '')}</td>`);
-    if (showDate) tdCols.push(`<td style="text-align:center;">${dateFmt(s.date)}</td>`);
-    if (showDesc) tdCols.push(`<td style="text-align:right;">${s.desc || ''}</td>`);
-    if (showDebit) tdCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;">${numFmt(Number(s.debit || 0).toLocaleString())}</td>`);
-    if (showCredit) tdCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;">${numFmt(Number(s.credit || 0).toLocaleString())}</td>`);
-    if (showStatus) tdCols.push(`<td style="text-align:center;">${s.status || ''}</td>`);
-    return `<tr>${tdCols.join('')}</tr>`;
-  }).join('');
+    const lines = AppState.voucherDetails[s.id] || [];
 
-  // Total row
-  const totCols = [];
-  if (showRow) totCols.push('<td></td>');
-  if (showSanadNo) totCols.push('<td></td>');
-  if (showDayNo) totCols.push('<td></td>');
-  if (showDate) totCols.push('<td></td>');
-  if (showDesc) totCols.push(`<td style="text-align:right;font-weight:bold;">جمع کل دفتر روزنامه</td>`);
-  if (showDebit) totCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${formatNumberForPrint(totalDebit.toLocaleString(), numberType)}</td>`);
-  if (showCredit) totCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${formatNumberForPrint(totalCredit.toLocaleString(), numberType)}</td>`);
-  if (showStatus) totCols.push('<td></td>');
+    let vDebit = 0, vCredit = 0;
+    let isFirst = true;
 
+    lines.forEach(line => {
+      rowSeq++;
+      vDebit  += (line.debit  || 0);
+      vCredit += (line.credit || 0);
+      const accCode = line.account || '';
+      const accName = getAccName(accCode);
+      // Debit lines first (بدهکار), then credit (بستانکار) — already ordered in data
+      const isDebit = (line.debit || 0) > 0;
+      // Indent credit lines (بستانکار) as per Iranian convention
+      const accNameDisplay = isDebit
+        ? accName
+        : `&nbsp;&nbsp;&nbsp;&nbsp;${accName}`;
+      const descDisplay = isDebit
+        ? (line.desc || '')
+        : `&nbsp;&nbsp;&nbsp;&nbsp;${line.desc || ''}`;
+
+      const tds = [];
+      if (showRow)     tds.push(`<td style="text-align:center;">${numFmt(rowSeq)}</td>`);
+      if (showSanadNo) tds.push(isFirst
+        ? `<td style="text-align:center;font-weight:bold;">${numFmt(s.id)}</td>`
+        : `<td style="text-align:center;color:#94a3b8;">↑</td>`);
+      if (showDayNo)   tds.push(isFirst
+        ? `<td style="text-align:center;">${numFmt(s.dayOfYear || '')}</td>`
+        : `<td></td>`);
+      if (showDate)    tds.push(isFirst
+        ? `<td style="text-align:center;">${dateFmt(s.date)}</td>`
+        : `<td></td>`);
+      if (showStatus)  tds.push(isFirst
+        ? `<td style="text-align:center;">${s.status || ''}</td>`
+        : `<td></td>`);
+      tds.push(`<td style="text-align:center;direction:ltr;">${accCode}</td>`);
+      tds.push(`<td style="text-align:right;">${accNameDisplay}</td>`);
+      tds.push(`<td style="text-align:right;">${descDisplay}</td>`);
+      if (showDebit)   tds.push(isDebit
+        ? `<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(line.debit)}</td>`
+        : `<td></td>`);
+      if (showCredit)  tds.push(!isDebit
+        ? `<td style="text-align:left;direction:ltr;white-space:nowrap;">${monFmt(line.credit)}</td>`
+        : `<td></td>`);
+
+      bodyHtml += `<tr class="article-row">${tds.join('')}</tr>`;
+      isFirst = false;
+    });
+
+    // Sub-total row per voucher (جمع سند)
+    if (lines.length > 0) {
+      grandDebit  += vDebit;
+      grandCredit += vCredit;
+      const emptyColCount = colDefs.length - (showDebit ? 1 : 0) - (showCredit ? 1 : 0) - 1;
+      // Build subtotal columns
+      const subCols = [];
+      let filledCount = 0;
+      if (showRow)     { subCols.push('<td></td>'); filledCount++; }
+      if (showSanadNo) { subCols.push(`<td style="text-align:center;font-weight:bold;">${numFmt(s.id)}</td>`); filledCount++; }
+      if (showDayNo)   { subCols.push('<td></td>'); filledCount++; }
+      if (showDate)    { subCols.push('<td></td>'); filledCount++; }
+      if (showStatus)  { subCols.push('<td></td>'); filledCount++; }
+      // account code + name + desc merged as label
+      subCols.push('<td colspan="3" style="text-align:right;font-weight:bold;">جمع سند</td>');
+      if (showDebit)   subCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(vDebit)}</td>`);
+      if (showCredit)  subCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(vCredit)}</td>`);
+      bodyHtml += `<tr class="subtotal-row">${subCols.join('')}</tr>`;
+      // Separator row
+      bodyHtml += `<tr class="sep-row"><td colspan="${colDefs.length}" style="height:6px;border:none;background:transparent;"></td></tr>`;
+    }
+  });
+
+  // ────────────────────────────────────────
+  // Grand total row (جمع کل دفتر روزنامه)
+  // ────────────────────────────────────────
+  const grandCols = [];
+  if (showRow)     grandCols.push('<td></td>');
+  if (showSanadNo) grandCols.push('<td></td>');
+  if (showDayNo)   grandCols.push('<td></td>');
+  if (showDate)    grandCols.push('<td></td>');
+  if (showStatus)  grandCols.push('<td></td>');
+  grandCols.push('<td colspan="3" style="text-align:right;font-weight:bold;">جمع کل دفتر روزنامه</td>');
+  if (showDebit)   grandCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(grandDebit)}</td>`);
+  if (showCredit)  grandCols.push(`<td style="text-align:left;direction:ltr;white-space:nowrap;font-weight:bold;">${monFmt(grandCredit)}</td>`);
+
+  // ────────────────────────────────────────
+  // Open print window and write HTML
+  // ────────────────────────────────────────
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
@@ -3378,47 +3465,83 @@ function submitPrintJournalRange() {
     <head>
       <title>دفتر روزنامه - ${activeYear}</title>
       <style>
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
         body { font-family: '${tdF}', Tahoma, Arial, sans-serif; padding: 0; margin: 0; color: #000; background: #fff; font-size: ${tdS}; }
-        @page { size: ${pageSize} ${orientation}; margin: 12mm; }
-        .no-print { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #1e293b; color: #f8fafc; flex-wrap: wrap; }
+        @page { size: ${pageSize} ${orientation}; margin: 10mm; }
+
+        .no-print { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #1e293b; color: #f8fafc; flex-wrap: wrap; position: sticky; top: 0; z-index: 99; }
         .no-print button { border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
         .btn-pdf { background: #dc2626; color: #fff; }
         .btn-print { background: #0284c7; color: #fff; }
-        .report-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 14px; padding: 10px 14px 10px 14px; }
+
+        .report-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding: 10px 14px 10px 14px; margin-bottom: 12px; }
         .company-name { font-family: '${compF}', Tahoma; font-size: ${compS}; font-weight: bold; color: ${isBw ? '#000' : compC}; }
         .report-title { font-family: '${titleF}', Tahoma; font-size: ${titleS}; font-weight: bold; color: ${titleColor}; text-align: center; }
         .report-sub { font-size: 11px; color: #475569; text-align: center; margin-top: 3px; }
-        .main-table { width: 100%; border-collapse: collapse; margin: 0 14px; width: calc(100% - 28px); }
-        .main-table th { font-family: '${thF}', Tahoma; font-size: ${thS}; color: ${isBw ? '#000' : thC}; background-color: ${headerBg} !important; border: 1px solid ${isBw ? '#000' : '#94a3b8'}; padding: 5px 4px; text-align: center; }
-        .main-table td { font-family: '${tdF}', Tahoma; font-size: ${tdS}; color: ${isBw ? '#000' : tdC}; border: 1px solid ${isBw ? '#888' : '#cbd5e1'}; padding: 4px 5px; }
-        .main-table tr:nth-child(even) td { background-color: ${isBw ? '#f5f5f5' : '#f8fafc'}; }
-        .total-row td { font-family: '${totF}', Tahoma; font-size: ${totS}; color: ${isBw ? '#000' : totC}; background-color: ${isBw ? '#e0e0e0' : '#e2e8f0'} !important; font-weight: bold; border: 1px solid ${isBw ? '#000' : '#94a3b8'}; padding: 5px 4px; }
-        @media print { .no-print { display: none !important; } body { padding: 0; } }
+
+        .main-table { width: calc(100% - 28px); border-collapse: collapse; margin: 0 14px; }
+        .main-table thead th {
+          font-family: '${thF}', Tahoma; font-size: ${thS}; color: ${isBw ? '#000' : thC};
+          background-color: ${headerBg} !important;
+          border: 1px solid ${isBw ? '#000' : '#64748b'};
+          padding: 6px 4px; text-align: center;
+          position: sticky; top: 0;
+        }
+        .main-table td { font-family: '${tdF}', Tahoma; font-size: ${tdS}; color: ${isBw ? '#000' : tdC}; border: 1px solid ${isBw ? '#aaa' : '#cbd5e1'}; padding: 4px 5px; }
+        .article-row:nth-child(odd) td { background-color: ${isBw ? '#fff' : '#fff'}; }
+        .article-row:nth-child(even) td { background-color: ${isBw ? '#f7f7f7' : '#f8fafc'}; }
+
+        /* Subtotal row (جمع سند) */
+        .subtotal-row td {
+          font-family: '${totF}', Tahoma; font-size: ${totS}; font-weight: bold;
+          background-color: ${subTotBg} !important;
+          border: 1px solid ${isBw ? '#888' : '#93c5fd'};
+          color: ${isBw ? '#000' : '#1e40af'};
+          padding: 4px 5px;
+        }
+        /* Grand total row */
+        .grand-total-row td {
+          font-family: '${totF}', Tahoma; font-size: ${totS}; font-weight: bold;
+          background-color: ${grandBg} !important;
+          border: 2px solid ${isBw ? '#000' : '#1d4ed8'};
+          color: ${isBw ? '#000' : '#1e3a8a'};
+          padding: 6px 5px;
+        }
+        .sep-row td { border: none !important; }
+
+        @media print {
+          .no-print { display: none !important; }
+          body { padding: 0; }
+          .main-table thead th { position: static; }
+          .subtotal-row { page-break-inside: avoid; }
+        }
       </style>
     </head>
-    <body${isBw ? ' style="filter:grayscale(100%) contrast(120%);"' : ''}>
+    <body${isBw ? ' style="filter:grayscale(100%) contrast(115%);"' : ''}>
       <div class="no-print">
-        <span style="font-weight:bold;color:#38bdf8;">📒 دفتر روزنامه - ${activeYear} (${selectedSanads.length} سند)</span>
+        <span style="font-weight:bold;color:#38bdf8;">📒 دفتر روزنامه | ${activeYear} | تعداد اسناد: ${selectedSanads.length} | تعداد آرتیکل: ${rowSeq}</span>
         <button class="btn-pdf" onclick="exportJrnToPDF()">📄 ذخیره PDF</button>
         <button class="btn-print" onclick="window.print()">🖨️ چاپ</button>
       </div>
+
       <div class="report-header">
         <div>${logoHtml}</div>
         <div style="text-align:center;">
           <div class="company-name">${companyName}</div>
           <div class="report-title">دفتر روزنامه</div>
-          <div class="report-sub">سال مالی ${activeYear} &nbsp;|&nbsp; تعداد اسناد: ${selectedSanads.length}</div>
+          <div class="report-sub">سال مالی ${activeYear} &nbsp;|&nbsp; تعداد اسناد: ${numFmt(selectedSanads.length)} &nbsp;|&nbsp; تعداد آرتیکل: ${numFmt(rowSeq)}</div>
         </div>
         <div style="font-size:11px;color:#475569;text-align:left;">
-          <div>تاریخ چاپ: ${new Date().toLocaleDateString('fa-IR')}</div>
+          <div>تاریخ چاپ:</div>
+          <div>${new Date().toLocaleDateString('fa-IR')}</div>
         </div>
       </div>
+
       <table class="main-table">
-        <thead><tr>${thCols.join('')}</tr></thead>
+        <thead><tr>${thHtml}</tr></thead>
         <tbody>
-          ${rows}
-          <tr class="total-row">${totCols.join('')}</tr>
+          ${bodyHtml}
+          <tr class="grand-total-row">${grandCols.join('')}</tr>
         </tbody>
       </table>
     </body>
@@ -3433,6 +3556,7 @@ function submitPrintJournalRange() {
     setTimeout(() => { printWindow.document.title = oldTitle; }, 1000);
   };
 }
+
 
 function copyActiveVoucher() {
   if (!selectedSanadId) {
