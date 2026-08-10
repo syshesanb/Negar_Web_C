@@ -2128,6 +2128,12 @@ function printVouchers() {
   const modal = document.getElementById('printVouchersModal');
   if (!modal) return;
 
+  const currentFiscalYear = SessionState.fiscalYear || AppState.fiscalYear || '1403';
+  const titleEl = document.getElementById('printVouchersModalTitle');
+  if (titleEl) {
+    titleEl.innerHTML = `🖨️ تنظیمات و محدوده چاپ اسناد حسابداری سال جاری : ${currentFiscalYear}`;
+  }
+
   // Set default values based on current sanads database
   const sortedIds = AppState.sanads.map(s => s.id).sort((a, b) => a - b);
   const minId = sortedIds.length > 0 ? sortedIds[0] : 101;
@@ -2151,6 +2157,7 @@ function printVouchers() {
   const radioNo = document.getElementById('printRangeByNo');
   if (radioNo) radioNo.checked = true;
   togglePrintRangeInputs();
+  togglePrintFontSettingsState();
 
   modal.style.display = 'flex';
 }
@@ -2158,6 +2165,19 @@ function printVouchers() {
 function closePrintVouchersModal() {
   const modal = document.getElementById('printVouchersModal');
   if (modal) modal.style.display = 'none';
+}
+
+function togglePrintFontSettingsState() {
+  const chk = document.getElementById('printUseDefaultFonts');
+  const container = document.getElementById('printCustomFontsContainer');
+  if (!chk || !container) return;
+  if (chk.checked) {
+    container.style.opacity = '0.4';
+    container.style.pointerEvents = 'none';
+  } else {
+    container.style.opacity = '1';
+    container.style.pointerEvents = 'auto';
+  }
 }
 
 function openPrintDateCal(inputId, btnEl) {
@@ -2454,9 +2474,9 @@ function submitPrintVouchersRange() {
         </table>
 
         <!-- Independent Description Box below Total Amount line -->
-        <div style="border:1px solid #94a3b8; border-radius:6px; padding:10px 14px; margin-top:12px; margin-bottom:24px; background:#f8fafc; font-size:12px; line-height:1.6; text-align:right;">
-          <span style="font-weight:bold; color:#0f172a;">شرح سند:</span>
-          <span style="color:#1e293b; margin-right:6px;">${s.desc || ''}</span>
+        <div class="voucher-desc-box" style="border:1px solid #94a3b8; border-radius:6px; padding:10px 14px; margin-top:12px; margin-bottom:24px; background:#f8fafc; font-size:12px; line-height:1.6; text-align:right;">
+          <span style="font-weight:bold;">شرح سند:</span>
+          <span style="margin-right:6px;">${s.desc || ''}</span>
         </div>
 
         <div class="signatures">
@@ -2469,6 +2489,48 @@ function submitPrintVouchersRange() {
     `;
   }).join('<div class="page-break"></div>');
 
+  let customFontsCss = '';
+  const useDefaultFonts = document.getElementById('printUseDefaultFonts')?.checked;
+  if (!useDefaultFonts) {
+    const compFam = document.getElementById('fontCompFamily')?.value || 'Tahoma';
+    const compSz = document.getElementById('fontCompSize')?.value || '16px';
+    const compCol = document.getElementById('fontCompColor')?.value || '#0f172a';
+
+    const titleFam = document.getElementById('fontTitleFamily')?.value || 'Tahoma';
+    const titleSz = document.getElementById('fontTitleSize')?.value || '18px';
+    const titleCol = document.getElementById('fontTitleColor')?.value || '#0284c7';
+
+    const thFam = document.getElementById('fontThFamily')?.value || 'Tahoma';
+    const thSz = document.getElementById('fontThSize')?.value || '12px';
+    const thCol = document.getElementById('fontThColor')?.value || '#0f172a';
+
+    const tdFam = document.getElementById('fontTdFamily')?.value || 'Tahoma';
+    const tdSz = document.getElementById('fontTdSize')?.value || '11px';
+    const tdCol = document.getElementById('fontTdColor')?.value || '#0f172a';
+
+    const descFam = document.getElementById('fontDescFamily')?.value || 'Tahoma';
+    const descSz = document.getElementById('fontDescSize')?.value || '11px';
+    const descCol = document.getElementById('fontDescColor')?.value || '#0f172a';
+
+    const infoFam = document.getElementById('fontInfoFamily')?.value || 'Tahoma';
+    const infoSz = document.getElementById('fontInfoSize')?.value || '11px';
+    const infoCol = document.getElementById('fontInfoColor')?.value || '#0f172a';
+
+    const sigFam = document.getElementById('fontSigFamily')?.value || 'Tahoma';
+    const sigSz = document.getElementById('fontSigSize')?.value || '11px';
+    const sigCol = document.getElementById('fontSigColor')?.value || '#0f172a';
+
+    customFontsCss = `
+        .voucher-header .company-title { font-family: '${compFam}', Tahoma, sans-serif !important; font-size: ${compSz} !important; color: ${compCol} !important; }
+        .voucher-header .doc-title { font-family: '${titleFam}', Tahoma, sans-serif !important; font-size: ${titleSz} !important; color: ${titleCol} !important; }
+        .main-table th { font-family: '${thFam}', Tahoma, sans-serif !important; font-size: ${thSz} !important; color: ${thCol} !important; }
+        .main-table td { font-family: '${tdFam}', Tahoma, sans-serif !important; font-size: ${tdSz} !important; color: ${tdCol} !important; }
+        .voucher-desc-box { font-family: '${descFam}', Tahoma, sans-serif !important; font-size: ${descSz} !important; color: ${descCol} !important; }
+        .header-left.doc-info { font-family: '${infoFam}', Tahoma, sans-serif !important; font-size: ${infoSz} !important; color: ${infoCol} !important; }
+        .signatures .sig-box { font-family: '${sigFam}', Tahoma, sans-serif !important; font-size: ${sigSz} !important; color: ${sigCol} !important; }
+    `;
+  }
+
   printWindow.document.write(`
     <!DOCTYPE html>
     <html dir="rtl" lang="fa">
@@ -2477,6 +2539,7 @@ function submitPrintVouchersRange() {
       <title>پیش‌نمایش چاپ اسناد حسابداری</title>
       <style>
         @page { size: A4 portrait; margin: 15mm; }
+        ${customFontsCss}
         html, body {
           height: 100%;
           margin: 0;

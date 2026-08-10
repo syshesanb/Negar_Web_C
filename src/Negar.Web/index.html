@@ -3326,12 +3326,12 @@
 
   <!-- Modal: Print Vouchers Range Setup (پاپ‌آپ محدوده چاپ اسناد) -->
   <div id="printVouchersModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); z-index:3000; align-items:center; justify-content:center;">
-    <div class="modal-content card" style="width:780px; max-width:96vw; max-height:96vh; border:1px solid rgba(56, 189, 248, 0.4); box-shadow:0 12px 36px rgba(0,0,0,0.8); background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-radius:12px; padding:16px 20px; overflow:visible;">
+    <div class="modal-content card" style="width:900px; max-width:96vw; max-height:94vh; border:1px solid rgba(56, 189, 248, 0.4); box-shadow:0 12px 36px rgba(0,0,0,0.8); background:linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-radius:12px; padding:18px 22px; overflow-y:auto;">
       
       <!-- Modal Header -->
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:12px;">
-        <h3 style="margin:0; font-size:1.02rem; color:#38bdf8; display:flex; align-items:center; gap:8px;">
-          🖨️ تنظیمات و محدوده چاپ اسناد حسابداری
+        <h3 id="printVouchersModalTitle" style="margin:0; font-size:1.02rem; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+          🖨️ تنظیمات و محدوده چاپ اسناد حسابداری سال جاری : 1403
         </h3>
         <button type="button" class="btn btn-outline" style="padding:2px 8px; border:none; color:var(--text-muted); font-size:1.1rem; cursor:pointer;" onclick="closePrintVouchersModal()">✕</button>
       </div>
@@ -3430,7 +3430,7 @@
       </fieldset>
 
       <!-- GroupBox 3: Number Format Selection (انتخاب نوع نمایش اعداد) -->
-      <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:10px 14px; margin-bottom:14px; background:rgba(15, 23, 42, 0.6);">
+      <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:10px 14px; margin-bottom:10px; background:rgba(15, 23, 42, 0.6);">
         <legend style="color:#f8fafc; font-weight:bold; font-size:0.85rem; padding:0 8px;">انتخاب نوع نمایش اعداد</legend>
 
         <div style="display:flex; align-items:center; gap:10px;">
@@ -3439,6 +3439,204 @@
             <option value="en" style="background:#1e293b; color:#f8fafc;">نمایش اعداد بصورت انگلیسی</option>
             <option value="fa" selected style="background:#1e293b; color:#f8fafc;">نمایش اعداد بصورت فارسی</option>
           </select>
+        </div>
+      </fieldset>
+
+      <!-- GroupBox 4: Font Settings (تنظیم فونت قسمتهای مختلف گزارش) -->
+      <fieldset style="border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:12px 14px; margin-bottom:16px; background:rgba(15, 23, 42, 0.6);">
+        <legend style="color:#f8fafc; font-weight:bold; font-size:0.85rem; padding:0 8px;">تنظیم فونت قسمتهای مختلف گزارش</legend>
+
+        <!-- Default Fonts Checkbox -->
+        <div style="margin-bottom:12px;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color:#38bdf8; font-size:0.85rem;">
+            <input type="checkbox" id="printUseDefaultFonts" checked onchange="togglePrintFontSettingsState()">
+            <span>استفاده از فونت‌های پیش‌فرض در گزارش</span>
+          </label>
+        </div>
+
+        <!-- Custom Fonts Controls Container -->
+        <div id="printCustomFontsContainer" style="display:flex; flex-direction:column; gap:8px; opacity:0.4; pointer-events:none; transition:opacity 0.2s ease;">
+          
+          <!-- Header Labels Row -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; font-weight:bold; font-size:0.78rem; color:var(--text-muted); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;">
+            <span>بخش مربوطه در گزارش</span>
+            <span>نام فونت</span>
+            <span>سایز فونت</span>
+            <span style="text-align:center;">رنگ</span>
+          </div>
+
+          <!-- 1. Company Name Font -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت نام شرکت:</span>
+            <select id="fontCompFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontCompSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="12px">12 px</option>
+              <option value="14px">14 px</option>
+              <option value="16px" selected>16 px</option>
+              <option value="18px">18 px</option>
+              <option value="20px">20 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontCompColor" value="#0f172a" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ نام شرکت" />
+            </div>
+          </div>
+
+          <!-- 2. Report Title Font -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت عنوان گزارش (سند حسابداری):</span>
+            <select id="fontTitleFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontTitleSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="14px">14 px</option>
+              <option value="16px">16 px</option>
+              <option value="18px" selected>18 px</option>
+              <option value="20px">20 px</option>
+              <option value="22px">22 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontTitleColor" value="#0284c7" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ عنوان گزارش" />
+            </div>
+          </div>
+
+          <!-- 3. Table Header Columns Font -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت عنوان سر ستونها:</span>
+            <select id="fontThFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontThSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="10px">10 px</option>
+              <option value="11px">11 px</option>
+              <option value="12px" selected>12 px</option>
+              <option value="13px">13 px</option>
+              <option value="14px">14 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontThColor" value="#0f172a" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ سر ستون‌ها" />
+            </div>
+          </div>
+
+          <!-- 4. Table Row Data Cells Font -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت ردیف‌های دفتر:</span>
+            <select id="fontTdFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontTdSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="9px">9 px</option>
+              <option value="10px">10 px</option>
+              <option value="11px" selected>11 px</option>
+              <option value="12px">12 px</option>
+              <option value="13px">13 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontTdColor" value="#0f172a" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ ردیف‌های دفتر" />
+            </div>
+          </div>
+
+          <!-- 5. Voucher Description Font -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت شرح سند:</span>
+            <select id="fontDescFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontDescSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="10px">10 px</option>
+              <option value="11px" selected>11 px</option>
+              <option value="12px">12 px</option>
+              <option value="13px">13 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontDescColor" value="#0f172a" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ شرح سند" />
+            </div>
+          </div>
+
+          <!-- 6. Doc Info Font (شماره سند، تاریخ، وضعیت، صفحه) -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت مشخصات (شماره سند، تاریخ، وضعیت، صفحه):</span>
+            <select id="fontInfoFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontInfoSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="10px">10 px</option>
+              <option value="11px" selected>11 px</option>
+              <option value="12px">12 px</option>
+              <option value="13px">13 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontInfoColor" value="#0f172a" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ مشخصات سند" />
+            </div>
+          </div>
+
+          <!-- 7. Signatures Font -->
+          <div style="display:grid; grid-template-columns: 240px 1fr 110px 60px; gap:10px; align-items:center;">
+            <span style="font-size:0.8rem; color:#f1f5f9;">فونت امضاء کنندگان:</span>
+            <select id="fontSigFamily" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="Tahoma" selected>Tahoma</option>
+              <option value="IRANSans">IRANSans</option>
+              <option value="Vazirmatn">Vazirmatn</option>
+              <option value="B Nazanin">B Nazanin</option>
+              <option value="B Yekan">B Yekan</option>
+              <option value="Sahel">Sahel</option>
+              <option value="Mitra">Mitra</option>
+              <option value="Arial">Arial</option>
+            </select>
+            <select id="fontSigSize" class="form-select" style="height:28px; font-size:0.8rem; background:#1e293b; color:#f8fafc; border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:2px 6px;">
+              <option value="10px">10 px</option>
+              <option value="11px" selected>11 px</option>
+              <option value="12px">12 px</option>
+              <option value="13px">13 px</option>
+            </select>
+            <div style="display:flex; justify-content:center;">
+              <input type="color" id="fontSigColor" value="#0f172a" style="width:34px; height:26px; border:1px solid #475569; border-radius:4px; background:transparent; cursor:pointer;" title="رنگ امضاء کنندگان" />
+            </div>
+          </div>
+
         </div>
       </fieldset>
 
