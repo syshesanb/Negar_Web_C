@@ -5282,6 +5282,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Mark as tab mode & set window name for target resolution
     AppState.isTabMode = true;
     window.name = 'negar_tab_' + formParam;
+    
+    // Collapse right sidebar and close flyout panel so controls take 100% full screen width!
+    toggleAppSidebar(true);
+    closeModuleFlyoutPanel();
 
     // 2. Bypass login overlay
     const overlay = document.getElementById('loginOverlay');
