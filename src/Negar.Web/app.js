@@ -707,6 +707,8 @@ function showForm(formId) {
 
   if (formId !== 'form-hesabdari-main') {
     document.body.classList.remove('accounts-mode');
+  } else {
+    document.body.classList.add('accounts-mode');
   }
   document.querySelectorAll('.tiles-container').forEach(t => {
     t.classList.remove('active');
@@ -818,20 +820,20 @@ function switchHesabdariTab(tabId) {
     }
   });
 
-  // 2. Update sub-tab panels (all panels use uniform 100% full-width block layout)
+  // 2. Update sub-tab panels
   const panels = document.querySelectorAll('.hesabdari-tab-panel');
   panels.forEach(panel => {
     if (panel.id === 'tab-panel-' + tabId) {
       panel.classList.add('active');
-      panel.style.display = 'block';
+      panel.style.display = '';
     } else {
       panel.classList.remove('active');
       panel.style.display = 'none';
     }
   });
 
-  // Ensure body is free of flex constraints so all tabs have identical 100% full-width layout
-  document.body.classList.remove('accounts-mode');
+  // Keep accounts-mode active on body so all tabs have sticky headers and inner datagrid scroll
+  document.body.classList.add('accounts-mode');
 
   // 3. Render dynamic content for specific tab
   if (tabId === 'accounts') renderAccountsTable();
