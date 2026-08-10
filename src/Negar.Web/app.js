@@ -2601,7 +2601,7 @@ function submitPrintVouchersRange() {
         .doc-title { font-size: 18px; font-weight: bold; color: #0284c7; }
         .main-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 12px; margin-bottom: 20px; }
         .main-table th, .main-table td { border: 1px solid #94a3b8; padding: 5px 3px; text-align: right; word-wrap: break-word; overflow-wrap: break-word; }
-        .main-table th { background-color: #f1f5f9; font-weight: bold; text-align: center !important; }
+        .main-table th { background-color: #e2e8f0 !important; font-weight: bold; text-align: center !important; }
         .main-table td:nth-child(5), .main-table td:nth-child(6), .main-table td:nth-child(7) { white-space: nowrap !important; text-align: right; direction: ltr; font-size: 11px; }
         .signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 10px; }
         .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
