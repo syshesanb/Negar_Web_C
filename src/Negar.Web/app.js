@@ -2430,12 +2430,36 @@ function submitPrintVouchersRange() {
       <meta charset="UTF-8">
       <title>پیش‌نمایش چاپ اسناد حسابداری</title>
       <style>
-        @page { size: A4; margin: 15mm; }
-        body { font-family: Tahoma, 'IRANSans', Arial, sans-serif; padding: 20px; color: #0f172a; background: #fff; font-size: 12px; line-height: 1.5; }
-        .no-print-bar { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
-        .no-print-btn { background: #0284c7; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 14px; }
-        .no-print-btn:hover { background: #0369a1; }
-        .voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; }
+        @page { size: A4 portrait; margin: 15mm; }
+        body { font-family: Tahoma, 'IRANSans', Arial, sans-serif; padding: 20px; color: #0f172a; background: #e2e8f0; font-size: 12px; line-height: 1.5; }
+        .no-print-bar {
+          background: #0f172a;
+          color: #fff;
+          padding: 12px 18px;
+          border-radius: 10px;
+          margin-bottom: 24px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .toolbar-title { font-size: 14px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 6px; }
+        .toolbar-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .toolbar-group { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .toolbar-group label { color: #cbd5e1; white-space: nowrap; }
+        .toolbar-select { background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 6px; padding: 5px 8px; font-size: 12px; font-family: inherit; cursor: pointer; }
+        .toolbar-select:focus { border-color: #38bdf8; outline: none; }
+        .no-print-btn { border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: 12px; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .print-btn { background: #0284c7; color: #fff; }
+        .print-btn:hover { background: #0369a1; }
+        .pdf-btn { background: #dc2626; color: #fff; }
+        .pdf-btn:hover { background: #b91c1c; }
+        .word-btn { background: #2563eb; color: #fff; }
+        .word-btn:hover { background: #1d4ed8; }
+        
+        .voucher-page { border: 1px solid #cbd5e1; border-radius: 8px; padding: 24px; margin-bottom: 30px; background: #fff; page-break-inside: avoid; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .voucher-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px; }
         .header-right { width: 30%; display: flex; align-items: center; justify-content: flex-start; }
         .header-center { width: 40%; text-align: center; }
@@ -2449,19 +2473,123 @@ function submitPrintVouchersRange() {
         .signatures { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 10px; }
         .sig-box { text-align: center; width: 22%; border-top: 1px solid #0f172a; padding-top: 6px; font-weight: bold; font-size: 11px; }
         .page-break { page-break-after: always; height: 0; }
+        
         @media print {
           .no-print-bar { display: none !important; }
           body { padding: 0; background: #fff; }
-          .voucher-page { border: none; padding: 0; margin-bottom: 0; }
+          .voucher-page { border: none; padding: 0; margin-bottom: 0; box-shadow: none; }
         }
       </style>
     </head>
     <body>
       <div class="no-print-bar">
-        <span>🖨️ پیش‌نمایش چاپ ${selectedVouchers.length} سند حسابداری انتخاب‌شده</span>
-        <button class="no-print-btn" onclick="window.print()">🖨️ تایید و چاپ اسناد</button>
+        <div class="toolbar-title">
+          🖨️ پیش‌نمایش چاپ ${selectedVouchers.length} سند حسابداری انتخاب‌شده
+        </div>
+
+        <div class="toolbar-controls">
+          <!-- Paper Settings -->
+          <div class="toolbar-group">
+            <label>📐 کاغذ:</label>
+            <select id="pageSizeSelect" class="toolbar-select" onchange="changePageSize(this.value)">
+              <option value="A4" selected>A4</option>
+              <option value="A5">A5</option>
+              <option value="Letter">Letter</option>
+            </select>
+          </div>
+
+          <div class="toolbar-group">
+            <label>🔄 جهت:</label>
+            <select id="pageOrientationSelect" class="toolbar-select" onchange="changePageOrientation(this.value)">
+              <option value="portrait" selected>عمودی</option>
+              <option value="landscape">افقی</option>
+            </select>
+          </div>
+
+          <div class="toolbar-group">
+            <label>📏 حاشیه:</label>
+            <select id="pageMarginSelect" class="toolbar-select" onchange="changePageMargin(this.value)">
+              <option value="normal" selected>عادی</option>
+              <option value="narrow">باریک</option>
+              <option value="zero">بدون حاشیه</option>
+            </select>
+          </div>
+
+          <!-- Exports & Print -->
+          <button class="no-print-btn word-btn" onclick="exportToWord()">📝 خروجی Word</button>
+          <button class="no-print-btn pdf-btn" onclick="exportToPDF()">📄 ذخیره به صورت PDF</button>
+          <button class="no-print-btn print-btn" onclick="window.print()">🖨️ تنظیمات چاپگر و چاپ</button>
+        </div>
       </div>
-      ${vouchersHtml}
+
+      <div id="printableArea">
+        ${vouchersHtml}
+      </div>
+
+      <script>
+        function changePageSize(size) {
+          let styleEl = document.getElementById('dynamicPageStyle');
+          if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'dynamicPageStyle';
+            document.head.appendChild(styleEl);
+          }
+          const orientation = document.getElementById('pageOrientationSelect')?.value || 'portrait';
+          const margin = document.getElementById('pageMarginSelect')?.value || 'normal';
+          
+          let marginVal = '15mm';
+          if (margin === 'narrow') marginVal = '5mm';
+          if (margin === 'zero') marginVal = '0mm';
+
+          styleEl.innerHTML = '@page { size: ' + size + ' ' + orientation + '; margin: ' + marginVal + '; }';
+        }
+
+        function changePageOrientation(orientation) {
+          const size = document.getElementById('pageSizeSelect')?.value || 'A4';
+          changePageSize(size);
+        }
+
+        function changePageMargin(margin) {
+          const size = document.getElementById('pageSizeSelect')?.value || 'A4';
+          changePageSize(size);
+        }
+
+        function exportToPDF() {
+          const oldTitle = document.title;
+          document.title = 'اسناد_حسابداری_' + new Date().toISOString().slice(0, 10);
+          window.print();
+          setTimeout(() => { document.title = oldTitle; }, 1000);
+        }
+
+        function exportToWord() {
+          const content = document.getElementById('printableArea').innerHTML;
+          const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40' dir='rtl'>" +
+            "<head><meta charset='utf-8'><title>اسناد حسابداری</title>" +
+            "<style>" +
+            "body { font-family: Tahoma, Arial, sans-serif; direction: rtl; padding: 20px; }" +
+            "table { border-collapse: collapse; width: 100%; margin-top: 15px; margin-bottom: 20px; }" +
+            "th, td { border: 1px solid #333; padding: 8px; text-align: right; }" +
+            "th { background-color: #f1f5f9; font-weight: bold; }" +
+            ".signatures { display: flex; justify-content: space-between; margin-top: 30px; }" +
+            ".sig-box { text-align: center; width: 22%; border-top: 1px solid #000; padding-top: 5px; }" +
+            "</style></head><body>";
+          const footer = "</body></html>";
+          const sourceHTML = header + content + footer;
+
+          const blob = new Blob(['\\ufeff' + sourceHTML], {
+            type: 'application/msword'
+          });
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'اسناد_حسابداری.doc';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      </script>
     </body>
     </html>
   `);
