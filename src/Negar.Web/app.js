@@ -658,6 +658,10 @@ function showTiles(moduleId) {
   const formsArea = document.getElementById('formsArea');
   if (formsArea) formsArea.style.display = 'none';
 
+  // Show background branding watermark when no form is open
+  const watermark = document.getElementById('negarMainWatermark');
+  if (watermark) watermark.style.display = 'flex';
+
   // Hide all tile containers
   document.querySelectorAll('.tiles-container').forEach(t => {
     t.classList.remove('active');
@@ -708,6 +712,10 @@ function showForm(formId) {
     t.classList.remove('active');
     t.style.display = 'none';
   });
+
+  // Hide background branding watermark when a form is opened
+  const watermark = document.getElementById('negarMainWatermark');
+  if (watermark) watermark.style.display = 'none';
 
   // Show forms area
   const formsArea = document.getElementById('formsArea');

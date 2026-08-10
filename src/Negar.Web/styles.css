@@ -479,9 +479,102 @@ html, body {
   margin: 0;
 }
 
-/* ── Tiles Container ── */
-.tiles-container { display: none; }
-.tiles-container.active { display: block; }
+/* ── Tiles Container (Hidden from main background, used only as menu templates) ── */
+.tiles-container,
+.tiles-container.active {
+  display: none !important;
+}
+
+/* ── Main Workspace Negar Watermark Branding (واترمارک پرده روشن نگار در پس‌زمینه) ── */
+.negar-main-watermark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  width: 100%;
+  user-select: none;
+  pointer-events: none;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.watermark-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: watermarkFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes watermarkFadeIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.watermark-logo-badge {
+  width: 120px;
+  height: 120px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(30, 41, 59, 0.4) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.watermark-icon {
+  font-size: 3.6rem;
+  filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.35));
+  opacity: 0.9;
+}
+
+.watermark-title {
+  font-size: 4.2rem;
+  font-weight: 900;
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(148, 163, 184, 0.12) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.3));
+}
+
+.watermark-divider {
+  width: 160px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.35) 50%, transparent 100%);
+  margin: 6px 0;
+}
+
+.watermark-subtitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: rgba(148, 163, 184, 0.35);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.watermark-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: rgba(56, 189, 248, 0.35);
+  text-transform: uppercase;
+  margin-top: 14px;
+  padding: 6px 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  background: rgba(56, 189, 248, 0.04);
+}
 
 .page-title {
   font-size: 1.3rem;
