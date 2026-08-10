@@ -4993,62 +4993,109 @@ const SessionState = {
   year:    null    // currently active year string
 };
 
+let selectedCompanyCodeForSwitch = null;
+let selectedYearForSwitch = null;
+
 function renderSwitchCompanyForm() {
-  const compSel = document.getElementById('switchCompany');
-  if (!compSel) return;
+  const companyGridBody = document.getElementById('switchCompanyGridBody');
+  if (!companyGridBody) return;
 
-  // Build company dropdown
-  compSel.innerHTML = AppState.companies.map(c =>
-    `<option value="${c.code}" ${SessionState.company && SessionState.company.code === c.code ? 'selected' : ''}>${c.name} (${c.code})</option>`
-  ).join('');
+  // Default to currently active company or first available company
+  if (!selectedCompanyCodeForSwitch) {
+    selectedCompanyCodeForSwitch = SessionState.company ? SessionState.company.code : (AppState.companies[0]?.code || '');
+  }
 
-  refreshSwitchYearList();
+  // Render Right Side DataGrid: Companies
+  companyGridBody.innerHTML = AppState.companies.map(c => {
+    const isSelected = c.code === selectedCompanyCodeForSwitch;
+    const activeStyle = isSelected ? 'background:rgba(2, 132, 199, 0.3); font-weight:bold; border-right:4px solid var(--accent-color);' : '';
+    return `
+      <tr style="cursor:pointer; ${activeStyle}" onclick="selectCompanyForSwitch('${c.code}')">
+        <td style="text-align:center;">${c.code}</td>
+        <td>${c.name}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Render Left Side DataGrid: Fiscal Years for selected company
+  renderSwitchYearGrid();
 }
 
-function refreshSwitchYearList() {
-  const compSel = document.getElementById('switchCompany');
-  const yearSel = document.getElementById('switchYear');
-  if (!compSel || !yearSel) return;
+function selectCompanyForSwitch(companyCode) {
+  selectedCompanyCodeForSwitch = companyCode;
+  selectedYearForSwitch = null; // Reset year selection so default active year for new company is loaded
+  renderSwitchCompanyForm();
+}
 
-  const selectedCode = compSel.value;
+function renderSwitchYearGrid() {
+  const yearGridBody = document.getElementById('switchYearGridBody');
+  if (!yearGridBody) return;
+
   const years = AppState.fiscalYears
-    .filter(fy => fy.company === selectedCode)
+    .filter(fy => fy.company === selectedCompanyCodeForSwitch)
     .sort((a, b) => Number(b.year) - Number(a.year));
 
   if (years.length === 0) {
-    yearSel.innerHTML = '<option value="">-- سال مالی تعریف نشده --</option>';
-  } else {
-    yearSel.innerHTML = years.map(fy =>
-      `<option value="${fy.year}" ${SessionState.year === fy.year ? 'selected' : ''}>${fy.year} (${fy.status})</option>`
-    ).join('');
+    yearGridBody.innerHTML = `
+      <tr>
+        <td colspan="2" style="text-align:center; color:var(--text-muted); padding:16px;">
+          -- سال مالی برای این شرکت تعریف نشده است --
+        </td>
+      </tr>
+    `;
+    selectedYearForSwitch = null;
+    return;
   }
+
+  // Default to active year or first year in list
+  if (!selectedYearForSwitch) {
+    const activeOne = years.find(fy => fy.status === 'فعال') || years[0];
+    selectedYearForSwitch = activeOne ? activeOne.year : '';
+  }
+
+  // Render Left Side DataGrid: Fiscal Years
+  yearGridBody.innerHTML = years.map(fy => {
+    const isSelected = fy.year === selectedYearForSwitch;
+    const activeStyle = isSelected ? 'background:rgba(2, 132, 199, 0.3); font-weight:bold; border-right:4px solid var(--accent-color);' : '';
+    const statusColor = fy.status === 'فعال' ? 'color:var(--success-color);' : 'color:var(--text-muted);';
+    return `
+      <tr style="cursor:pointer; ${activeStyle}" onclick="selectYearForSwitch('${fy.year}')">
+        <td style="text-align:center;">${fy.year}</td>
+        <td style="text-align:center; ${statusColor}">${fy.status}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function selectYearForSwitch(year) {
+  selectedYearForSwitch = year;
+  renderSwitchYearGrid();
 }
 
 function applyCompanySwitch() {
-  const compSel = document.getElementById('switchCompany');
-  const yearSel = document.getElementById('switchYear');
-  if (!compSel || !yearSel) return;
+  if (!selectedCompanyCodeForSwitch) {
+    alert('لطفاً یک شرکت را از دیتاگرید سمت راست انتخاب کنید.');
+    return;
+  }
+  if (!selectedYearForSwitch) {
+    alert('لطفاً یک سال مالی را از دیتاگرید سمت چپ انتخاب کنید.');
+    return;
+  }
 
-  const selectedCode = compSel.value;
-  const selectedYear = yearSel.value;
-
-  if (!selectedCode) { alert('لطفاً یک شرکت انتخاب کنید.'); return; }
-  if (!selectedYear) { alert('برای این شرکت هیچ سال مالی تعریف نشده است. ابتدا سال مالی اضافه کنید.'); return; }
-
-  const company = AppState.companies.find(c => c.code === selectedCode);
+  const company = AppState.companies.find(c => c.code === selectedCompanyCodeForSwitch);
   if (!company) return;
 
   // Update session
   switchActiveCompany(company);
-  SessionState.year    = selectedYear;
+  SessionState.year = selectedYearForSwitch;
 
-  // Update header
+  // Update header and status bar
   updateHeaderBar();
 
-  // Feedback
-  alert(`✅ تغییر با موفقیت اعمال شد.\n\nشرکت فعال: ${company.name}\nسال مالی فعال: ${selectedYear}`);
+  // Feedback toast
+  alert(`✅ شرکت و سال مالی با موفقیت انتخاب شد.\n\nشرکت فعال: ${company.name}\nسال مالی فعال: ${selectedYearForSwitch}`);
 
-  // Go back to tiles
+  // Go to main tiles
   goBack();
 }
 
