@@ -4630,16 +4630,15 @@ function clearCompLogo() {
 }
 
 function openCompanyForm(companyId) {
-  const panel = document.getElementById('companyFormPanel');
+  const modal = document.getElementById('companyModalOverlay');
   const title = document.getElementById('companyFormTitle');
-  if (!panel) return;
+  if (!modal) return;
 
-  // Scroll the inline form into view
-  panel.style.display = 'block';
+  modal.style.display = 'flex';
 
   if (companyId === null) {
     // NEW company mode
-    title.textContent = '➕ تعریف شرکت جدید';
+    title.textContent = '🏢 تعریف شرکت جدید';
     document.getElementById('editingCompanyId').value = '';
     document.getElementById('compCode').value = '';
     document.getElementById('compName').value = '';
@@ -4654,33 +4653,28 @@ function openCompanyForm(companyId) {
     document.getElementById('compActiveYear').value = '1403';
     
     // New fields:
-    document.getElementById('compLegalType').value = 'سهامی خاص';
-    document.getElementById('compRegNo').value = '';
-    document.getElementById('compNationalId').value = '';
-    document.getElementById('compRegDate').value = '';
-    document.getElementById('compActivity').value = '';
-    document.getElementById('compFactoryAddress').value = '';
-    document.getElementById('compBankName').value = '';
-    document.getElementById('compBankAccount').value = '';
-    document.getElementById('compBankShiba').value = '';
-    document.getElementById('compBankCard').value = '';
-    document.getElementById('compCurrency').value = 'ریال';
-    document.getElementById('compModyanUniqueId').value = '';
-    document.getElementById('compInsuranceCode').value = '';
-    document.getElementById('compVatRate').value = '10';
-    document.getElementById('compModyanPrivateKey').value = '';
-    document.getElementById('compLicenseNo').value = '';
-    document.getElementById('compLicenseExpiry').value = '';
-    document.getElementById('compShenaseSenfi').value = '';
-    document.getElementById('compCEO').value = '';
-    document.getElementById('compCeoNationalId').value = '';
-    document.getElementById('compCeoPhone').value = '';
-    document.getElementById('compAuthorizedSignatories').value = '';
+    if (document.getElementById('compLegalType')) document.getElementById('compLegalType').value = 'سهامی خاص';
+    if (document.getElementById('compRegNo')) document.getElementById('compRegNo').value = '';
+    if (document.getElementById('compNationalId')) document.getElementById('compNationalId').value = '';
+    if (document.getElementById('compRegDate')) document.getElementById('compRegDate').value = '';
+    if (document.getElementById('compActivity')) document.getElementById('compActivity').value = '';
+    if (document.getElementById('compFactoryAddress')) document.getElementById('compFactoryAddress').value = '';
+    if (document.getElementById('compCurrency')) document.getElementById('compCurrency').value = 'ریال';
+    if (document.getElementById('compModyanUniqueId')) document.getElementById('compModyanUniqueId').value = '';
+    if (document.getElementById('compInsuranceCode')) document.getElementById('compInsuranceCode').value = '';
+    if (document.getElementById('compVatRate')) document.getElementById('compVatRate').value = '10';
+    if (document.getElementById('compModyanPrivateKey')) document.getElementById('compModyanPrivateKey').value = '';
+    if (document.getElementById('compLicenseNo')) document.getElementById('compLicenseNo').value = '';
+    if (document.getElementById('compLicenseExpiry')) document.getElementById('compLicenseExpiry').value = '';
+    if (document.getElementById('compShenaseSenfi')) document.getElementById('compShenaseSenfi').value = '';
+    if (document.getElementById('compCEO')) document.getElementById('compCEO').value = '';
+    if (document.getElementById('compCeoNationalId')) document.getElementById('compCeoNationalId').value = '';
+    if (document.getElementById('compCeoPhone')) document.getElementById('compCeoPhone').value = '';
   } else {
     // EDIT mode: load existing data
     const company = AppState.companies.find(c => c.id === companyId);
     if (!company) return;
-    title.textContent = `✏️ ویرایش شرکت: ${company.name}`;
+    title.textContent = `✏️ ویرایش مشخصات شرکت: ${company.name}`;
     document.getElementById('editingCompanyId').value = company.id;
     document.getElementById('compCode').value = company.code;
     document.getElementById('compName').value = company.name;
@@ -4695,41 +4689,34 @@ function openCompanyForm(companyId) {
     document.getElementById('compActiveYear').value = company.activeYear || '1403';
 
     // New fields:
-    document.getElementById('compLegalType').value = company.legalType || 'سهامی خاص';
-    document.getElementById('compRegNo').value = company.regNo || '';
-    document.getElementById('compNationalId').value = company.nationalId || '';
-    document.getElementById('compRegDate').value = company.regDate || '';
-    document.getElementById('compActivity').value = company.activity || '';
-    document.getElementById('compFactoryAddress').value = company.factoryAddress || '';
-    document.getElementById('compBankName').value = company.bankName || '';
-    document.getElementById('compBankAccount').value = company.bankAccount || '';
-    document.getElementById('compBankShiba').value = company.bankShiba || '';
-    document.getElementById('compBankCard').value = company.bankCard || '';
-    document.getElementById('compCurrency').value = company.currency || 'ریال';
-    document.getElementById('compModyanUniqueId').value = company.modyanUniqueId || '';
-    document.getElementById('compInsuranceCode').value = company.insuranceCode || '';
-    document.getElementById('compVatRate').value = company.vatRate || '10';
-    document.getElementById('compModyanPrivateKey').value = company.modyanPrivateKey || '';
-    document.getElementById('compLicenseNo').value = company.licenseNo || '';
-    document.getElementById('compLicenseExpiry').value = company.licenseExpiry || '';
-    document.getElementById('compShenaseSenfi').value = company.shenaseSenfi || '';
-    document.getElementById('compCEO').value = company.ceo || '';
-    document.getElementById('compCeoNationalId').value = company.ceoNationalId || '';
-    document.getElementById('compCeoPhone').value = company.ceoPhone || '';
-    document.getElementById('compAuthorizedSignatories').value = company.authorizedSignatories || '';
+    if (document.getElementById('compLegalType')) document.getElementById('compLegalType').value = company.legalType || 'سهامی خاص';
+    if (document.getElementById('compRegNo')) document.getElementById('compRegNo').value = company.regNo || '';
+    if (document.getElementById('compNationalId')) document.getElementById('compNationalId').value = company.nationalId || '';
+    if (document.getElementById('compRegDate')) document.getElementById('compRegDate').value = company.regDate || '';
+    if (document.getElementById('compActivity')) document.getElementById('compActivity').value = company.activity || '';
+    if (document.getElementById('compFactoryAddress')) document.getElementById('compFactoryAddress').value = company.factoryAddress || '';
+    if (document.getElementById('compCurrency')) document.getElementById('compCurrency').value = company.currency || 'ریال';
+    if (document.getElementById('compModyanUniqueId')) document.getElementById('compModyanUniqueId').value = company.modyanUniqueId || '';
+    if (document.getElementById('compInsuranceCode')) document.getElementById('compInsuranceCode').value = company.insuranceCode || '';
+    if (document.getElementById('compVatRate')) document.getElementById('compVatRate').value = company.vatRate || '10';
+    if (document.getElementById('compModyanPrivateKey')) document.getElementById('compModyanPrivateKey').value = company.modyanPrivateKey || '';
+    if (document.getElementById('compLicenseNo')) document.getElementById('compLicenseNo').value = company.licenseNo || '';
+    if (document.getElementById('compLicenseExpiry')) document.getElementById('compLicenseExpiry').value = company.licenseExpiry || '';
+    if (document.getElementById('compShenaseSenfi')) document.getElementById('compShenaseSenfi').value = company.shenaseSenfi || '';
+    if (document.getElementById('compCEO')) document.getElementById('compCEO').value = company.ceo || '';
+    if (document.getElementById('compCeoNationalId')) document.getElementById('compCeoNationalId').value = company.ceoNationalId || '';
+    if (document.getElementById('compCeoPhone')) document.getElementById('compCeoPhone').value = company.ceoPhone || '';
   }
 
   // Reset active tab to General when opening
   switchCompanyFormTab('general');
 
-  // Scroll panel into view smoothly
-  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-  document.getElementById('compCode').focus();
+  setTimeout(() => document.getElementById('compCode')?.focus(), 100);
 }
 
 function closeCompanyForm() {
-  const panel = document.getElementById('companyFormPanel');
-  if (panel) panel.style.display = 'none';
+  const modal = document.getElementById('companyModalOverlay');
+  if (modal) modal.style.display = 'none';
 }
 
 function saveCompany() {
