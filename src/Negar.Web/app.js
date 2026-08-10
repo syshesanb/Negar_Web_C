@@ -4868,9 +4868,9 @@ function renderFiscalYearsTable() {
 }
 
 function openFiscalYearForm(fiscalYearId) {
-  const panel = document.getElementById('fiscalYearFormPanel');
+  const modal = document.getElementById('fiscalYearModalOverlay');
   const title = document.getElementById('fiscalYearFormTitle');
-  if (!panel) return;
+  if (!modal) return;
 
   // Refresh company dropdown from AppState
   const select = document.getElementById('fyCompany');
@@ -4880,16 +4880,17 @@ function openFiscalYearForm(fiscalYearId) {
     ).join('');
   }
 
-  panel.style.display = 'block';
+  modal.style.display = 'flex';
 
   if (fiscalYearId === null) {
     // NEW mode
-    title.textContent = '➕ تعریف سال مالی جدید';
+    title.textContent = '📅 تعریف سال مالی جدید';
     document.getElementById('editingFiscalYearId').value = '';
     document.getElementById('fyYear').value = '';
     document.getElementById('fyStartDate').value = '';
     document.getElementById('fyEndDate').value = '';
     document.getElementById('fyNotes').value = '';
+    if (document.getElementById('fyStatus')) document.getElementById('fyStatus').value = 'فعال';
     if (select && AppState.companies.length > 0) {
       select.value = AppState.companies[0].code;
     }
@@ -4903,16 +4904,16 @@ function openFiscalYearForm(fiscalYearId) {
     document.getElementById('fyStartDate').value = fy.startDate;
     document.getElementById('fyEndDate').value = fy.endDate;
     document.getElementById('fyNotes').value = fy.notes || '';
+    if (document.getElementById('fyStatus')) document.getElementById('fyStatus').value = fy.status || 'فعال';
     if (select) select.value = fy.company;
   }
 
-  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-  document.getElementById('fyYear').focus();
+  setTimeout(() => document.getElementById('fyYear')?.focus(), 100);
 }
 
 function closeFiscalYearForm() {
-  const panel = document.getElementById('fiscalYearFormPanel');
-  if (panel) panel.style.display = 'none';
+  const modal = document.getElementById('fiscalYearModalOverlay');
+  if (modal) modal.style.display = 'none';
 }
 
 function saveFiscalYear() {

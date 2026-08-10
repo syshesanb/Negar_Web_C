@@ -1077,10 +1077,29 @@
               </table>
             </div>
 
-            <!-- Inline Add / Edit Fiscal Year Form -->
-            <div id="fiscalYearFormPanel" style="display:none;" class="inline-form">
-              <h4 id="fiscalYearFormTitle">تعریف سال مالی جدید</h4>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- POPUP MODAL: DEFINITION & EDIT FISCAL YEAR   -->
+        <!-- ============================================ -->
+        <div id="fiscalYearModalOverlay" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.8); backdrop-filter:blur(5px); z-index:3000; align-items:center; justify-content:center;">
+          <div class="card form-card" style="max-width:750px; width:92%; max-height:90vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border-radius:12px; box-shadow:0 16px 48px rgba(0,0,0,0.6); background:var(--bg-card); border:1px solid var(--border-color);">
+            
+            <!-- Modal Header -->
+            <div style="padding:16px 24px; background:var(--bg-secondary); border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <h3 id="fiscalYearFormTitle" style="margin:0; font-size:1.15rem; color:var(--accent-color); font-weight:bold; display:flex; align-items:center; gap:8px;">
+                📅 تعریف سال مالی جدید
+              </h3>
+              <button type="button" onclick="closeFiscalYearForm()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; line-height:1; transition:color 0.2s;" onmouseover="this.style.color='var(--danger-color)'" onmouseout="this.style.color='var(--text-muted)'">
+                ✖
+              </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div style="padding:20px 24px; overflow-y:auto; flex:1;">
               <input type="hidden" id="editingFiscalYearId" value="" />
+              
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">سال مالی: *</label>
@@ -1100,6 +1119,9 @@
                     <button class="date-picker-btn" type="button" onclick="PersianCal.open('fyEndDate', this)" title="انتخاب از تقویم">...</button>
                   </div>
                 </div>
+              </div>
+
+              <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">شرکت مربوطه:</label>
                   <select id="fyCompany" class="form-select">
@@ -1109,8 +1131,8 @@
                 <div class="form-group">
                   <label class="form-label">وضعیت سال مالی: *</label>
                   <select id="fyStatus" class="form-select">
-                    <option value="باز">باز (Open - 🔓)</option>
-                    <option value="بسته شده">بسته شده (Closed - 🔒)</option>
+                    <option value="فعال">فعال (Active - 🟢)</option>
+                    <option value="بسته">بسته شده (Closed - 🔒)</option>
                     <option value="تعلیق شده">تعلیق شده (Suspended - ⚠️)</option>
                     <option value="حسابرسی شده">حسابرسی شده (Audited - 🛡️)</option>
                     <option value="شبیه سازی">شبیه‌سازی (Simulation - 🧪)</option>
@@ -1118,15 +1140,19 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group">
+
+              <div class="form-group" style="margin-top:12px;">
                 <label class="form-label">توضیحات سال مالی:</label>
                 <input type="text" id="fyNotes" class="form-input" placeholder="توضیحات اختیاری..." />
               </div>
-              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-                <button class="btn btn-outline" onclick="closeFiscalYearForm()">انصراف</button>
-                <button class="btn btn-primary" onclick="saveFiscalYear()">💾 ذخیره سال مالی</button>
-              </div>
             </div>
+
+            <!-- Modal Footer -->
+            <div style="padding:14px 24px; background:var(--bg-secondary); border-top:1px solid var(--border-color); display:flex; gap:12px; justify-content:flex-end; align-items:center;">
+              <button type="button" class="btn btn-outline" onclick="closeFiscalYearForm()" style="padding:8px 20px;">❌ انصراف</button>
+              <button type="button" class="btn btn-primary" onclick="saveFiscalYear()" style="padding:8px 26px; font-weight:bold;">💾 ذخیره سال مالی</button>
+            </div>
+
           </div>
         </div>
 
