@@ -1305,9 +1305,9 @@
 
           <!-- Sub-tabs Navigation Bar -->
           <div class="hesabdari-subtabs-bar">
-            <div class="subtab-item active" data-tab="accounts" onclick="switchHesabdariTab('accounts')">سرفصل حساب‌ها</div>
+            <div class="subtab-item active" data-tab="sanad" onclick="switchHesabdariTab('sanad')">ثبت سند حسابداری</div>
+            <div class="subtab-item" data-tab="accounts" onclick="switchHesabdariTab('accounts')">سرفصل حساب‌ها</div>
             <div class="subtab-item" data-tab="shenavar" onclick="switchHesabdariTab('shenavar')">حساب‌های شناور</div>
-            <div class="subtab-item" data-tab="sanad" onclick="switchHesabdariTab('sanad')">ثبت سند حسابداری</div>
             <div class="subtab-item" data-tab="bank" onclick="switchHesabdariTab('bank')">مغایرت بانکی</div>
             <div class="subtab-item" data-tab="taraz" onclick="switchHesabdariTab('taraz')">تراز آزمایشی</div>
             <div class="subtab-item" data-tab="ledger" onclick="switchHesabdariTab('ledger')">دفتر حساب</div>
@@ -1321,7 +1321,7 @@
 
 
           <!-- Tab 2: سرفصل حساب‌ها -->
-          <div id="tab-panel-accounts" class="hesabdari-tab-panel active" style="display:block;">
+          <div id="tab-panel-accounts" class="hesabdari-tab-panel" style="display:none;">
             <div class="card form-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
                 <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -1441,7 +1441,7 @@
           </div>
 
           <!-- Tab 4: ثبت سند حسابداری -->
-          <div id="tab-panel-sanad" class="hesabdari-tab-panel">
+          <div id="tab-panel-sanad" class="hesabdari-tab-panel active" style="display:block;">
             <div class="card form-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div style="font-weight:700;font-size:0.95rem;">📝 ثبت و مدیریت اسناد حسابداری</div>

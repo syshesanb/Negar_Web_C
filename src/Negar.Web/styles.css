@@ -1457,55 +1457,59 @@ tr.tree-level-1 {
 }
 
 /* ══════════════════════════════════════════════════════
-   HESABDARI SUB-TABS (Desktop-like sub-navigation bar)
+   HESABDARI SUB-TABS (Fixed Top Dedicated Navigation Bar)
 ══════════════════════════════════════════════════════ */
 .hesabdari-subtabs-bar {
   display: flex;
   align-items: center;
   overflow-x: auto;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 10px 10px 0 0;
-  padding: 6px 8px;
-  gap: 4px;
-  margin-bottom: 0;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 10px;
+  padding: 8px 12px;
+  gap: 6px;
+  margin-top: 0;
+  margin-bottom: 16px;
   white-space: nowrap;
-  box-shadow: inset 0 -1px 0 var(--border-color);
-  width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 100% !important;
   box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
 }
 .subtab-item {
-  padding: 8px 14px;
-  font-size: 0.83rem;
+  padding: 8px 16px;
+  font-size: 0.84rem;
   font-weight: 600;
   color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.2s ease;
   user-select: none;
-  border: 1px solid transparent;
 }
 .subtab-item:hover {
-  background: rgba(56, 189, 248, 0.12);
-  color: var(--text-color);
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
 }
 .subtab-item.active {
-  background: var(--accent-color);
-  color: #0f172a;
+  background: #0284c7;
+  color: #ffffff;
   font-weight: 800;
-  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.35);
+  border-color: #38bdf8;
+  box-shadow: 0 2px 12px rgba(2, 132, 199, 0.5);
 }
 
 .hesabdari-tab-panel {
   display: none;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  padding: 20px;
-  width: 100%;
+  width: 100% !important;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 .hesabdari-tab-panel.active {
   display: block;

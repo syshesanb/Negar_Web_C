@@ -784,7 +784,7 @@ function showForm(formId) {
   if (formId === 'form-account-levels') loadCodingSettings();
   if (formId === 'form-hesabdari-main') {
     const activeSub = document.querySelector('.hesabdari-subtabs-bar .subtab-item.active');
-    const tabId = activeSub ? activeSub.getAttribute('data-tab') : 'accounts';
+    const tabId = activeSub ? activeSub.getAttribute('data-tab') : 'sanad';
     switchHesabdariTab(tabId);
   }
 }
@@ -800,8 +800,10 @@ function openHesabdariMain(mode) {
   showForm('form-hesabdari-main');
   if (mode === 'reports') {
     switchHesabdariTab('taraz');
-  } else {
+  } else if (mode === 'coding') {
     switchHesabdariTab('accounts');
+  } else {
+    switchHesabdariTab('sanad');
   }
 }
 
