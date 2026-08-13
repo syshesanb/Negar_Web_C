@@ -3,6 +3,161 @@
 // Architecture: Each tile button shows its own form; Back button returns to tiles
 // =============================================================================
 
+// ======================================================
+// Eshkal Logger & Diagnostics System (دیباگر اختصاصی eshkal.txt)
+// ======================================================
+const EshkalLogger = {
+  logs: [],
+  startTime: Date.now(),
+
+  clear() {
+    this.logs = [];
+    this.startTime = Date.now();
+    try {
+      localStorage.removeItem('negar_eshkal_txt');
+    } catch(e) {}
+  },
+
+  log(eventTitle, details = {}) {
+    const elapsed = Date.now() - this.startTime;
+    const timestamp = new Date().toLocaleTimeString('fa-IR') + ` (+${elapsed}ms)`;
+
+    let snapshot = {};
+    try {
+      const getDim = (idOrSel) => {
+        const el = typeof idOrSel === 'string' ? (document.getElementById(idOrSel) || document.querySelector(idOrSel)) : idOrSel;
+        if (!el) return 'NOT_FOUND';
+        const cs = window.getComputedStyle(el);
+        const rect = el.getBoundingClientRect();
+        return {
+          display: cs.display,
+          width: cs.width,
+          height: cs.height,
+          minWidth: cs.minWidth,
+          minHeight: cs.minHeight,
+          maxWidth: cs.maxWidth,
+          maxHeight: cs.maxHeight,
+          flexDirection: cs.flexDirection,
+          flex: cs.flex,
+          offsetWidth: el.offsetWidth,
+          offsetHeight: el.offsetHeight,
+          clientWidth: el.clientWidth,
+          clientHeight: el.clientHeight,
+          scrollWidth: el.scrollWidth,
+          scrollHeight: el.scrollHeight,
+          rectWidth: Math.round(rect.width),
+          rectHeight: Math.round(rect.height),
+          rectTop: Math.round(rect.top),
+          rectLeft: Math.round(rect.left),
+          overflowX: cs.overflowX,
+          overflowY: cs.overflowY,
+          visibility: cs.visibility
+        };
+      };
+
+      snapshot = {
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        bodyClasses: document.body.className,
+        mainApp: getDim('mainApp'),
+        appLayoutWrapper: getDim('.app-layout-wrapper'),
+        appSidebar: getDim('appSidebar'),
+        appSidebarClasses: document.getElementById('appSidebar')?.className || '',
+        appContainer: getDim('.app-container'),
+        mainContent: getDim('mainContent'),
+        formsArea: getDim('formsArea'),
+        formHesabdariMain: getDim('form-hesabdari-main'),
+        hesabdariSubtabsBar: getDim('.hesabdari-subtabs-bar'),
+        tabPanelAccounts: getDim('tab-panel-accounts'),
+        formCard: getDim('.card.form-card'),
+        tableWrapper: getDim('.table-wrapper'),
+        accountsTable: getDim('#tab-panel-accounts table'),
+        watermark: getDim('negarMainWatermark')
+      };
+    } catch(e) {
+      snapshot = { error: e.message };
+    }
+
+    const logEntry = {
+      index: this.logs.length + 1,
+      timestamp,
+      elapsedMs: elapsed,
+      event: eventTitle,
+      details,
+      snapshot
+    };
+
+    this.logs.push(logEntry);
+    this.saveToStorage();
+  },
+
+  formatAsText() {
+    let txt = `======================================================\n`;
+    txt += `  گزارش جامع دیباگ عرض و ارتفاع سیستم نگار (eshkal.txt)\n`;
+    txt += `  تاریخ و زمان ایجاد: ${new Date().toLocaleString('fa-IR')}\n`;
+    txt += `  آدرس URL جاری: ${window.location.href}\n`;
+    txt += `======================================================\n\n`;
+
+    this.logs.forEach(entry => {
+      txt += `------------------------------------------------------\n`;
+      txt += `[رویداد ${entry.index}] زمان: ${entry.timestamp} | رویداد: ${entry.event}\n`;
+      if (Object.keys(entry.details).length > 0) {
+        txt += `جزئیات: ${JSON.stringify(entry.details)}\n`;
+      }
+      txt += `ابعاد، عرض، ارتفاع و موقعیت عناصر:\n`;
+      const s = entry.snapshot;
+      if (s) {
+        txt += `  • پنجره مرورگر: عرض=${s.windowWidth}px | ارتفاع=${s.windowHeight}px\n`;
+        txt += `  • کلاس‌های body: "${s.bodyClasses}"\n`;
+        txt += `  • کلاس‌های sidebar: "${s.appSidebarClasses}"\n`;
+        txt += `  • mainApp: ${JSON.stringify(s.mainApp)}\n`;
+        txt += `  • appLayoutWrapper: ${JSON.stringify(s.appLayoutWrapper)}\n`;
+        txt += `  • appContainer: ${JSON.stringify(s.appContainer)}\n`;
+        txt += `  • mainContent: ${JSON.stringify(s.mainContent)}\n`;
+        txt += `  • formsArea: ${JSON.stringify(s.formsArea)}\n`;
+        txt += `  • formHesabdariMain: ${JSON.stringify(s.formHesabdariMain)}\n`;
+        txt += `  • hesabdariSubtabsBar: ${JSON.stringify(s.hesabdariSubtabsBar)}\n`;
+        txt += `  • tabPanelAccounts: ${JSON.stringify(s.tabPanelAccounts)}\n`;
+        txt += `  • formCard: ${JSON.stringify(s.formCard)}\n`;
+        txt += `  • tableWrapper: ${JSON.stringify(s.tableWrapper)}\n`;
+        txt += `  • accountsTable: ${JSON.stringify(s.accountsTable)}\n`;
+        txt += `  • watermark: ${JSON.stringify(s.watermark)}\n`;
+      }
+      txt += `\n`;
+    });
+
+    return txt;
+  },
+
+  saveToStorage() {
+    const text = this.formatAsText();
+    try {
+      localStorage.setItem('negar_eshkal_txt', text);
+    } catch(e) {}
+
+    // Auto-send log to local background server to automatically overwrite C:\Negar_Web_C\eshkal.txt
+    try {
+      fetch('http://127.0.0.1:9999/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: text
+      }).catch(() => {});
+    } catch(e) {}
+  },
+
+  downloadFile() {
+    const text = this.formatAsText();
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'eshkal.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+};
+
+
 // ============================
 // AUTHENTICATION - Credentials
 // ============================
@@ -67,7 +222,9 @@ function doLogin() {
       overlay.classList.add('login-fade-out');
       setTimeout(() => {
         overlay.style.display = 'none';
-        mainApp.style.display = 'block';
+        mainApp.style.display = 'flex';
+        mainApp.style.flexDirection = 'column';
+        mainApp.style.width = '100%';
         mainApp.classList.add('app-fade-in');
 
         // Update header info (Username/Role)
@@ -111,6 +268,7 @@ function togglePasswordVisibility() {
     input.type = 'password';
     if (btn) btn.textContent = '👁';
   }
+  try { input.focus(); } catch(e) {}
 }
 
 function logout() {
@@ -628,6 +786,7 @@ function openPageTab(url, formKey) {
 }
 
 function executeCardInNewTab(onclickAttr) {
+  closeModuleFlyoutPanel();
   if (onclickAttr.includes('openHesabdariMain')) {
     const match = onclickAttr.match(/openHesabdariMain\(['"]([^'"]+)['"]\)/);
     const mode = match ? match[1] : 'coding';
@@ -638,7 +797,7 @@ function executeCardInNewTab(onclickAttr) {
       openPageTab(`index.html?form=${match[1]}`, match[1]);
     }
   } else {
-    openPageTab(`index.html`, 'main');
+    showTiles('system');
   }
 }
 
@@ -687,20 +846,107 @@ function showTiles(moduleId) {
 
   // Automatically expand sidebar on tile dashboard
   toggleAppSidebar(false);
+
+  updateDocumentTitle(null);
+}
+
+// ============================
+// Dynamic Browser Tab Title Handler
+// ============================
+function updateDocumentTitle(formId, customSubTitle) {
+  if (!formId) {
+    document.title = 'نگار تحت وب - سیستم یکپارچه مالی، حسابداری، انبارداری';
+    return;
+  }
+
+  const titlesMap = {
+    'form-switch-company': 'تغییر شرکت / سال مالی',
+    'form-switch-year': 'تغییر سال مالی',
+    'form-companies-list': 'مدیریت شرکت‌ها',
+    'form-fiscal-years': 'مدیریت سال‌های مالی',
+    'form-hesabdari-main': 'حسابداری',
+    'form-accounts-chart': 'کدگذاری حساب‌ها',
+    'form-shenavar': 'حساب‌های شناور',
+    'form-sanad1': 'ثبت و مدیریت اسناد حسابداری',
+    'form-sanad2': 'ثبت و صدور سند حسابداری',
+    'form-product-groups': 'گروه‌بندی کالاها',
+    'form-products': 'تعریف و مدیریت کالاها',
+    'form-warehouses': 'مدیریت انبارها',
+    'form-cardex': 'کاردکس کالا',
+    'form-purchase-invoice': 'فاکتور خرید',
+    'form-sales-invoice': 'فاکتور فروش',
+    'form-warehouse-transfer': 'انتقال بین انبارها',
+    'form-users-list': 'مدیریت کاربران',
+    'form-permissions-matrix': 'سطوح دسترسی کاربران',
+    'form-change-password': 'تغییر رمز عبور',
+    'form-activity-log': 'لاگ فعالیت‌ها',
+    'form-backup': 'پشتیبان‌گیری',
+    'form-restore': 'بازیابی اطلاعات',
+    'form-theme-manager': 'مدیریت تم‌ها',
+    'form-lock': 'قفل سیستم',
+    'form-about': 'درباره نگار',
+    'form-contact': 'تماس با ما',
+    'form-exit': 'خروج از سیستم',
+    'form-data-migration': 'مهاجرت داده‌ها',
+    'form-system-messages': 'پیام‌های سیستم',
+    'form-release': 'تغییرات نسخه',
+    'form-update': 'ارتقای سیستم',
+    'form-db-audit': 'ممیزی دیتابیس',
+    'form-account-levels': 'سطوح کدگذاری حساب‌ها',
+    'form-tax-system': 'سامانه مودیان',
+    'form-parties': 'اشخاص و طرف حساب‌ها',
+    'form-personnel': 'مدیریت پرسنل',
+    'form-payslip': 'فیش حقوقی',
+    'form-attendance': 'حضور و غیاب',
+    'form-assets-list': 'اموال و دارایی ثابت',
+    'form-depreciation': 'محاسبه استهلاک',
+    'form-letters': 'دبیرخانه و نامه‌ها',
+    'form-dms': 'مدیریت اسناد DMS',
+    'form-crm-customers': 'مشتریان CRM',
+    'form-crm-opportunities': 'فرصت‌های CRM',
+    'form-checks': 'مدیریت چک‌ها',
+    'form-bank-accounts': 'حساب‌های بانکی',
+    'form-budget-plan': 'برنامه‌ریزی بودجه',
+    'form-cost-centers': 'مراکز هزینه',
+    'form-bom': 'فرمول ساخت BOM'
+  };
+
+  let title = customSubTitle || titlesMap[formId];
+
+  if (!title) {
+    const targetForm = document.getElementById(formId);
+    if (targetForm) {
+      const heading = targetForm.querySelector('.form-heading') || targetForm.querySelector('h1, h2, h3, h4');
+      if (heading) {
+        title = heading.textContent.replace(/\s*\([^)]*\)/g, '').trim();
+      }
+    }
+  }
+
+  if (!title) {
+    title = 'نگار تحت وب';
+  }
+
+  document.title = title + ' - نگار';
 }
 
 // ============================
 // Show Form (called when a tile is clicked)
 // ============================
 function showForm(formId) {
-  // If we are in the main dashboard tab (not inside a sub-tab)
-  if (!AppState.isTabMode) {
+  EshkalLogger.log('showForm_Enter', { formId });
+
+  // If we are in the main dashboard tab (not inside a sub-tab) and not a system dialog, open in browser tab per company pageOpenMode setting
+  if (!AppState.isTabMode && formId !== 'form-switch-company' && formId !== 'form-switch-year') {
     const url = `index.html?form=${formId}`;
     openPageTab(url, formId);
     return;
   }
 
   AppState.currentForm = formId;
+
+  // Update browser tab title
+  updateDocumentTitle(formId);
 
   // Automatically slide collapse sidebar to the right when entering any form
   toggleAppSidebar(true);
@@ -722,6 +968,8 @@ function showForm(formId) {
   // Show forms area
   const formsArea = document.getElementById('formsArea');
   formsArea.style.display = 'flex';
+  formsArea.style.flexDirection = 'column';
+  formsArea.style.width = '100%';
 
   // Hide back-bar when in voucher editor (form-sanad2)
   const backBar = document.querySelector('.back-bar');
@@ -741,7 +989,13 @@ function showForm(formId) {
   // Show selected form
   const targetForm = document.getElementById(formId);
   if (targetForm) {
-    targetForm.style.display = 'block';
+    if (formId === 'form-hesabdari-main' || formId === 'form-sanad2') {
+      targetForm.style.display = 'flex';
+      targetForm.style.flexDirection = 'column';
+      targetForm.style.width = '100%';
+    } else {
+      targetForm.style.display = 'block';
+    }
 
     // Set back-bar title
     const heading = targetForm.querySelector('.form-heading');
@@ -810,6 +1064,8 @@ function openHesabdariMain(mode) {
 }
 
 function switchHesabdariTab(tabId) {
+  EshkalLogger.log('switchHesabdariTab_Enter', { tabId });
+
   // 1. Update sub-tab navigation items
   const items = document.querySelectorAll('.hesabdari-subtabs-bar .subtab-item');
   items.forEach(item => {
@@ -834,6 +1090,24 @@ function switchHesabdariTab(tabId) {
 
   // Keep accounts-mode active on body so all tabs have sticky headers and inner datagrid scroll
   document.body.classList.add('accounts-mode');
+
+  // Hide background branding watermark when hesabdari subtabs are active
+  const watermark = document.getElementById('negarMainWatermark');
+  if (watermark) watermark.style.display = 'none';
+
+  const hesabdariSubTitles = {
+    'accounts': 'حسابداری - سرفصل حساب‌ها',
+    'shenavar': 'حسابداری - حساب‌های شناور',
+    'sanad': 'حسابداری - اسناد',
+    'taraz': 'حسابداری - تراز آزمایشی',
+    'ledger': 'حسابداری - دفتر حساب',
+    'bank': 'حسابداری - مغایرت بانکی',
+    'taraz-shenavar': 'حسابداری - تراز شناور',
+    'daftar-shenavar': 'حسابداری - دفتر شناور'
+  };
+  if (hesabdariSubTitles[tabId]) {
+    updateDocumentTitle('form-hesabdari-main', hesabdariSubTitles[tabId]);
+  }
 
   // 3. Render dynamic content for specific tab
   if (tabId === 'accounts') renderAccountsTable();
@@ -5822,6 +6096,23 @@ function updateSystemClock() {
 // Init on page load
 // ============================
 document.addEventListener('DOMContentLoaded', () => {
+  // Clear previous log messages completely on each page load/refresh as requested by user
+  EshkalLogger.clear();
+
+  // Check if form parameter is present in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const formParam = urlParams.get('form');
+  const modeParam = urlParams.get('mode');
+
+  EshkalLogger.log('01_DOMContentLoaded_Start', { formParam, modeParam });
+
+  // Schedule timed layout snapshots to capture what changes "after a few moments"
+  [50, 150, 300, 500, 1000, 1500, 2000, 3000, 5000].forEach(delay => {
+    setTimeout(() => {
+      EshkalLogger.log(`Timed_Layout_Snapshot_${delay}ms`);
+    }, delay);
+  });
+
   // Load companies list from localStorage if updated previously
   try {
     const savedCompanies = localStorage.getItem('negar_companies');
@@ -5832,20 +6123,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   } catch(e) {}
-
-  // Initialize dbAccounts with default accounts mapped to company 1001
-  dbAccounts = AppState.accounts.map(a => ({ ...a, companyCode: '1001' }));
-  // Save a pristine template of default accounts before any user modification
-  pristineAccountsTemplate = AppState.accounts.map(a => ({ ...a }));
-  // Expand default accounts on load
-  AppState.accounts.forEach(a => {
-    expandedAccountIds.add(a.id);
-  });
-
-  // Check if form parameter is present in URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const formParam = urlParams.get('form');
-  const modeParam = urlParams.get('mode');
 
   let savedCompCode = null;
   let savedYear = null;
@@ -5868,7 +6145,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainApp = document.getElementById('mainApp');
     if (overlay) overlay.style.display = 'none';
     if (mainApp) {
-      mainApp.style.display = 'block';
+      mainApp.style.display = 'flex';
+      mainApp.style.flexDirection = 'column';
+      mainApp.style.width = '100%';
       mainApp.classList.add('app-fade-in');
     }
 
@@ -5912,9 +6191,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   } else {
-    // Standard dashboard mode: focus username field
+    // Standard dashboard mode: focus username field and ensure inputs are enabled
+    const passInput = document.getElementById('loginPassword');
+    if (passInput) {
+      passInput.disabled = false;
+      passInput.readOnly = false;
+    }
     const usernameInput = document.getElementById('loginUsername');
-    if (usernameInput) setTimeout(() => usernameInput.focus(), 200);
+    if (usernameInput) {
+      usernameInput.disabled = false;
+      usernameInput.readOnly = false;
+      setTimeout(() => usernameInput.focus(), 200);
+    }
   }
 
   // Update clock & date immediately and then every second

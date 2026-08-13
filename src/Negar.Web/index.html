@@ -11,7 +11,7 @@
         var isFormPage = window.location.search.indexOf('form=') !== -1;
         var isLoggedIn = localStorage.getItem('negar_logged_in') === 'true';
         if (isFormPage || isLoggedIn) {
-          document.write('<style>#loginOverlay{display:none !important;}#mainApp{display:block !important;}</style>');
+          document.write('<style>#loginOverlay{display:none !important;}#mainApp{display:flex !important; flex-direction:column; width:100%; height:100vh;}</style>');
         }
       } catch(e) {}
     })();
@@ -93,20 +93,6 @@
 
   <!-- MAIN APP (hidden until login) -->
   <div id="mainApp" style="display:none;">
-
-
-  <header class="desktop-header">
-    <div class="title-bar">
-      <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</div>
-      <div style="display:flex;gap:16px;align-items:center;">
-        <span>کاربر: <b id="headerUsername">---</b></span>
-        <span>شرکت: <b id="headerCompany">شرکت نمونه نگار</b></span>
-        <span id="headerYear">سال مالی: 1403</span>
-        <span>تاریخ: <b id="headerDate">---</b></span>
-        <span>ساعت: <b id="headerTime">--:--:--</b></span>
-      </div>
-    </div>
-  </header>
 
   <!-- APP LAYOUT WRAPPER -->
   <div class="app-layout-wrapper">
@@ -200,7 +186,7 @@
       <!-- ================================================================
            MAIN WORKSPACE BRANDING WATERMARK (واترمارک پس‌زمینه نگار)
            ================================================================ -->
-      <div class="negar-main-watermark" id="negarMainWatermark">
+      <div class="negar-main-watermark" id="negarMainWatermark" style="display:none;">
         <div class="watermark-content">
           <div class="watermark-logo-badge">
             <span class="watermark-icon">📊</span>
@@ -1076,8 +1062,6 @@
 
           </div>
         </div>
-          </div>
-        </div>
 
         <div id="form-fiscal-years" class="form-section">
           <h2 class="form-heading">📅 مدیریت سال‌های مالی (FiscalYearForm)</h2>
@@ -1441,7 +1425,7 @@
           </div>
 
           <!-- Tab 4: ثبت سند حسابداری -->
-          <div id="tab-panel-sanad" class="hesabdari-tab-panel active" style="display:block;">
+          <div id="tab-panel-sanad" class="hesabdari-tab-panel" style="display:none;">
             <div class="card form-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div style="font-weight:700;font-size:0.95rem;">📝 ثبت و مدیریت اسناد حسابداری</div>
@@ -2727,8 +2711,21 @@
       </div> <!-- end formsArea -->
 
     </main>
-  </div>
-</div> <!-- end app-layout-wrapper -->
+  </div> <!-- end app-layout-wrapper -->
+
+  <!-- BOTTOM STATUS BAR (نوار وضعیت پایین صفحه) -->
+  <footer class="desktop-header">
+    <div class="title-bar">
+      <div>📊 سیستم یکپارچه مالی، حسابداری، انبارداری و خرید و فروش نگار تحت وب</div>
+      <div style="display:flex;gap:16px;align-items:center;">
+        <span>کاربر: <b id="headerUsername">---</b></span>
+        <span>شرکت: <b id="headerCompany">شرکت نمونه نگار</b></span>
+        <span id="headerYear">سال مالی: 1403</span>
+        <span>تاریخ: <b id="headerDate">---</b></span>
+        <span>ساعت: <b id="headerTime">--:--:--</b></span>
+      </div>
+    </div>
+  </footer>
 
 
 
